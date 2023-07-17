@@ -7,8 +7,43 @@ function Dashboard() {
   return (
     <div className="inset-0 p-4">
       <div className="grid sm:grid-cols-2 gap-8">
-        <div className="rounded-lg bg-gray-200 h-80">Card 1</div>
-        <div className="rounded-lg bg-gray-200 h-80">Card 2</div>
+        {/* cards */}
+        <div className="rounded-lg bg-gray-100 min-h-80 p-8 grid lg:grid-cols-2 click-action hover:cursor-pointer shadow-lg hover:shadow-primary-300">
+          <div className="lg:-mr-10">
+            <div className="px-2 font-bold text-gray-400">MASTERCLASS</div>
+            <div className="p-2 font-bold text-3xl">
+              Journée mondiale <br />
+              de la Tuberculose
+            </div>
+            <div className="px-2 text-gray-400">
+              Découvre nos DPs et <br />
+              maîtrise un incontournable <br />
+              des EDN.
+            </div>
+          </div>
+          <div className="lg:ml-8 flex flex-col items-center justify-end">
+          <img
+            className="rounded-full w-full max-w-[250px]"
+            src="/assets/image/card1.png"
+            alt="Journée mondiale de la Tuberculose"
+          />
+          </div>
+        </div>
+        <div className="rounded-lg bg-gray-100 min-h-80 p-8 click-action hover:cursor-pointer shadow-lg hover:shadow-primary-300">
+          <div className="px-2 font-bold text-gray-400">PHARMACOLOGIE</div>
+          <div className="p-2 font-bold text-3xl">Méthotrexate</div>
+          <div className="px-2 text-gray-400">
+            Une compilation transversale pour <br />
+            comprendre l’usage de ce traitement.
+          </div>
+          <div className="flex justify-center">
+            <img
+              className="-mt-6 -mb-10 center"
+              src="/assets/image/card2.png"
+              alt="Une compilation transversale pour comprendre l’usage de ce traitement."
+            />
+          </div>
+        </div>
       </div>
       <div className="mt-8 mb-2 font-bold text-xl text-gray-600">
         Quick access

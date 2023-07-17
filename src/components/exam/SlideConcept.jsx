@@ -67,7 +67,7 @@ function SlideConcept({ open, setOpen }) {
                         <p>Déclaration obligatoire <span className="font-thin">à l’ARS</span> si toxines</p>
                         <p>Vaccination immédiate <span className="font-thin">dans les suites</span></p>
                       </div>
-                      <img src="/assets/image/image 1.png" alt="Aspect d’une angine à diphtérie"/>
+                      <img src="/assets/image/image1.png" alt="Aspect d’une angine à diphtérie"/>
                       <i className="text-gray-500">Aspect d’une angine à diphtérie</i>
                     </div>
                   </div>
