@@ -15,18 +15,14 @@ function App() {
     <div className="App">
       <QuizContextProvider>
         <BrowserRouter>
-          <Layout title="Dashboard" Sidebar={Sidebar}>
             <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/library/" element={<Library />} />
-              <Route path="/annales/" element={<Annales />} />
-              <Route path="/planner/" element={<Planner />} />
-              <Route path="/playlists/" element={<Playlists />} />
-              <Route path="/toolbox/" element={<Toolbox />} />
-            </Routes>
-          </Layout>
-          <Routes>
-            <Route path="/quiz" element={<Quiz />} />
+              <Route path="/" element={<Layout Sidebar={Sidebar}><Dashboard /></Layout>} />
+              <Route path="/library/" element={<Layout Sidebar={Sidebar}><Library /></Layout>} />
+              <Route path="/annales/" element={<Layout Sidebar={Sidebar}><Annales /></Layout>} />
+              <Route path="/planner/" element={<Layout Sidebar={Sidebar}><Planner /></Layout>} />
+              <Route path="/playlists/" element={<Layout Sidebar={Sidebar}><Playlists /></Layout>} />
+              <Route path="/toolbox/" element={<Layout Sidebar={Sidebar}><Toolbox /></Layout>} />
+              <Route path="/quiz" element={<Quiz />} />
           </Routes>
         </BrowserRouter>
       </QuizContextProvider>

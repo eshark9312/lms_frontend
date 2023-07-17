@@ -8,7 +8,7 @@ import ToolboxIcon from "../icons/ToolboxIcon";
 import SettingsIcon from "../icons/SettingsIcon";
 import SupportIcon from "../icons/SupportIcon";
 import { Link, NavLink } from "react-router-dom";
-import Search from "./Search";
+import Search from "./GlobalSearch";
 
 const navigation = [
   { name: "Home", href: "/", icon: HomeIcon },
