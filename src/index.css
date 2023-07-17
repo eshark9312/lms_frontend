@@ -5,3 +5,9 @@
 * {
     font-family: 'Inter', sans-serif !important;
 }
+
+@layer components{
+    .click-action{
+        @apply active:scale-95 transition-transform
+    }
+}

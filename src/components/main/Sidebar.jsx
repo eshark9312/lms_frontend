@@ -48,7 +48,7 @@ function Sidebar() {
                       item.current
                         ? "bg-gray-50 text-primary-600"
                         : "text-gray-700 hover:text-primary-600 hover:bg-gray-50",
-                      "group flex gap-x-3 rounded-md p-2 leading-6 font-semibold"
+                      "group flex gap-x-3 rounded-md p-2 leading-6 font-semibold click-action"
                     )}
                   >
                     <div
@@ -74,7 +74,7 @@ function Sidebar() {
             </div>
             <ul className="-mx-2 mt-2 space-y-1">
               <li>
-                <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600">
+                <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600 click-action">
                   <div className="h-8 w-8 grounded flex justify-center items-center border-2 border-inherit rounded border-dashed text-[22px] pb-[1px]">
                     +
                   </div>
@@ -82,7 +82,7 @@ function Sidebar() {
                 </Link>
               </li>
               <li>
-                <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600">
+                <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600 click-action">
                   <div className="h-8 w-8 grounded flex justify-center items-center border-2 border-inherit rounded border-dashed text-[22px] pb-[1px]">
                     +
                   </div>
@@ -90,7 +90,7 @@ function Sidebar() {
                 </Link>
               </li>
               <li>
-                <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600">
+                <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600 click-action">
                   <div className="h-8 w-8 grounded flex justify-center items-center border-2 border-inherit rounded border-dashed text-[22px] pb-[1px]">
                     +
                   </div>
@@ -102,7 +102,7 @@ function Sidebar() {
           <li className="mt-auto mb-8">
             <ul className="-mx-2 space-y-1">
               <li>
-                <Link className="text-gray-700 hover:text-primary-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 leading-6 font-semibold">
+                <Link className="text-gray-700 hover:text-primary-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 leading-6 font-semibold click-action">
                   <div
                     className="text-gray-500 group-hover:text-primary-600 h-6 w-6 shrink-0"
                     aria-hidden="true"
@@ -113,7 +113,7 @@ function Sidebar() {
                 </Link>
               </li>
               <li>
-                <Link className="text-gray-700 hover:text-primary-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 leading-6 font-semibold">
+                <Link className="text-gray-700 hover:text-primary-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 leading-6 font-semibold click-action">
                   <div
                     className="text-gray-500 group-hover:text-primary-600 h-6 w-6 shrink-0"
                     aria-hidden="true"
