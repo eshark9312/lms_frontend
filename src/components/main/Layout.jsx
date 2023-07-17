@@ -1,10 +1,45 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useLocation } from "react-router-dom";
 
-export default function Layout({ title, Sidebar, Content }) {
+export default function Layout({ Sidebar, children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+  const [title, setTitle] = useState("");
 
+  useEffect(() => {
+    console.log(location.pathname)
+    switch (location.pathname) {
+      case "/": {
+        setTitle("Dashboard");
+        break;
+      }
+      case "/library/": {
+        setTitle("Library");
+        break;
+      }
+      case "/annales/": {
+        setTitle("Annales");
+        break;
+      }
+      case "/planner/": {
+        setTitle("Planner");
+        break;
+      }
+      case "/playlists/": {
+        setTitle("Playlists");
+        break;
+      }
+      case "/toolbox/": {
+        setTitle("Toolbox");
+        break;
+      }
+      default:{
+        setTitle("");
+      }
+    }
+  }, [location.pathname]);
   return (
     <div>
       <Transition.Root show={sidebarOpen} as={Fragment}>
@@ -87,9 +122,7 @@ export default function Layout({ title, Sidebar, Content }) {
       </div>
 
       <main className="py-10 lg:pl-72">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <Content />
-        </div>
+        <div className="px-4 sm:px-6 lg:px-8">{children}</div>
       </main>
     </div>
   );

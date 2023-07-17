@@ -7,16 +7,16 @@ import PlaylistIcon from "../icons/PlaylistIcon";
 import ToolboxIcon from "../icons/ToolboxIcon";
 import SettingsIcon from "../icons/SettingsIcon";
 import SupportIcon from "../icons/SupportIcon";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import Search from "./Search";
 
 const navigation = [
-  { name: "Home", href: "#", icon: HomeIcon, current: true },
-  { name: "Library", href: "#", icon: LibraryIcon, current: false },
-  { name: "Annales", href: "#", icon: AnnalesIcon, current: false },
-  { name: "Planner", href: "#", icon: PlannerIcon, current: false },
-  { name: "Playlists", href: "#", icon: PlaylistIcon, current: false },
-  { name: "Toolbox", href: "#", icon: ToolboxIcon, current: false },
+  { name: "Home", href: "/", icon: HomeIcon },
+  { name: "Library", href: "/library/", icon: LibraryIcon },
+  { name: "Annales", href: "/annales/", icon: AnnalesIcon },
+  { name: "Planner", href: "/planner/", icon: PlannerIcon },
+  { name: "Playlists", href: "/playlists/", icon: PlaylistIcon },
+  { name: "Toolbox", href: "/toolbox/", icon: ToolboxIcon },
 ];
 
 function classNames(...classes) {
@@ -42,28 +42,25 @@ function Sidebar() {
             <ul className="-mx-2 space-y-1">
               {navigation.map((item) => (
                 <li key={item.name}>
-                  <a
-                    href={item.href}
-                    className={classNames(
-                      item.current
-                        ? "bg-gray-50 text-primary-600"
-                        : "text-gray-700 hover:text-primary-600 hover:bg-gray-50",
-                      "group flex gap-x-3 rounded-md p-2 leading-6 font-semibold click-action"
-                    )}
+                  <NavLink
+                    to={item.href}
+                    className={({ isActive }) =>
+                      classNames(
+                        isActive
+                          ? "bg-gray-50 text-primary-600"
+                          : "text-gray-700 hover:text-primary-600 hover:bg-gray-50",
+                        "group flex gap-x-3 rounded-md p-2 leading-6 font-semibold click-action"
+                      )
+                    }
                   >
                     <div
-                      className={classNames(
-                        item.current
-                          ? "text-primary-600"
-                          : "text-gray-500 group-hover:text-primary-600",
-                        "h-6 w-6 shrink-0"
-                      )}
+                      className="text-inherit group-hover:text-inherit h-6 w-6 shrink-0"
                       aria-hidden="true"
                     >
                       <item.icon />
                     </div>
                     {item.name}
-                  </a>
+                  </NavLink>
                 </li>
               ))}
             </ul>

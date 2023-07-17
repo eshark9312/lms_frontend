@@ -1,7 +1,7 @@
 import React from "react";
-import TrandingItem from "./TrendingItem";
-import QuickAccess from "./QuickAccess";
-import RecentItem from "./RecentItem";
+import TrandingItem from "../../components/main/dashboard/TrendingItem";
+import QuickAccess from "../../components/main/dashboard/QuickAccess";
+import RecentItem from "../../components/main/dashboard/RecentItem";
 
 function Dashboard() {
   return (
