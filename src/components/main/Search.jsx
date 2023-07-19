@@ -4,7 +4,7 @@ import SearchIcon from "../icons/SearchIcon";
 function Search() {
   return (
     <form
-      className="my-4 relative flex w-[450px] justify-center items-center"
+      className="relative flex w-[450px] h-fit justify-center items-center"
       action="#"
       method="GET"
     >

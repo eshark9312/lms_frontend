@@ -27,7 +27,7 @@ export default function Tabs({ tabs, setCurrentTab }) {
                   )}
                   aria-hidden="true"
                 />
-                <span>{tab.name}</span>
+                <span className="font-bold">{tab.name}</span>
               </div>
             ))}
           </div>
