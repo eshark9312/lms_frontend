@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import Tabs from "../../components/main/Tabs";
+import React, { useEffect, useState } from "react";
 import { BuildingOfficeIcon, CreditCardIcon } from "@heroicons/react/20/solid";
+import Tabs from "../../components/main/Tabs";
 import Matieres from "../../components/main/library/Matieres";
 import Breadcrumb from "../../components/main/Breadcrumb";
 import Items from "../../components/main/library/Items";
@@ -22,10 +22,18 @@ function Library() {
     );
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  const pages = [
+    { name: 'Library', href: '/', current: false },
+  ]
+  
   return (
     <div>
       <div className="-mt-4 mb-6">
-        <Breadcrumb />
+        <Breadcrumb pages={pages}/>
       </div>
       <div className="flex justify-between">
         <div className="text-3xl font-bold">Library</div>

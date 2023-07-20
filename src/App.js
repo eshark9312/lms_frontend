@@ -9,6 +9,7 @@ import Annales from "./pages/main/Annlaes";
 import Planner from "./pages/main/Planner";
 import Playlists from "./pages/main/Playlists";
 import Toolbox from "./pages/main/Toolbox";
+import Matiere from "./components/main/library/Matiere";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Layout Sidebar={Sidebar}><Dashboard /></Layout>} />
               <Route path="/library/" element={<Layout Sidebar={Sidebar}><Library /></Layout>} />
+              <Route path="/library/matiere/:id?" element={<Layout Sidebar={Sidebar}><Matiere /></Layout>} />
               <Route path="/annales/" element={<Layout Sidebar={Sidebar}><Annales /></Layout>} />
               <Route path="/planner/" element={<Layout Sidebar={Sidebar}><Planner /></Layout>} />
               <Route path="/playlists/" element={<Layout Sidebar={Sidebar}><Playlists /></Layout>} />

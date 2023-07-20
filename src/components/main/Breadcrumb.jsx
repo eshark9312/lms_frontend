@@ -1,19 +1,16 @@
 import { ChevronRightIcon, HomeIcon } from '@heroicons/react/20/solid'
+import { Link } from 'react-router-dom'
 
-const pages = [
-  { name: 'Library', href: '#', current: false },
-]
-
-export default function Breadcrumb() {
+export default function Breadcrumb({pages}) {
   return (
     <nav className="flex" aria-label="Breadcrumb">
-      <ol role="list" className="flex items-center space-x-4">
+      <ol className="flex items-center space-x-4">
         <li>
           <div>
-            <a href="#" className="text-gray-400 hover:text-gray-500">
+            <Link to={"/"} className="text-gray-400 hover:text-gray-500">
               <HomeIcon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
               <span className="sr-only">Home</span>
-            </a>
+            </Link>
           </div>
         </li>
         {pages.map((page) => (

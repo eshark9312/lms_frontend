@@ -1,9 +1,12 @@
 import React from 'react'
 import ProgressCircle from '../../common/ProgressCircle'
+import { useNavigate } from 'react-router-dom'
 
-function CatCard() {
+function CatCard({catId}) {
+  const navigate = useNavigate()
+
   return (
-        <div className="border-2 rounded-lg min-h-[200px] bg-white p-6 hover:shadow-lg hover:shadow-gray-300 click-action">
+        <div onClick={()=>{navigate(`/library/matiere/${catId}`)}} className="border-2 rounded-lg min-h-[200px] bg-white p-6 hover:shadow-lg hover:shadow-gray-300 click-action hover:cursor-pointer">
           <div className="flex justify-between items-center">
             <div className="w-20 h-20 bg-gray-100 rounded-lg flex flex-col justify-end items-center">
               <img src="/assets/image/card3.svg" alt="card" />
