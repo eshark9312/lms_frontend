@@ -1,4 +1,4 @@
-import { ArrowDownIcon } from "@heroicons/react/24/outline";
+import { ArrowDownIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import React from "react";
 import { Link } from "react-router-dom";
 import Label from "../../../common/Label";
@@ -147,15 +147,15 @@ function SavedQuestions() {
                     href="#"
                     className="text-indigo-600 hover:text-indigo-900"
                   >
-                    Delete
+                    <TrashIcon className="w-5 h-5 stroke-2"/>
                   </Link>
                 </td>
                 <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                   <Link
-                    href="#"
+                    to="/quiz"
                     className="text-indigo-600 hover:text-indigo-900"
                   >
-                    Test
+                    <PencilSquareIcon className="w-5 h-5 stroke-2" />
                   </Link>
                 </td>
               </tr>

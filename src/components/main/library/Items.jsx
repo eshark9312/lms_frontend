@@ -3,6 +3,7 @@ import { ProgressBar } from "../../common/ProgressBar";
 import Pagination from "../Pagination";
 import Search from "../Search";
 import Filter from "../Filter";
+import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
 const items = [
   {
@@ -111,20 +112,18 @@ export default function Items() {
                   </td>
                   <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                     <Link
-                      href="#"
+                      to="/quiz"
                       className="text-indigo-600 hover:text-indigo-900"
                     >
-                      Edit<span className="sr-only">, {item.title}</span>
+                      <PencilSquareIcon className="w-5 h-5 stroke-2"/>
                     </Link>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-      </div>
-      <div className="mt-4">
         <Pagination />
+        </div>
       </div>
     </div>
   );

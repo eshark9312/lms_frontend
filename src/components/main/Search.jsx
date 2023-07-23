@@ -19,7 +19,7 @@ function Search() {
       </div>
       <input
         id="search-field"
-        className="block py-3 h-full w-full pl-10 pr-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm  rounded-lg border-2 border-gray-400 focus:border-primary-600"
+        className="block py-3 h-full w-full pl-10 pr-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 text-sm  rounded-lg border-2 border-gray-400 focus:border-primary-600"
         placeholder="Search"
         type="search"
         name="search"

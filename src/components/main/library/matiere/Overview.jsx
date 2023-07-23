@@ -1,4 +1,4 @@
-import { EllipsisVerticalIcon } from '@heroicons/react/24/outline'
+import { EllipsisVerticalIcon, PencilSquareIcon } from '@heroicons/react/24/outline'
 import React from 'react'
 import PieChart from '../../PieChart'
 import Search from '../../Search'
@@ -48,12 +48,6 @@ function Overview() {
     },
     {
       title: "234. Insuffisance cardiaque",
-      status: "Fait",
-      questions: "24 questions",
-      progressRate: 60,
-    },
-    {
-      title: "Lindsay Walton",
       status: "Fait",
       questions: "24 questions",
       progressRate: 60,
@@ -119,20 +113,18 @@ function Overview() {
               </td>
               <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                 <Link
-                  href="#"
+                  to="/quiz"
                   className="text-indigo-600 hover:text-indigo-900"
                 >
-                  Edit<span className="sr-only">, {item.title}</span>
+                  <PencilSquareIcon className="w-5 h-5 stroke-2" />
                 </Link>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
-  </div>
-  <div className="mt-4">
     <Pagination />
+    </div>
   </div>
   <div className="mt-8 grid md:grid-cols-2 gap-8 bg-gray-50">
     {/* statistics card */}

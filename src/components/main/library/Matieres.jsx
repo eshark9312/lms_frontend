@@ -16,9 +16,6 @@ function Matieres() {
             <CatCard catId={idx} />
           ))}
         </div>
-        <div className="mt-4">
-          <Pagination />
-        </div>
       </div>
     </div>
   );

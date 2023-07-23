@@ -23,7 +23,7 @@ export default function Tabs({ tabs, setCurrentTab }) {
                     tab.current
                       ? "text-indigo-500"
                       : "text-gray-400 group-hover:text-gray-500",
-                    "-ml-0.5 mr-2 h-5 w-5"
+                    "-ml-0.5 mr-2 h-5 w-5 stroke-2"
                   )}
                   aria-hidden="true"
                 />
