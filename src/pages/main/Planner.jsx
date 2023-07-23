@@ -1,6 +1,6 @@
 import React from "react";
 import Calendar from "../../components/main/Calendar";
-function Planner() {
+function PlannerPage() {
   return (
     <div className="-my-10 h-screen">
       <div className="py-10 h-full">
@@ -10,4 +10,4 @@ function Planner() {
   );
 }
 
-export default Planner;
+export default PlannerPage;

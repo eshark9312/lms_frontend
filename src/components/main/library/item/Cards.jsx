@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Label from "../../../common/Label";
 import Search from "../../Search";
 import Filter from "../../Filter";
 import SlideShow from "./SlideShow";

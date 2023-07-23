@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { BuildingOfficeIcon, CreditCardIcon } from "@heroicons/react/20/solid";
 import Tabs from "../../components/main/Tabs";
 import Matieres from "../../components/main/library/Matieres";
 import Breadcrumb from "../../components/main/Breadcrumb";
 import Items from "../../components/main/library/Items";
+import { BriefcaseIcon, FolderIcon } from "@heroicons/react/24/outline";
 
-function Library() {
+function LibraryPage() {
   const [tabs, setTabs] = useState([
-    { name: "Matières", icon: BuildingOfficeIcon, current: true },
-    { name: "Items", icon: CreditCardIcon, current: false },
+    { name: "Matières", icon: BriefcaseIcon, current: true },
+    { name: "Items", icon: FolderIcon, current: false },
   ]);
 
   const setCurrentTab = (selectedTab) => {
@@ -56,4 +56,4 @@ function Library() {
   );
 }
 
-export default Library;
+export default LibraryPage;

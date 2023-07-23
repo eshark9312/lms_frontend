@@ -1,12 +1,4 @@
-import {
-  ArrowDownIcon,
-  ChevronDownIcon,
-  EllipsisVerticalIcon,
-} from "@heroicons/react/24/outline";
 import React from "react";
-import { Link } from "react-router-dom";
-import Check from "../../common/Check";
-import Label from "../../common/Label";
 import Playlist from "./Playlist";
 
 function Playlists() {
