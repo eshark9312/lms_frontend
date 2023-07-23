@@ -1,12 +1,7 @@
-import React from 'react'
-import PieChart from '../../components/main/PieChart'
+import React from "react";
 
 function Annales() {
-  return (
-    <div>Annales
-      <PieChart />
-    </div>
-  )
+  return <div>Annales</div>;
 }
 
-export default Annales
+export default Annales;

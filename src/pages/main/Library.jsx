@@ -27,7 +27,7 @@ function Library() {
   }, []);
 
   const pages = [
-    { name: 'Library', href: '/', current: false },
+    { name: 'Library', href: '/library/', current: true },
   ]
   
   return (

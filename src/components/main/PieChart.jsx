@@ -1,64 +1,56 @@
-import React, { useRef, useEffect, useState } from "react";
-import "intersection-observer";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Doughnut } from "react-chartjs-2";
+import React, { useEffect, useRef } from "react";
+import * as d3 from "d3";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
-
-export const data = {
-  labels: ["", "Blue", "Yellow", "Green", "Purple", "Orange"],
-  datasets: [
-    {
-      label: "# of Votes",
-      data: [12, 19, 3, 2, 3],
-      backgroundColor: [
-        "rgba(255, 99, 132, 0.2)",
-        "rgba(54, 162, 235, 0.2)",
-        "rgba(255, 206, 86, 0.2)",
-        "rgba(75, 192, 192, 0.2)",
-        "rgba(153, 102, 255, 0.2)",
-        "rgba(255, 159, 64, 0.2)",
-      ],
-      borderColor: [
-        "rgba(255, 99, 132, 1)",
-        "rgba(54, 162, 235, 1)",
-        "rgba(255, 206, 86, 1)",
-        "rgba(75, 192, 192, 1)",
-        "rgba(153, 102, 255, 1)",
-        "rgba(255, 159, 64, 1)",
-      ],
-      borderWidth: 2,
-    },
-  ],
-};
-
-export default function PieChart() {
-  const [isVisible, setIsVisible] = useState(false);
+const PieChart = ({
+  data = [20, 35, 10, 15, 20],
+  color = ["#7F56D9", "#9E77ED", "#B692F6", "#D6BBFB", "#EAECF0"],
+}) => {
   const chartRef = useRef(null);
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 1 }
-    );
     if (chartRef.current) {
-      observer.observe(chartRef.current);
+      d3.select(chartRef.current).select("svg").remove();
+      const width = 250; // Width of the chart
+      const height = 250; // Height of the chart
+      const radius = Math.min(width, height) / 2; // Radius of the doughnut
+      const svg = d3
+        .select(chartRef.current)
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", `translate(${width / 2}, ${height / 2})`);
+      const arc = d3
+        .arc()
+        .innerRadius(radius * 0.6) // Inner radius of the doughnut
+        .outerRadius(radius); // Outer radius of the doughnut
+      const pie = d3
+        .pie()
+        .sort(null)
+        .value((d) => d);
+      const arcs = svg
+        .selectAll("arc")
+        .data(pie(data))
+        .enter()
+        .append("g")
+        .attr("class", "arc");
+      arcs
+        .append("path")
+        .attr("d", arc)
+        .attr("fill", (d, idx) => color[idx]);
+      // Add labels if needed
+      // arcs.append('text')
+      //   .attr('transform', d => `translate(${arc.centroid(d)})`)
+      //   .attr('text-anchor', 'middle')
+      //   .text(d => d.data);
+
+      // Attach onclick event to the arcs
+      arcs.on("click", (event, d) => {
+        // Event handler code to execute when the arc is clicked
+        console.log("Arc clicked!", d);
+      });
     }
-    return () => {
-      if (chartRef.current) {
-        observer.unobserve(chartRef.current);
-      }
-    };
-  }, []);
-  return (
-    <div ref={chartRef}>
-      {isVisible && <Doughnut data={data} />}
-    </div>
-  );
-}
+  }, [data, color]);
+  return <div ref={chartRef}></div>;
+};
+
+export default PieChart;

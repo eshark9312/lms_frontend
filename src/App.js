@@ -7,9 +7,11 @@ import Dashboard from "./pages/main/Dashboard";
 import Library from "./pages/main/Library";
 import Annales from "./pages/main/Annlaes";
 import Planner from "./pages/main/Planner";
-import Playlists from "./pages/main/Playlists";
+import PlaylistsPage from "./pages/main/PlaylistPage";
 import Toolbox from "./pages/main/Toolbox";
-import Matiere from "./components/main/library/Matiere";
+import Matiere from "./components/main/library/matiere/Matiere";
+import Item from "./components/main/library/item/Item";
+import Colors from "./components/common/Colors";
 
 function App() {
   return (
@@ -20,11 +22,13 @@ function App() {
               <Route path="/" element={<Layout Sidebar={Sidebar}><Dashboard /></Layout>} />
               <Route path="/library/" element={<Layout Sidebar={Sidebar}><Library /></Layout>} />
               <Route path="/library/matiere/:id?" element={<Layout Sidebar={Sidebar}><Matiere /></Layout>} />
+              <Route path="/library/item/:id?" element={<Layout Sidebar={Sidebar}><Item /></Layout>} />
               <Route path="/annales/" element={<Layout Sidebar={Sidebar}><Annales /></Layout>} />
               <Route path="/planner/" element={<Layout Sidebar={Sidebar}><Planner /></Layout>} />
-              <Route path="/playlists/" element={<Layout Sidebar={Sidebar}><Playlists /></Layout>} />
+              <Route path="/playlists/" element={<Layout Sidebar={Sidebar}><PlaylistsPage /></Layout>} />
               <Route path="/toolbox/" element={<Layout Sidebar={Sidebar}><Toolbox /></Layout>} />
-              <Route path="/quiz" element={<Quiz />} />
+              <Route path="/quiz/" element={<Quiz />} />
+              <Route path="/colors/" element={<Colors />} />
           </Routes>
         </BrowserRouter>
       </QuizContextProvider>

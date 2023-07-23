@@ -5,7 +5,7 @@ function classNames(...classes) {
 export default function Tabs({ tabs, setCurrentTab }) {
   return (
         <div className="-mx-4 sm:-mx-6 lg:-mx-8 border-b-2 border-gray-200">
-          <div className="px-4 sm:px-6 lg:px-8 -mb-px flex space-x-8" aria-label="Tabs">
+          <div className="px-4 sm:px-6 lg:px-8 -mb-px flex space-x-8 hover:cursor-pointer" aria-label="Tabs">
             {tabs.map((tab) => (
               <div
                 key={tab.name}

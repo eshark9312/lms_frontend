@@ -47,12 +47,6 @@ const items = [
     questions: "24 questions",
     progressRate: 60,
   },
-  {
-    title: "Lindsay Walton",
-    status: "Fait",
-    questions: "24 questions",
-    progressRate: 60,
-  },
 ];
 
 export default function Items() {
@@ -60,7 +54,9 @@ export default function Items() {
     <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
       <div className="inline-block min-w-full py-2 align-middle">
         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
-          <div className="p-6 bg-white text-xl font-extrabold">Liste des items</div>
+          <div className="p-6 bg-white text-xl font-extrabold">
+            Liste des items
+          </div>
           <div className="p-4 bg-white flex justify-between">
             <Search />
             <Filter />
@@ -98,13 +94,14 @@ export default function Items() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
-              {items.map((item) => (
-                <tr key={item.title}>
-                  <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
-                    {item.title}
+              {items.map((item, index) => (
+                <tr key={item.title} >
+                  <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 hover:text-primary-600 hover:cursor-pointer click-action">
+                    <Link to={`/library/item/${index}`}>{item.title}</Link>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {item.status}
+                    <div className="w-fit h-fit rounded-full border-2 border-success-200 bg-success-50 text-success-700 px-2 py-0.5">                      {item.status}
+                    </div>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     {item.questions}

@@ -2,6 +2,7 @@ import React from "react";
 import TrandingItem from "../../components/main/dashboard/TrendingItem";
 import QuickAccess from "../../components/main/dashboard/QuickAccess";
 import RecentItem from "../../components/main/dashboard/RecentItem";
+import Calendar from "../../components/main/Calendar";
 
 function Dashboard() {
   return (
@@ -22,11 +23,11 @@ function Dashboard() {
             </div>
           </div>
           <div className="lg:ml-8 flex flex-col items-center justify-end">
-          <img
-            className="rounded-full w-full max-w-[250px]"
-            src="/assets/image/card1.png"
-            alt="Journée mondiale de la Tuberculose"
-          />
+            <img
+              className="rounded-full w-full max-w-[250px]"
+              src="/assets/image/card1.png"
+              alt="Journée mondiale de la Tuberculose"
+            />
           </div>
         </div>
         <div className="rounded-lg bg-gray-100 min-h-80 p-8 click-action hover:cursor-pointer shadow-lg hover:shadow-primary-300">
@@ -54,7 +55,7 @@ function Dashboard() {
         <QuickAccess />
         <QuickAccess />
       </div>
-      <div className="grid sm:grid-cols-2">
+      <div className="grid sm:h-[520px] sm:grid-cols-2">
         <div>
           <div className="mt-8 mb-2 font-bold text-xl text-gray-600">
             Recently viewed
@@ -68,11 +69,14 @@ function Dashboard() {
             <RecentItem>336. Méningites virales</RecentItem>
             <RecentItem>188. Endocardite infectieuse</RecentItem>
             <RecentItem>336. Méningites virales</RecentItem>
+            <RecentItem>188. Endocardite infectieuse</RecentItem>
+            <RecentItem>336. Méningites virales</RecentItem>
           </div>
         </div>
-        <div>
-          <div className="mt-8 mb-2 font-bold text-xl text-gray-600">
-            Your day plan
+        <div className="mt-8 mb-2 h-[500px] flex flex-col">
+          <div className="font-bold text-xl text-gray-600">Your day plan</div>
+          <div className="h-[480px]">
+            <Calendar />
           </div>
         </div>
       </div>
