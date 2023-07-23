@@ -4,7 +4,7 @@ import Tabs from "../../Tabs";
 import Breadcrumb from "../../Breadcrumb";
 import {
   ClipboardIcon,
-  HeartIcon,
+  PaperClipIcon,
   ViewColumnsIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
@@ -21,7 +21,7 @@ const Item = () => {
 
   const [tabs, setTabs] = useState([
     { name: "Overview", icon: ViewColumnsIcon, current: true },
-    { name: "Saved questions", icon: HeartIcon, current: false },
+    { name: "Saved questions", icon: PaperClipIcon, current: false },
     { name: "Cards", icon: ClipboardIcon, current: false },
     { name: "Toolbox", icon: WrenchScrewdriverIcon, current: false },
   ]);
