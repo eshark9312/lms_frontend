@@ -210,8 +210,8 @@ function Toolbox() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {cards.map((card) => (
-            <div className="group border-2 rounded-lg min-h-[200px] bg-white p-6 hover:shadow-lg hover:shadow-gray-300 click-action">
-              <div className="group-hover:hidden flex flex-col h-full">
+            <div className="border-2 rounded-lg min-h-[200px] bg-white p-6 hover:shadow-lg hover:shadow-gray-300 click-action">
+              <div className="flex flex-col h-full">
                 <div className="py-2 text-2xl font-extrabold">{card.title}</div>
                 <div className="flex-1">{card.desc}</div>
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -220,11 +220,6 @@ function Toolbox() {
                       {category.id}. {category.title}
                     </div>
                   ))}
-                </div>
-              </div>
-              <div className="hidden group-hover:flex items-center justify-center h-full">
-                <div className="px-4 py-2 text-gray-500 font-bold border-2 border-gray-200 rounded-md  hover:cursor-pointer hover:shadow-md">
-                  open
                 </div>
               </div>
             </div>

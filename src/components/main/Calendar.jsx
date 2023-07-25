@@ -1,69 +1,172 @@
-import { Fragment, useEffect, useRef } from 'react'
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, EllipsisHorizontalIcon } from '@heroicons/react/20/solid'
-import { Menu, Transition } from '@headlessui/react'
-
-const days = [
-  { date: '2021-12-27' },
-  { date: '2021-12-28' },
-  { date: '2021-12-29' },
-  { date: '2021-12-30' },
-  { date: '2021-12-31' },
-  { date: '2022-01-01', isCurrentMonth: true },
-  { date: '2022-01-02', isCurrentMonth: true },
-  { date: '2022-01-03', isCurrentMonth: true },
-  { date: '2022-01-04', isCurrentMonth: true },
-  { date: '2022-01-05', isCurrentMonth: true },
-  { date: '2022-01-06', isCurrentMonth: true },
-  { date: '2022-01-07', isCurrentMonth: true },
-  { date: '2022-01-08', isCurrentMonth: true },
-  { date: '2022-01-09', isCurrentMonth: true },
-  { date: '2022-01-10', isCurrentMonth: true },
-  { date: '2022-01-11', isCurrentMonth: true },
-  { date: '2022-01-12', isCurrentMonth: true },
-  { date: '2022-01-13', isCurrentMonth: true },
-  { date: '2022-01-14', isCurrentMonth: true },
-  { date: '2022-01-15', isCurrentMonth: true },
-  { date: '2022-01-16', isCurrentMonth: true },
-  { date: '2022-01-17', isCurrentMonth: true },
-  { date: '2022-01-18', isCurrentMonth: true },
-  { date: '2022-01-19', isCurrentMonth: true },
-  { date: '2022-01-20', isCurrentMonth: true, isToday: true },
-  { date: '2022-01-21', isCurrentMonth: true },
-  { date: '2022-01-22', isCurrentMonth: true, isSelected: true },
-  { date: '2022-01-23', isCurrentMonth: true },
-  { date: '2022-01-24', isCurrentMonth: true },
-  { date: '2022-01-25', isCurrentMonth: true },
-  { date: '2022-01-26', isCurrentMonth: true },
-  { date: '2022-01-27', isCurrentMonth: true },
-  { date: '2022-01-28', isCurrentMonth: true },
-  { date: '2022-01-29', isCurrentMonth: true },
-  { date: '2022-01-30', isCurrentMonth: true },
-  { date: '2022-01-31', isCurrentMonth: true },
-  { date: '2022-02-01' },
-  { date: '2022-02-02' },
-  { date: '2022-02-03' },
-  { date: '2022-02-04' },
-  { date: '2022-02-05' },
-  { date: '2022-02-06' },
-]
+import {
+  add,
+  eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  format,
+  getDay,
+  getWeek,
+  isEqual,
+  isSameDay,
+  isSameMonth,
+  isToday,
+  parse,
+  parseISO,
+  startOfToday,
+  startOfWeek,
+} from "date-fns";
+import {
+  Link,
+  Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  EllipsisHorizontalIcon,
+} from "@heroicons/react/20/solid";
+import { Menu, Transition } from "@headlessui/react";
 
 function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
+const events = [
+  {
+    type: "matiere",
+    id: 12,
+    title: "Cardiologie",
+    date: "2023-07-25",
+    from: "17:00",
+    to: "18:00",
+    desc: "",
+  },
+  {
+    type: "matiere",
+    id: 14,
+    title: "Pneumologie",
+    date: "2023-07-25",
+    from: "13:00",
+    to: "16:00",
+    desc: "",
+  },
+  {
+    type: "item",
+    id: 1,
+    title: "188. Endocardite infectieuse",
+    date: "2023-07-25",
+    from: "9:00",
+    to: "10:00",
+    desc: "here some description you added",
+  },
+  {
+    type: "item",
+    id: 2,
+    title: "152. Endocardite infectieuse",
+    date: "2023-07-25",
+    from: "10:00",
+    to: "11:00",
+    desc: "",
+  },
+  {
+    type: "DP",
+    id: 12,
+    title: "DP 2",
+    date: "2023-07-26",
+    from: "17:00",
+    to: "18:00",
+    desc: "here some description you added",
+  },
+  {
+    type: "question",
+    id: 12,
+    title: "#3066",
+    date: "2023-07-26",
+    from: "18:00",
+    to: "19:00",
+    desc: "",
+  },
+];
+
 export default function Calendar() {
-  const container = useRef(null)
-  const containerNav = useRef(null)
-  const containerOffset = useRef(null)
+  const container = useRef(null);
+  const containerNav = useRef(null);
+  const containerOffset = useRef(null);
+
+  const [today, setToday] = useState(startOfToday());
+  const [selectedDay, setSelectedDay] = useState(today);
+  const [selectedWeek, setSelectedWeek] = useState(
+    eachDayOfInterval({
+      start: startOfWeek(selectedDay),
+      end: endOfWeek(selectedDay),
+    })
+  );
+  const [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
+  const [firstDayCurrentMonth, setFirstDayCurrentMonth] = useState(
+    parse(currentMonth, "MMM-yyyy", new Date())
+  );
+  const [days, setDays] = useState([]);
+
+  useEffect(() => {
+    setSelectedWeek(
+      eachDayOfInterval({
+        start: startOfWeek(selectedDay),
+        end: endOfWeek(selectedDay),
+      })
+    );
+  }, [selectedDay]);
+
+  useEffect(() => {
+    const _days_ = eachDayOfInterval({
+      start: firstDayCurrentMonth,
+      end: endOfMonth(firstDayCurrentMonth),
+    }).map((date) => ({
+      date: date,
+      isCurrentMonth: true,
+      isToday: isEqual(today, date),
+      isSelected: isEqual(selectedDay, date),
+    }));
+    for (let i = 1; i < getDay(firstDayCurrentMonth) + 1; i++)
+      _days_.unshift({
+        date: add(firstDayCurrentMonth, { days: -i }),
+        isCurrentMonth: false,
+      });
+    for (let i = 1; i < 7 - getDay(endOfMonth(firstDayCurrentMonth)); i++)
+      _days_.push({
+        date: add(endOfMonth(firstDayCurrentMonth), { days: i }),
+        isCurrentMonth: false,
+      });
+    setDays(() => _days_);
+    console.log(today, firstDayCurrentMonth, selectedDay);
+  }, [today, firstDayCurrentMonth, selectedDay]);
+
+  const toPreviousMonth = () => {
+    const firstDayPreviousMonth = add(firstDayCurrentMonth, { months: -1 });
+    setCurrentMonth(format(firstDayPreviousMonth, "MMM-yyyy"));
+    setFirstDayCurrentMonth(firstDayPreviousMonth);
+  };
+
+  const toNextMonth = () => {
+    const firstDayNextMonth = add(firstDayCurrentMonth, { months: 1 });
+    setCurrentMonth(format(firstDayNextMonth, "MMM-yyyy"));
+    setFirstDayCurrentMonth(firstDayNextMonth);
+  };
 
   useEffect(() => {
     // Set the container scroll position based on the current time.
-    const currentMinute = new Date().getHours() * 60
+    const currentMinute = new Date().getHours() * 60;
     container.current.scrollTop =
-      ((container.current.scrollHeight - containerNav.current.offsetHeight - containerOffset.current.offsetHeight) *
+      ((container.current.scrollHeight -
+        containerNav.current.offsetHeight -
+        containerOffset.current.offsetHeight) *
         currentMinute) /
-      1440
-  }, [])
+      1440;
+  }, []);
 
   return (
     <div className="flex h-full flex-col">
@@ -71,16 +174,18 @@ export default function Calendar() {
         <div>
           <h1 className="text-base font-semibold leading-6 text-gray-900">
             <time dateTime="2022-01-22" className="sm:hidden">
-              Jan 22, 2022
+              {format(selectedDay, "MMM dd, yyyy")}
             </time>
             <time dateTime="2022-01-22" className="hidden sm:inline">
-              January 22, 2022
+              {format(selectedDay, "MMMM dd, yyyy")}
             </time>
           </h1>
-          <p className="mt-1 text-sm text-gray-500">Saturday</p>
+          <p className="mt-1 text-sm text-gray-500">
+            {format(selectedDay, "EEEE")}
+          </p>
         </div>
         <div className="flex items-center">
-          {/* <div className="relative flex items-center rounded-md bg-white shadow-sm md:items-stretch">
+        <div className="relative flex items-center rounded-md bg-white shadow-sm md:items-stretch md:hidden">
             <div
               className="pointer-events-none absolute inset-0 rounded-md ring-1 ring-inset ring-gray-300"
               aria-hidden="true"
@@ -89,24 +194,17 @@ export default function Calendar() {
               type="button"
               className="flex items-center justify-center rounded-l-md py-2 pl-3 pr-4 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:px-2 md:hover:bg-gray-50"
             >
-              <span className="sr-only">Previous day</span>
+              <span className="sr-only">Previous week</span>
               <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
             </button>
             <button
               type="button"
-              className="hidden px-3.5 text-sm font-semibold text-gray-900 hover:bg-gray-50 focus:relative md:block"
-            >
-              Today
-            </button>
-            <span className="relative -mx-px h-5 w-px bg-gray-300 md:hidden" />
-            <button
-              type="button"
               className="flex items-center justify-center rounded-r-md py-2 pl-4 pr-3 text-gray-400 hover:text-gray-500 focus:relative md:w-9 md:px-2 md:hover:bg-gray-50"
             >
-              <span className="sr-only">Next day</span>
+              <span className="sr-only">Next week</span>
               <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
             </button>
-          </div> */}
+          </div>
           <div className="hidden md:ml-4 md:flex md:items-center">
             <Menu as="div" className="relative">
               <Menu.Button
@@ -114,7 +212,10 @@ export default function Calendar() {
                 className="flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
               >
                 Day view
-                <ChevronDownIcon className="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
+                <ChevronDownIcon
+                  className="-mr-1 h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
               </Menu.Button>
 
               <Transition
@@ -130,54 +231,58 @@ export default function Calendar() {
                   <div className="py-1">
                     <Menu.Item>
                       {({ active }) => (
-                        <a
-                          href="#"
+                        <div
                           className={classNames(
-                            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                            'block px-4 py-2 text-sm'
+                            active
+                              ? "bg-gray-100 text-gray-900"
+                              : "text-gray-700",
+                            "block px-4 py-2 text-sm"
                           )}
                         >
                           Day view
-                        </a>
+                        </div>
                       )}
                     </Menu.Item>
                     <Menu.Item>
                       {({ active }) => (
-                        <a
-                          href="#"
+                        <div
                           className={classNames(
-                            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                            'block px-4 py-2 text-sm'
+                            active
+                              ? "bg-gray-100 text-gray-900"
+                              : "text-gray-700",
+                            "block px-4 py-2 text-sm"
                           )}
                         >
                           Week view
-                        </a>
+                        </div>
                       )}
                     </Menu.Item>
                     <Menu.Item>
                       {({ active }) => (
-                        <a
-                          href="#"
+                        <div
                           className={classNames(
-                            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                            'block px-4 py-2 text-sm'
+                            active
+                              ? "bg-gray-100 text-gray-900"
+                              : "text-gray-700",
+                            "block px-4 py-2 text-sm"
                           )}
                         >
                           Month view
-                        </a>
+                        </div>
                       )}
                     </Menu.Item>
                     <Menu.Item>
                       {({ active }) => (
-                        <a
-                          href="#"
+                        <div
                           className={classNames(
-                            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                            'block px-4 py-2 text-sm'
+                            active
+                              ? "bg-gray-100 text-gray-900"
+                              : "text-gray-700",
+                            "block px-4 py-2 text-sm"
                           )}
                         >
-                          Year view
-                        </a>
+                          All plans
+                        </div>
                       )}
                     </Menu.Item>
                   </div>
@@ -211,84 +316,93 @@ export default function Calendar() {
                 <div className="py-1">
                   <Menu.Item>
                     {({ active }) => (
-                      <a
-                        href="#"
+                      <div
                         className={classNames(
-                          active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                          'block px-4 py-2 text-sm'
+                          active
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700",
+                          "block px-4 py-2 text-sm"
                         )}
                       >
                         Create event
-                      </a>
+                      </div>
                     )}
                   </Menu.Item>
                 </div>
                 <div className="py-1">
                   <Menu.Item>
                     {({ active }) => (
-                      <a
-                        href="#"
+                      <div
+                        onClick={() => {
+                          setSelectedDay(today);
+                        }}
                         className={classNames(
-                          active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                          'block px-4 py-2 text-sm'
+                          active
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700",
+                          "block px-4 py-2 text-sm"
                         )}
                       >
                         Go to today
-                      </a>
+                      </div>
                     )}
                   </Menu.Item>
                 </div>
                 <div className="py-1">
                   <Menu.Item>
                     {({ active }) => (
-                      <a
-                        href="#"
+                      <div
                         className={classNames(
-                          active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                          'block px-4 py-2 text-sm'
+                          active
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700",
+                          "block px-4 py-2 text-sm"
                         )}
                       >
                         Day view
-                      </a>
+                      </div>
                     )}
                   </Menu.Item>
                   <Menu.Item>
                     {({ active }) => (
-                      <a
-                        href="#"
+                      <div
                         className={classNames(
-                          active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                          'block px-4 py-2 text-sm'
+                          active
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700",
+                          "block px-4 py-2 text-sm"
                         )}
                       >
                         Week view
-                      </a>
+                      </div>
                     )}
                   </Menu.Item>
                   <Menu.Item>
                     {({ active }) => (
-                      <a
-                        href="#"
+                      <div
                         className={classNames(
-                          active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                          'block px-4 py-2 text-sm'
+                          active
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700",
+                          "block px-4 py-2 text-sm"
                         )}
                       >
                         Month view
-                      </a>
+                      </div>
                     )}
                   </Menu.Item>
                   <Menu.Item>
                     {({ active }) => (
-                      <a
-                        href="#"
+                      <div
                         className={classNames(
-                          active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                          'block px-4 py-2 text-sm'
+                          active
+                            ? "bg-gray-100 text-gray-900"
+                            : "text-gray-700",
+                          "block px-4 py-2 text-sm"
                         )}
                       >
                         Year view
-                      </a>
+                      </div>
                     )}
                   </Menu.Item>
                 </div>
@@ -303,49 +417,28 @@ export default function Calendar() {
             ref={containerNav}
             className="sticky top-0 z-10 grid flex-none grid-cols-7 bg-white text-xs text-gray-500 shadow ring-1 ring-black ring-opacity-5 md:hidden"
           >
-            <button type="button" className="flex flex-col items-center pb-1.5 pt-3">
-              <span>W</span>
-              {/* Default: "text-gray-900", Selected: "bg-gray-900 text-white", Today (Not Selected): "text-indigo-600", Today (Selected): "bg-indigo-600 text-white" */}
-              <span className="mt-3 flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-gray-900">
-                19
-              </span>
-            </button>
-            <button type="button" className="flex flex-col items-center pb-1.5 pt-3">
-              <span>T</span>
-              <span className="mt-3 flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-indigo-600">
-                20
-              </span>
-            </button>
-            <button type="button" className="flex flex-col items-center pb-1.5 pt-3">
-              <span>F</span>
-              <span className="mt-3 flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-gray-900">
-                21
-              </span>
-            </button>
-            <button type="button" className="flex flex-col items-center pb-1.5 pt-3">
-              <span>S</span>
-              <span className="mt-3 flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-base font-semibold text-white">
-                22
-              </span>
-            </button>
-            <button type="button" className="flex flex-col items-center pb-1.5 pt-3">
-              <span>S</span>
-              <span className="mt-3 flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-gray-900">
-                23
-              </span>
-            </button>
-            <button type="button" className="flex flex-col items-center pb-1.5 pt-3">
-              <span>M</span>
-              <span className="mt-3 flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-gray-900">
-                24
-              </span>
-            </button>
-            <button type="button" className="flex flex-col items-center pb-1.5 pt-3">
-              <span>T</span>
-              <span className="mt-3 flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-gray-900">
-                25
-              </span>
-            </button>
+            {selectedWeek.map((date) => (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedDay(date);
+                }}
+                className="flex flex-col items-center pb-1.5 pt-3"
+              >
+                <span>{format(date, "EEEEE")}</span>
+                {/* Default: "text-gray-900", Selected: "bg-gray-900 text-white", Today (Not Selected): "text-indigo-600", Today (Selected): "bg-indigo-600 text-white" */}
+                <span
+                  className={classNames(
+                    "mt-3 flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-gray-900",
+                    isSameDay(date, today) && "text-indigo-600",
+                    isSameDay(date, selectedDay) &&
+                      "rounded-full bg-gray-900 text-white"
+                  )}
+                >
+                  {format(date, "dd")}
+                </span>
+              </button>
+            ))}
           </div>
           <div className="flex w-full flex-auto">
             <div className="w-14 flex-none bg-white ring-1 ring-gray-100" />
@@ -353,7 +446,7 @@ export default function Calendar() {
               {/* Horizontal lines */}
               <div
                 className="col-start-1 col-end-2 row-start-1 grid divide-y divide-gray-100"
-                style={{ gridTemplateRows: 'repeat(48, minmax(3.5rem, 1fr))' }}
+                style={{ gridTemplateRows: "repeat(48, minmax(3.5rem, 1fr))" }}
               >
                 <div ref={containerOffset} className="row-end-1 h-7"></div>
                 <div>
@@ -505,60 +598,78 @@ export default function Calendar() {
               {/* Events */}
               <ol
                 className="col-start-1 col-end-2 row-start-1 grid grid-cols-1"
-                style={{ gridTemplateRows: '1.75rem repeat(288, minmax(0, 1fr)) auto' }}
+                style={{
+                  gridTemplateRows: "1.75rem repeat(288, minmax(0, 1fr)) auto",
+                }}
               >
-                <li className="relative mt-px flex" style={{ gridRow: '74 / span 12' }}>
-                  <a
-                    href="#"
-                    className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 p-2 text-xs leading-5 hover:bg-blue-100"
-                  >
-                    <p className="order-1 font-semibold text-blue-700">Breakfast</p>
-                    <p className="text-blue-500 group-hover:text-blue-700">
-                      <time dateTime="2022-01-22T06:00">6:00 AM</time>
-                    </p>
-                  </a>
-                </li>
-                <li className="relative mt-px flex" style={{ gridRow: '92 / span 30' }}>
-                  <a
-                    href="#"
-                    className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-pink-50 p-2 text-xs leading-5 hover:bg-pink-100"
-                  >
-                    <p className="order-1 font-semibold text-pink-700">Flight to Paris</p>
-                    <p className="order-1 text-pink-500 group-hover:text-pink-700">
-                      John F. Kennedy International Airport
-                    </p>
-                    <p className="text-pink-500 group-hover:text-pink-700">
-                      <time dateTime="2022-01-22T07:30">7:30 AM</time>
-                    </p>
-                  </a>
-                </li>
-                <li className="relative mt-px flex" style={{ gridRow: '134 / span 18' }}>
-                  <a
-                    href="#"
-                    className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-indigo-50 p-2 text-xs leading-5 hover:bg-indigo-100"
-                  >
-                    <p className="order-1 font-semibold text-indigo-700">Sightseeing</p>
-                    <p className="order-1 text-indigo-500 group-hover:text-indigo-700">Eiffel Tower</p>
-                    <p className="text-indigo-500 group-hover:text-indigo-700">
-                      <time dateTime="2022-01-22T11:00">11:00 AM</time>
-                    </p>
-                  </a>
-                </li>
+                {events.map(
+                  (event, idx) =>
+                    isSameDay(
+                      selectedDay,
+                      parse(event.date, "yyyy-MM-dd", new Date())
+                    ) && (
+                      <li
+                        key={idx}
+                        className="relative mt-px flex"
+                        style={{
+                          gridRow: `${
+                            Number(
+                              format(
+                                parse(event.from, "HH:mm", new Date()),
+                                "HH"
+                              )
+                            ) *
+                              12 +
+                            2
+                          } / span ${
+                            (Number(
+                              format(parse(event.to, "HH:mm", new Date()), "HH")
+                            ) -
+                              Number(
+                                format(
+                                  parse(event.from, "HH:mm", new Date()),
+                                  "HH"
+                                )
+                              )) *
+                            12
+                          }`,
+                        }}
+                      >
+                        <div className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 p-2 text-xs leading-5 hover:bg-blue-100">
+                          <p className="order-1 font-semibold text-blue-700">
+                            {event.title}
+                          </p>
+                          <p className="text-blue-500 group-hover:text-blue-700">
+                            <time dateTime="2022-01-22T06:00">
+                              {format(
+                                parse(event.from, "HH:mm", new Date()),
+                                "hh:mm a"
+                              )}
+                            </time>
+                          </p>
+                        </div>
+                      </li>
+                    )
+                )}
               </ol>
             </div>
           </div>
         </div>
-        <div className="hidden w-1/2 max-w-md flex-none border-l border-gray-100 px-8 py-10 xl:block">
+        <div className="hidden w-1/2 max-w-md flex-none border-l border-gray-100 px-8 py-10 md:block">
           <div className="flex items-center text-center text-gray-900">
             <button
+              onClick={toPreviousMonth}
               type="button"
               className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
             >
               <span className="sr-only">Previous month</span>
               <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
             </button>
-            <div className="flex-auto text-sm font-semibold">January 2022</div>
+            <div className="flex-auto text-sm font-semibold">
+              {format(firstDayCurrentMonth, "MMMM yyyy")}
+            </div>
             <button
+              onClick={toNextMonth}
               type="button"
               className="-m-1.5 flex flex-none items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
             >
@@ -567,42 +678,49 @@ export default function Calendar() {
             </button>
           </div>
           <div className="mt-6 grid grid-cols-7 text-center text-xs leading-6 text-gray-500">
+            <div>S</div>
             <div>M</div>
             <div>T</div>
             <div>W</div>
             <div>T</div>
             <div>F</div>
             <div>S</div>
-            <div>S</div>
           </div>
           <div className="isolate mt-2 grid grid-cols-7 gap-px rounded-lg bg-gray-200 text-sm shadow ring-1 ring-gray-200">
             {days.map((day, dayIdx) => (
               <button
+                onClick={() => setSelectedDay(day.date)}
                 key={day.date}
                 type="button"
                 className={classNames(
-                  'py-1.5 hover:bg-gray-100 focus:z-10',
-                  day.isCurrentMonth ? 'bg-white' : 'bg-gray-50',
-                  (day.isSelected || day.isToday) && 'font-semibold',
-                  day.isSelected && 'text-white',
-                  !day.isSelected && day.isCurrentMonth && !day.isToday && 'text-gray-900',
-                  !day.isSelected && !day.isCurrentMonth && !day.isToday && 'text-gray-400',
-                  day.isToday && !day.isSelected && 'text-indigo-600',
-                  dayIdx === 0 && 'rounded-tl-lg',
-                  dayIdx === 6 && 'rounded-tr-lg',
-                  dayIdx === days.length - 7 && 'rounded-bl-lg',
-                  dayIdx === days.length - 1 && 'rounded-br-lg'
+                  "py-1.5 hover:bg-gray-100 focus:z-10",
+                  day.isCurrentMonth ? "bg-white" : "bg-gray-50",
+                  (day.isSelected || day.isToday) && "font-semibold",
+                  day.isSelected && "text-white",
+                  !day.isSelected &&
+                    day.isCurrentMonth &&
+                    !day.isToday &&
+                    "text-gray-900",
+                  !day.isSelected &&
+                    !day.isCurrentMonth &&
+                    !day.isToday &&
+                    "text-gray-400",
+                  day.isToday && !day.isSelected && "text-indigo-600",
+                  dayIdx === 0 && "rounded-tl-lg",
+                  dayIdx === 6 && "rounded-tr-lg",
+                  dayIdx === days.length - 7 && "rounded-bl-lg",
+                  dayIdx === days.length - 1 && "rounded-br-lg"
                 )}
               >
                 <time
                   dateTime={day.date}
                   className={classNames(
-                    'mx-auto flex h-7 w-7 items-center justify-center rounded-full',
-                    day.isSelected && day.isToday && 'bg-indigo-600',
-                    day.isSelected && !day.isToday && 'bg-gray-900'
+                    "mx-auto flex h-7 w-7 items-center justify-center rounded-full",
+                    day.isSelected && day.isToday && "bg-indigo-600",
+                    day.isSelected && !day.isToday && "bg-gray-900"
                   )}
                 >
-                  {day.date.split('-').pop().replace(/^0/, '')}
+                  {format(day.date, "dd")}
                 </time>
               </button>
             ))}
@@ -610,5 +728,5 @@ export default function Calendar() {
         </div>
       </div>
     </div>
-  )
+  );
 }
