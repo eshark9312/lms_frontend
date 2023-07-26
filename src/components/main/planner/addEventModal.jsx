@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import Modal from "../../common/Modal";
 
-export default function AddEventModal({open, setOpen}) {
+export default function AddEventModal({ open, setOpen }) {
   return (
     <Modal open={open} setOpen={setOpen}>
       <div className="bg-white rounded-xl p-8 border-2 border-gray-400 mt-40">
@@ -44,7 +44,7 @@ export default function AddEventModal({open, setOpen}) {
                   name="card-cvc"
                   id="card-cvc"
                   className="relative block w-full rounded-none rounded-br-md border-0 bg-transparent py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  placeholder={format(Date.now(), "HH:00")}
+                  placeholder={format(Date.now() + 60 * 60 * 1000, "HH:00")}
                 />
               </div>
             </div>
@@ -84,14 +84,16 @@ export default function AddEventModal({open, setOpen}) {
             </div>
           </div>
           <div>
-              <button
-                onClick={()=>{setOpen(false)}}
-                type="submit"
-                className="flex mt-8 w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              >
-                Add
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                setOpen(false);
+              }}
+              type="submit"
+              className="flex mt-8 w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Add
+            </button>
+          </div>
         </fieldset>
       </div>
     </Modal>
