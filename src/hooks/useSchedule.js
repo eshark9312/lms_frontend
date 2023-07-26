@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+
 import {
   add,
   eachDayOfInterval,
@@ -6,21 +7,17 @@ import {
   endOfWeek,
   format,
   getDay,
+  getWeek,
   isEqual,
   isSameDay,
   isSameMonth,
   isSameWeek,
+  isToday,
   parse,
+  parseISO,
   startOfToday,
   startOfWeek,
 } from "date-fns";
-
-import Header from "../../components/main/planner/header";
-import DayView from "../../components/main/planner/dayView";
-import WeekView from "../../components/main/planner/weekView";
-import MonthView from "../../components/main/planner/monthView";
-import AddEventModal from "../../components/main/planner/addEventModal";
-
 const events = [
   {
     type: "matiere",
@@ -81,8 +78,8 @@ const events = [
     id: 1,
     title: "188. Endocardite infectieuse",
     date: "2023-08-02",
-    from: "12:00",
-    to: "13:00",
+    from: "9:00",
+    to: "12:13",
     desc: "here some description you added",
   },
   {
@@ -212,6 +209,24 @@ const events = [
     desc: "",
   },
   {
+    type: "matiere",
+    id: 14,
+    title: "Pneumologie",
+    date: "2023-07-25",
+    from: "9:00",
+    to: "12:00",
+    desc: "",
+  },
+  {
+    type: "item",
+    id: 1,
+    title: "188. Endocardite infectieuse",
+    date: "2023-07-25",
+    from: "9:00",
+    to: "12:13",
+    desc: "here some description you added",
+  },
+  {
     type: "item",
     id: 2,
     title: "152. Endocardite infectieuse",
@@ -294,12 +309,12 @@ const events = [
   },
 ];
 
-function PlannerPage() {
-  const [view, setView] = useState("Day view");
+const useSchedule = () => {
   const [today, setToday] = useState(startOfToday());
   const [selectedDay, setSelectedDay] = useState(today);
+  const [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
   const [firstDayCurrentMonth, setFirstDayCurrentMonth] = useState(
-    parse(format(today, "MMM-yyyy"), "MMM-yyyy", new Date())
+    parse(currentMonth, "MMM-yyyy", new Date())
   );
   const [days, setDays] = useState([]);
   const [selectedWeek, setSelectedWeek] = useState(
@@ -326,68 +341,23 @@ function PlannerPage() {
   const monthlyEvents = useMemo(
     () =>
       events.filter((event) =>
-        isSameMonth(parse(event.date, "yyyy-MM-dd", new Date()), firstDayCurrentMonth)
+        isSameMonth(parse(event.date, "yyyy-MM-dd", new Date()), selectedDay)
       ),
-    [firstDayCurrentMonth]
+    [selectedDay]
   );
 
-  const [open, setOpen]= useState(false)
-  const addEvent = () => {
-    setOpen(true)
-  };
-
-  const goToToday = () => {
-    setSelectedDay(today);
-  };
-
-  const next = () => {
-    switch (view) {
-      case "Day view":
-        nextDay();
-        break;
-      case "Week view":
-        nextWeek();
-        break;
-      case "Month view":
-        nextMonth();
-        break;
-      default:
-        break;
-    }
-  };
-  const previous = () => {
-    switch (view) {
-      case "Day view":
-        previousDay();
-        break;
-      case "Week view":
-        previousWeek();
-        break;
-      case "Month view":
-        previousMonth();
-        break;
-      default:
-        break;
-    }
-  };
-  const previousDay = () => {
-    setSelectedDay(add(selectedDay, { days: -1 }));
-  };
-  const nextDay = () => {
-    setSelectedDay(add(selectedDay, { days: +1 }));
-  };
-  const previousWeek = () => {
-    setSelectedDay(add(selectedDay, { days: -7 }));
-  };
-  const nextWeek = () => {
-    setSelectedDay(add(selectedDay, { days: +7 }));
-  };
+  const previousDay = () => {};
+  const nextDay = () => {};
+  const previousWeek = () => {};
+  const nextWeek = () => {};
   const previousMonth = () => {
     const firstDayPreviousMonth = add(firstDayCurrentMonth, { months: -1 });
+    setCurrentMonth(format(firstDayPreviousMonth, "MMM-yyyy"));
     setFirstDayCurrentMonth(firstDayPreviousMonth);
   };
   const nextMonth = () => {
     const firstDayNextMonth = add(firstDayCurrentMonth, { months: 1 });
+    setCurrentMonth(format(firstDayNextMonth, "MMM-yyyy"));
     setFirstDayCurrentMonth(firstDayNextMonth);
   };
 
@@ -421,64 +391,12 @@ function PlannerPage() {
         isCurrentMonth: false,
       });
     setDays(() => _days_);
+    console.log(today, firstDayCurrentMonth, selectedDay);
   }, [today, firstDayCurrentMonth, selectedDay]);
 
   useEffect(() => {
     setInterval(() => {
-      setToday(startOfToday());
+      if (!isToday(today)) setToday(startOfToday());
     }, 60000);
   });
-
-  useEffect(() => {
-    setFirstDayCurrentMonth(
-      parse(format(selectedDay, "MMM-yyyy"), "MMM-yyyy", new Date())
-    );
-  }, [selectedDay]);
-
-  return (
-    <div className="-mx-4 -mt-24 -mb-10 pt-16 sm:-mx-6 px-2 sm:px-6 pb-8 lg:-mt-10 lg:px-8 lg:-mx-8 lg:pt-4 h-screen bg-gray-50 ">
-      <div className="flex h-full flex-col">
-        <Header
-          title={format(firstDayCurrentMonth, "MMMM yyyy")}
-          view={view}
-          setView={setView}
-          addEvent={addEvent}
-          control={{ goToToday, previous, next }}
-        />
-        {view === "Day view" && (
-          <DayView
-            firstDayCurrentMonth={firstDayCurrentMonth}
-            days={days}
-            selectedDay={selectedDay}
-            setSelectedDay={setSelectedDay}
-            events={dailyEvents}
-            previousMonth={previousMonth}
-            nextMonth={nextMonth}
-            selectedWeek={selectedWeek}
-            today={today}
-          />
-        )}
-        {view === "Week view" && (
-          <WeekView
-            selectedWeek={selectedWeek}
-            selectedDay={selectedDay}
-            setSelectedDay={setSelectedDay}
-            today={today}
-            events={weeklyEvents}
-          />
-        )}
-        {view === "Month view" && (
-          <MonthView
-            days={days}
-            events={monthlyEvents}
-            selectedDay={selectedDay}
-            setSelectedDay={setSelectedDay}
-          />
-        )}
-      </div>
-      <AddEventModal open={open} setOpen={setOpen}/>
-    </div>
-  );
-}
-
-export default PlannerPage;
+};

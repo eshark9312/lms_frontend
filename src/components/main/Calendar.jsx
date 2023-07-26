@@ -142,7 +142,7 @@ export default function Calendar() {
         isCurrentMonth: false,
       });
     setDays(() => _days_);
-    console.log(today, firstDayCurrentMonth, selectedDay);
+    // console.log(today, firstDayCurrentMonth, selectedDay);
   }, [today, firstDayCurrentMonth, selectedDay]);
 
   const toPreviousMonth = () => {
@@ -420,6 +420,7 @@ export default function Calendar() {
             {selectedWeek.map((date) => (
               <button
                 type="button"
+                key={date}
                 onClick={() => {
                   setSelectedDay(date);
                 }}
