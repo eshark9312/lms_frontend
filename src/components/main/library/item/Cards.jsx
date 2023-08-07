@@ -4,7 +4,7 @@ import Filter from "../../Filter";
 import SlideShow from "./SlideShow";
 
 function Cards() {
-    const [open, setOpen]=useState(false)
+  const [open, setOpen] = useState(false);
   const cards = [
     {
       title: "Dissection aortique",
@@ -124,12 +124,17 @@ function Cards() {
               </div>
             </div>
             <div className="hidden group-hover:flex items-center justify-center h-full">
-                <div onClick={()=>setOpen(true)} className="px-4 py-2 text-gray-500 font-bold border-2 border-gray-200 rounded-md  hover:cursor-pointer hover:shadow-md">open</div>
+              <div
+                onClick={() => setOpen(true)}
+                className="px-4 py-2 text-gray-500 font-bold border-2 border-gray-200 rounded-md  hover:cursor-pointer hover:shadow-md"
+              >
+                open
+              </div>
             </div>
           </div>
         ))}
       </div>
-      <SlideShow open={open} setOpen={setOpen}/>
+      <SlideShow open={open} setOpen={setOpen} />
     </>
   );
 }

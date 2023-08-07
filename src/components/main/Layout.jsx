@@ -7,7 +7,6 @@ export default function Layout({ Sidebar, children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const [title, setTitle] = useState("");
-
   useEffect(() => {
     switch (location.pathname) {
       case "/": {
