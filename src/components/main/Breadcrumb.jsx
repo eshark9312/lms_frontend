@@ -20,15 +20,15 @@ export default function Breadcrumb({ pages }) {
                 className="h-5 w-5 flex-shrink-0 text-gray-400"
                 aria-hidden="true"
               />
-              <a
-                href={page.href}
+              <Link
+                to={page.href}
                 className={`${
                   page.current ? "text-primary-600" : "text-gray-500"
                 } ml-4 font-bold  hover:font-extrabold hover:text-primary-600`}
                 aria-current={page.current ? "page" : undefined}
               >
                 {page.name}
-              </a>
+              </Link>
             </div>
           </li>
         ))}

@@ -12,6 +12,8 @@ import Overview from "./Overview";
 import SavedQuestions from "./SavedQuestions";
 import Cards from "./Cards";
 import Toolbox from "./Toolbox";
+import axios from "axios";
+import { Spinner } from "../../../icons/Spinner";
 
 const Matiere = () => {
   const { id } = useParams();
@@ -27,7 +29,6 @@ const Matiere = () => {
   ]);
 
   const setCurrentTab = (selectedTab) => {
-    console.log(selectedTab);
     setTabs(
       tabs.map((tab) => {
         if (selectedTab === tab.name) tab.current = true;
@@ -37,14 +38,11 @@ const Matiere = () => {
     );
   };
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   const pages = [
     { name: "Library", href: "/library/", current: false },
     { name: "Cardiologie", href: "#", current: true },
   ];
+
   return (
     <div>
       <div className="-mt-4 mb-6">
@@ -54,15 +52,15 @@ const Matiere = () => {
         <div className="text-3xl font-bold">Library</div>
       </div>
       <Tabs tabs={tabs} setCurrentTab={setCurrentTab} />
-
-      <div
-        className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50"
-      >
-      {tabs.find((tab) => tab.current).name === "Overview" && (<Overview />)}
-      {tabs.find((tab) => tab.current).name === "Saved questions" && (<SavedQuestions />)}
-      {tabs.find((tab) => tab.current).name === "Cards" && (<Cards />)}
-      {tabs.find((tab) => tab.current).name === "Toolbox" && (<Toolbox />)}
-    </div>
+      
+        <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
+          {tabs.find((tab) => tab.current).name === "Overview" && <Overview id={id} />}
+          {tabs.find((tab) => tab.current).name === "Saved questions" && (
+            <SavedQuestions />
+          )}
+          {tabs.find((tab) => tab.current).name === "Cards" && <Cards />}
+          {tabs.find((tab) => tab.current).name === "Toolbox" && <Toolbox />}
+        </div>
     </div>
   );
 };

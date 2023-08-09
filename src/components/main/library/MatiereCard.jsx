@@ -2,7 +2,7 @@ import React from 'react'
 import ProgressCircle from '../../common/ProgressCircle'
 import { useNavigate } from 'react-router-dom'
 
-function CatCard({matiere}) {
+function MatiereCard({matiere}) {
   const navigate = useNavigate()
 
   return (
@@ -19,4 +19,4 @@ function CatCard({matiere}) {
   )
 }
 
-export default CatCard
+export default MatiereCard
