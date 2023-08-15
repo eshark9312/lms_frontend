@@ -14,9 +14,9 @@ import { ProgressBar } from "../../../common/ProgressBar";
 import Pagination from "../../Pagination";
 import { Spinner } from "../../../icons/Spinner";
 import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
+import { useAuth } from "../../../../providers/authProvider";
 
-function Overview({id}) {
-  console.log(id)
+function Overview({ matiere }) {
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const authHttpClient = useAuthHttpClient();
@@ -24,10 +24,9 @@ function Overview({id}) {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await authHttpClient.post(
-          `/item/filter/`,
-          { matiere_id: id }
-        );
+        const response = await authHttpClient.post(`/item/filter/`, {
+          matiere_id: matiere._id,
+        });
         setItems(response.data.data);
         console.log(response.data.data);
         setIsLoading(false);
@@ -36,7 +35,7 @@ function Overview({id}) {
       }
     };
     fetchItems();
-  }, [id]);
+  }, []);
 
   // const items = [
   //   {
@@ -136,8 +135,10 @@ function Overview({id}) {
             <tbody className="divide-y divide-gray-200 bg-white">
               {items.map((item) => (
                 <tr key={item._id}>
-                  <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
-                    {item.item_number}. {item.name}
+                  <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 hover:text-primary-600 hover:cursor-pointer click-action">
+                    <Link to={`/library/item/${item._id}`}>
+                      {item.item_number}. {item.name}
+                    </Link>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     {item.status}
@@ -146,7 +147,7 @@ function Overview({id}) {
                     {item.n_questions} questions
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    <ProgressBar progressPercentage={item._id} />
+                    <ProgressBar item={item} />
                   </td>
                   <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                     <Link
@@ -165,35 +166,93 @@ function Overview({id}) {
       </div>
       <div className="mt-8 grid md:grid-cols-2 gap-8 bg-gray-50">
         {/* statistics card */}
-        <div className="rounded-2xl bg-white p-6 relative">
-          <div className="absolute top-4 right-4 text-gray-500 hover:cursor-pointer group-hover:text-primary-600">
-            <EllipsisVerticalIcon className="w-6 h-6" />
-          </div>
-          <div>
-            <PieChart
-              color={["#7F56D9", "#9E77ED", "#B692F6", "#D6BBFB", "#EAECF0"]}
-            />
-          </div>
-          <div className="py-4">How you answer?</div>
-          <div className="text-green-500 text-4xl font-extrabold">
-            60% success
-          </div>
-        </div>
-        <div className="rounded-2xl bg-white p-6 relative">
-          <div className="absolute top-4 right-4 text-gray-500 hover:cursor-pointer group-hover:text-primary-600">
-            <EllipsisVerticalIcon className="w-6 h-6" />
-          </div>
-          <div>
-            <PieChart
-              color={["#475467", "#667085", "#98A2B3", "#D0D5DD", "#F2F4F7"]}
-            />
-          </div>
-          <div className="py-4">Progress rate</div>
-          <div className="text-green-500 text-4xl font-extrabold">60% done</div>
-        </div>
+        <StatisticsChart matiere={matiere} />
       </div>
     </>
   );
 }
+const StatisticsChart = ({ matiere }) => {
+  const [successRate, setSuccessRate] = useState(null);
+  const [progressRate, setProgressRate] = useState(0);
+
+  const authHttpClient = useAuthHttpClient();
+  const { user } = useAuth();
+  useEffect(() => {
+    const getSuccessRate = async () => {
+      try {
+        const response = await authHttpClient.post(`/progress/matiere/filter`, {
+          user_id: user._id,
+          matiere_id: matiere._id,
+        });
+        console.log(response);
+        setSuccessRate(response.data.data[0]?.success_rate);
+        setProgressRate(response.data.data[0]?.progress_rate);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getSuccessRate();
+  }, []);
+
+  return (
+    <>
+      <div className="rounded-2xl bg-white p-6 relative">
+        <div className="absolute top-4 right-4 text-gray-500 hover:cursor-pointer group-hover:text-primary-600">
+          <EllipsisVerticalIcon className="w-6 h-6" />
+        </div>
+        <div>
+          <PieChart
+            data={
+              successRate
+                ? [
+                    successRate.excellent,
+                    successRate.good,
+                    successRate.average,
+                    successRate.poor,
+                  ]
+                : [0, 0, 0, 1]
+            }
+            color={["#7F56D9", "#9E77ED", "#B692F6", "#D6BBFB", "#EAECF0"]}
+          />
+        </div>
+        <div className="py-4">How you answer?</div>
+        <div className="text-green-500 text-4xl font-extrabold">
+          {successRate
+            ? Math.round(
+                ((successRate.excellent + successRate.good) * 100) /
+                  (successRate.excellent +
+                    successRate.good +
+                    successRate.average +
+                    successRate.poor)
+              )
+            : 0}
+          % success
+        </div>
+      </div>
+      <div className="rounded-2xl bg-white p-6 relative">
+        <div className="absolute top-4 right-4 text-gray-500 hover:cursor-pointer group-hover:text-primary-600">
+          <EllipsisVerticalIcon className="w-6 h-6" />
+        </div>
+        <div>
+          <PieChart
+            data={
+              progressRate
+                ? [progressRate, matiere.n_questions - progressRate]
+                : [0, 1]
+            }
+            color={["#475467", "#F2F4F7"]}
+          />
+        </div>
+        <div className="py-4">Progress rate</div>
+        <div className="text-green-500 text-4xl font-extrabold">
+          {progressRate && matiere.n_questions
+            ? Math.round((progressRate * 100) / matiere.n_questions)
+            : 0}
+          % done
+        </div>
+      </div>
+    </>
+  );
+};
 
 export default Overview;

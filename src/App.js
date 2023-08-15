@@ -16,6 +16,7 @@ import AnnalesPage from "./pages/main/AnnlaesPage";
 import Quiz from "./pages/exam/Quiz";
 import Signin from "./components/auth/Signin";
 import Signup from "./components/auth/Signup";
+import Users from "./pages/main/Users";
 
 const ProtectedRoute = () => {
   const { user } = useAuth();
@@ -23,6 +24,7 @@ const ProtectedRoute = () => {
 };
 
 function App() {
+  
   return (
     <div className="App">
       <QuizContextProvider>
@@ -38,12 +40,13 @@ function App() {
                 <Route path="/planner/" element={<Layout Sidebar={Sidebar}><Planner /></Layout>} />
                 <Route path="/playlists/" element={<Layout Sidebar={Sidebar}><PlaylistsPage /></Layout>} />
                 <Route path="/toolbox/" element={<Layout Sidebar={Sidebar}><Toolbox /></Layout>} />
+                <Route path="/users/" element={<Layout Sidebar={Sidebar}><Users /></Layout>} />
                 <Route path="/quiz/" element={<Quiz />} />
                 <Route path="/colors/" element={<Colors />} />
               </Route>
               <Route path="/auth/signin" element={<Signin />} />
               <Route path="/auth/signup" element={<Signup />} />
-              <Route path="*" element={<Navigate to="/" replace={true} />} />
+              <Route path="*" element={<Navigate to="/"/>} />
             </Routes>
           </AuthProvider>
         </BrowserRouter>

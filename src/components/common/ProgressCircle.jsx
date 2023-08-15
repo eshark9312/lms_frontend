@@ -1,10 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import useAuthHttpClient from "../../hooks/useAuthHttpClient";
+import { useAuth } from "../../providers/authProvider";
 
-function ProgressCircle({ r, color = "primary", percent, strokeWidth = 8 }) {
+function ProgressCircle({ matiere, r, color = "primary", strokeWidth = 8 }) {
+  const [percent, setPercent] = useState(0);
+  const authHttpClient = useAuthHttpClient();
+  const { user } = useAuth();
+  useEffect(() => {
+    const getProgress = async () => {
+      authHttpClient
+        .post("/progress/matiere/filter", {
+          user_id: user._id,
+          matiere_id: matiere._id,
+        })
+        .then((response) => {
+          setPercent(
+            Math.round(
+              (response.data.data[0].progress_rate / matiere.n_questions) * 100
+            )
+          );
+        })
+        .catch(() => {
+          setPercent(0);
+        });
+    };
+    if (matiere.n_questions) getProgress();
+  }, [matiere]);
   const circumference = r * 2 * Math.PI;
   return (
     <div className="w-fit h-fit relative">
-      <svg className="transform -rotate-90 origin-center" width={2*r+strokeWidth} height={2*r+strokeWidth}>
+      <svg
+        className="transform -rotate-90 origin-center"
+        width={2 * r + strokeWidth}
+        height={2 * r + strokeWidth}
+      >
         <circle
           className="text-gray-200"
           strokeWidth={strokeWidth}

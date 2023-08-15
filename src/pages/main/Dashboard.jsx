@@ -3,11 +3,36 @@ import TrandingItem from "../../components/main/dashboard/TrendingItem";
 import QuickAccess from "../../components/main/dashboard/QuickAccess";
 import RecentItem from "../../components/main/dashboard/RecentItem";
 import Calendar from "../../components/main/Calendar";
+import ImageConverter from "../../components/common/ImageConverter";
+import { useAuth } from "../../providers/authProvider";
 
 function Dashboard() {
+  const { user } = useAuth();
+  const trandingItems = [
+    "Tuberculose",
+    "Coqueluche",
+    "Méningites infectieuse",
+    "Tuberculose",
+    "Tuberculose",
+    "Tuberculose",
+    "Tuberculose",
+    "Tuberculose",
+    "Tuberculose",
+    "Tuberculose",
+  ];
+  const libraryItems = [
+    "188. Endocardite infectieuse",
+    "336. Méningites virales",
+    "336. Méningites virales",
+    "188. Endocardite infectieuse",
+    "336. Méningites virales",
+    "188. Endocardite infectieuse",
+    "336. Méningites virales",
+  ];
   return (
     <div className="inset-0 p-4">
       <div className="grid sm:grid-cols-2 gap-8">
+        {/* <ImageConverter /> */}
         {/* cards */}
         <div className="rounded-lg bg-gray-100 min-h-80 p-8 grid lg:grid-cols-2 click-action hover:cursor-pointer shadow-lg hover:shadow-primary-300">
           <div className="lg:-mr-10">
@@ -46,67 +71,80 @@ function Dashboard() {
           </div>
         </div>
       </div>
-      <div className="mt-8 mb-2 font-bold text-xl text-gray-600">
-        Quick access
-      </div>
-      <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
-        <QuickAccess />
-        <QuickAccess />
-        <QuickAccess />
-        <QuickAccess />
-      </div>
-      <div className="grid sm:h-[520px] sm:grid-cols-2">
-        <div>
+      {user.role === "user" && (
+        <>
           <div className="mt-8 mb-2 font-bold text-xl text-gray-600">
-            Recently viewed
+            Quick access
           </div>
-          <div className="flex flex-col gap-1">
-            <RecentItem>188. Endocardite infectieuse</RecentItem>
-            <RecentItem>336. Méningites virales</RecentItem>
-            <RecentItem>188. Endocardite infectieuse</RecentItem>
-            <RecentItem>336. Méningites virales</RecentItem>
-            <RecentItem>188. Endocardite infectieuse</RecentItem>
-            <RecentItem>336. Méningites virales</RecentItem>
-            <RecentItem>188. Endocardite infectieuse</RecentItem>
-            <RecentItem>336. Méningites virales</RecentItem>
-            <RecentItem>188. Endocardite infectieuse</RecentItem>
-            <RecentItem>336. Méningites virales</RecentItem>
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
+            <QuickAccess />
+            <QuickAccess />
+            <QuickAccess />
+            <QuickAccess />
           </div>
-        </div>
-        <div className="mt-8 mb-2 h-[500px] flex flex-col">
-          <div className="font-bold text-xl text-gray-600">Your day plan</div>
-          <div className="h-[480px]">
-            <Calendar />
+          <div className="grid sm:h-[520px] sm:grid-cols-2">
+            <div>
+              <div className="mt-8 mb-2 font-bold text-xl text-gray-600">
+                Recently viewed
+              </div>
+              <div className="flex flex-col gap-1">
+                <RecentItem>188. Endocardite infectieuse</RecentItem>
+                <RecentItem>336. Méningites virales</RecentItem>
+                <RecentItem>188. Endocardite infectieuse</RecentItem>
+                <RecentItem>336. Méningites virales</RecentItem>
+                <RecentItem>188. Endocardite infectieuse</RecentItem>
+                <RecentItem>336. Méningites virales</RecentItem>
+                <RecentItem>188. Endocardite infectieuse</RecentItem>
+                <RecentItem>336. Méningites virales</RecentItem>
+                <RecentItem>188. Endocardite infectieuse</RecentItem>
+                <RecentItem>336. Méningites virales</RecentItem>
+              </div>
+            </div>
+            <div className="mt-8 mb-2 h-[500px] flex flex-col">
+              <div className="font-bold text-xl text-gray-600">
+                Your day plan
+              </div>
+              <div className="h-[480px]">
+                <Calendar />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
       <div>
         <div className="mt-8 mb-2 font-bold text-xl text-gray-600">
           Trending items
         </div>
         <div className="flex flex-wrap gap-x-2 gap-y-1">
-          <TrandingItem>Tuberculose</TrandingItem>
-          <TrandingItem>Coqueluche</TrandingItem>
-          <TrandingItem>Méningites infectieuse</TrandingItem>
-          <TrandingItem>Tuberculose</TrandingItem>
-          <TrandingItem>Tuberculose</TrandingItem>
-          <TrandingItem>Tuberculose</TrandingItem>
-          <TrandingItem>Tuberculose</TrandingItem>
-          <TrandingItem>Tuberculose</TrandingItem>
-          <TrandingItem>Tuberculose</TrandingItem>
-          <TrandingItem>Tuberculose</TrandingItem>
+          {trandingItems.map((item) =>
+            user.role === "admin" ? (
+              <TrandingItem withDeleteIcon>{item}</TrandingItem>
+            ) : (
+              <TrandingItem>{item}</TrandingItem>
+            )
+          )}
+          <TrandingItem
+            withIcon={false}
+            action={() => {
+              alert("add new tranding item");
+            }}
+            className="text-primary-600"
+          >
+            +
+          </TrandingItem>
         </div>
       </div>
       <div>
         <div className="mt-8 mb-2 font-bold text-xl text-gray-600">Library</div>
         <div className="flex flex-wrap gap-x-2 gap-y-1">
-          <RecentItem>188. Endocardite infectieuse</RecentItem>
-          <RecentItem>336. Méningites virales</RecentItem>
-          <RecentItem>336. Méningites virales</RecentItem>
-          <RecentItem>188. Endocardite infectieuse</RecentItem>
-          <RecentItem>336. Méningites virales</RecentItem>
-          <RecentItem>188. Endocardite infectieuse</RecentItem>
-          <RecentItem>336. Méningites virales</RecentItem>
+          {libraryItems.map((item) =>
+            user.role === "admin" ? (
+              <RecentItem withDeleteIcon>{item}</RecentItem>
+            ) : (
+              <RecentItem>{item}</RecentItem>
+            )
+          )}
+          <RecentItem action={()=>{alert("add new library item")}}>+</RecentItem>
         </div>
       </div>
     </div>

@@ -1,45 +1,39 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 import { isAxiosError } from "axios";
 import { httpClient } from "../config/axiosConfig";
 
-import { getAccessToken, setAccesstoken } from "../helper/Token";
+import { setAccessToken } from "../helper/Token";
 import { useNavigate } from "react-router-dom";
 import useAuthHttpClient from "../hooks/useAuthHttpClient";
 
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(undefined);
-  // const authHttpClient = useAuthHttpClient();
+  const [user, setUser] = useState(null);
+  const authHttpClient = useAuthHttpClient();
 
-  // useEffect(() => {
-  //   const getUserdetail = () => {
-  //     authHttpClient
-  //       .get("/user")
-  //       .then((res) => setUser(res.data))
-  //       .catch((e) => e);
-  //   };
-  //   getUserdetail();
-  // }, [authHttpClient]);
+  authHttpClient
+    .get("auth/refresh")
+    .then((res) => {
+      console.log(res);
+      setUser(res.data.data.user);
+    })
+    .catch((e) => e);
 
   const navigate = useNavigate();
   const login = async ({ email, password }) => {
     let err = "";
     try {
-      const { data } = await httpClient.post(
-        "/auth/signin",
-        { email, password },
-      );
+      const { data } = await httpClient.post("/auth/signin", {
+        email,
+        password,
+      });
       setUser(data.user);
-      setAccesstoken(data.user.token);
+      setAccessToken(data.user.token);
     } catch (error) {
       if (isAxiosError(error)) {
+        console.log(error);
         err = error.response.data.error;
       } else {
         err = "Opps! Something Unexpected happens";
@@ -50,7 +44,7 @@ export const AuthProvider = ({ children }) => {
   const signup = async (signUpData) => {
     let err = "";
     try {
-      const { data } =  await httpClient.post("/auth/signup", signUpData);
+      await httpClient.post("/auth/signup", signUpData);
     } catch (error) {
       if (isAxiosError(error)) {
         err = error.response.data.error;
@@ -65,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await httpClient.get("/auth/signout");
       setUser(undefined);
-      setAccesstoken("");
+      setAccessToken("");
       navigate("/");
     } catch (error) {
       if (isAxiosError(error)) {

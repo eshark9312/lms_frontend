@@ -1,7 +1,7 @@
 import axios from "axios";
 import { httpClient } from "../config/axiosConfig";
 import { useAuth } from "../providers/authProvider";
-import { getAccessToken, setAccesstoken } from "../helper/Token";
+import { getAccessToken, setAccessToken } from "../helper/Token";
 
 const useAuthHttpClient = () => {
   const { signout } = useAuth();
@@ -17,12 +17,12 @@ const useAuthHttpClient = () => {
   const refreshAccessToken = async () => {
     try {
       const response = await httpClient.get("/auth/refresh");
-      const { accessToken } = response.data;
-      return accessToken;
+      console.log(response.data);
+      const { token } = response.data.data;
+      return token;
     } catch (error) {
       signout();
     }
-
     return "";
   };
 
@@ -34,7 +34,7 @@ const useAuthHttpClient = () => {
 
       if (!accessToken) {
         accessToken = (await refreshAccessToken());
-        setAccesstoken(accessToken);
+        setAccessToken(accessToken);
       }
       config.headers["x-access-token"] = accessToken;
 
@@ -55,7 +55,7 @@ const useAuthHttpClient = () => {
         error.response.data.error?.name === "TokenExpiredError"
       ) {
         const accessToken = (await refreshAccessToken());
-        setAccesstoken(accessToken);
+        setAccessToken(accessToken);
 
         originalRequest.headers["x-access-token"] = accessToken;
 

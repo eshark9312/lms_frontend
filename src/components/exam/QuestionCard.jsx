@@ -132,6 +132,22 @@ function QuestionCard({ question, index, next }) {
                         openConceptSlide(true);
                       }}
                     >
+                      Méningites virales
+                      <ArrowSmallRightIcon className="w-4 h-4" />
+                    </Label>
+                    <Label
+                      onClick={() => {
+                        openConceptSlide(true);
+                      }}
+                    >
+                      Méningites virales
+                      <ArrowSmallRightIcon className="w-4 h-4" />
+                    </Label>
+                    <Label
+                      onClick={() => {
+                        openConceptSlide(true);
+                      }}
+                    >
                       Syndrome anticholinergique
                       <ArrowSmallRightIcon className="w-4 h-4" />
                     </Label>

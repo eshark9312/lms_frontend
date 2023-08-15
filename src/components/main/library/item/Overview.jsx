@@ -1,46 +1,10 @@
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PieChart from "../../PieChart";
-import Pagination from "../../Pagination";
+import { useAuth } from "../../../../providers/authProvider";
+import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
 
-function Overview() {
-  const questions = [
-    {
-      title: "Connaître la définition d’une douleur thoracique aiguë",
-      rank: "Rang A",
-    },
-    {
-      title:
-        "Savoir rechercher une détresse vitale devant une douleur thoracique",
-      rank: "Rang A",
-    },
-    {
-      title:
-        "Identifier les signes de gravité imposant des décisions thérapeutiques immédiates",
-      rank: "Rang B",
-    },
-    {
-      title:
-        "Savoir évoquer les quatre urgences cardio-vasculaires devant une douleur thoracique",
-      rank: "Rang A",
-    },
-    {
-      title:
-        "Connaître la sémiologie clinique fonctionnelle et physique de la dissection aortiuqe",
-      rank: "Rang A",
-    },
-    {
-      title:
-        "Connaître la démarche diagnostique des quatre urgences cardio-vasculaires",
-      rank: "Rang B",
-    },
-    {
-      title:
-        "Connaître la place et les anomalies de la radiographie thorax des quatre urgences cardio-vasculaires",
-      rank: "Rang B",
-    },
-  ];
-
+function Overview({ item }) {
   return (
     <>
       <div className="inline-block min-w-full py-2 align-middle">
@@ -50,52 +14,110 @@ function Overview() {
           </div>
           <table className="min-w-full divide-y divide-gray-300">
             <tbody className="divide-y divide-gray-200 bg-white">
-              {questions.map((question, idx) => (
+              {item?.objects.map(({ title, rank }, idx) => (
                 <tr key={idx}>
                   <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
-                    {question.title}
+                    {title}
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {question.rank}
+                    {rank}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <Pagination />
         </div>
       </div>
       <div className="mt-8 grid md:grid-cols-2 gap-8 bg-gray-50">
         {/* statistics card */}
-        <div className="rounded-2xl bg-white p-6 relative">
-          <div className="absolute top-4 right-4 text-gray-500 hover:cursor-pointer group-hover:text-primary-600">
-            <EllipsisVerticalIcon className="w-6 h-6" />
-          </div>
-          <div>
-            <PieChart
-              color={["#7F56D9", "#9E77ED", "#B692F6", "#D6BBFB", "#EAECF0"]}
-            />
-          </div>
-          <div className="py-4">How you answer?</div>
-          <div className="text-green-500 text-4xl font-extrabold">
-            60% success
-          </div>
-        </div>
-        <div className="rounded-2xl bg-white p-6 relative">
-          <div className="absolute top-4 right-4 text-gray-500 hover:cursor-pointer group-hover:text-primary-600">
-            <EllipsisVerticalIcon className="w-6 h-6" />
-          </div>
-          <div>
-            <PieChart
-              color={["#475467", "#667085", "#98A2B3", "#D0D5DD", "#F2F4F7"]}
-            />
-          </div>
-          <div className="py-4">Progress rate</div>
-          <div className="text-green-500 text-4xl font-extrabold">60% done</div>
-        </div>
+        <StatisticsChart item={item} />
       </div>
     </>
   );
 }
+
+const StatisticsChart = ({ item }) => {
+  const [successRate, setSuccessRate] = useState(null);
+  const [progressRate, setProgressRate] = useState(0);
+
+  const authHttpClient = useAuthHttpClient();
+  const { user } = useAuth();
+  useEffect(() => {
+    const getSuccessRate = async () => {
+      try {
+        const response = await authHttpClient.post(`/progress/matiere/filter`, {
+          user_id: user._id,
+          matiere_id: item._id,
+        });
+        console.log(response);
+        setSuccessRate(response.data.data[0]?.success_rate);
+        setProgressRate(response.data.data[0]?.progress_rate);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getSuccessRate();
+  }, []);
+
+  return (
+    <>
+      <div className="rounded-2xl bg-white p-6 relative">
+        <div className="absolute top-4 right-4 text-gray-500 hover:cursor-pointer group-hover:text-primary-600">
+          <EllipsisVerticalIcon className="w-6 h-6" />
+        </div>
+        <div>
+          <PieChart
+            data={
+              successRate
+                ? [
+                    successRate.excellent,
+                    successRate.good,
+                    successRate.average,
+                    successRate.poor,
+                  ]
+                : [0, 0, 0, 1]
+            }
+            color={["#7F56D9", "#9E77ED", "#B692F6", "#D6BBFB", "#EAECF0"]}
+          />
+        </div>
+        <div className="py-4">How you answer?</div>
+        <div className="text-green-500 text-4xl font-extrabold">
+          {successRate
+            ? Math.round(
+                ((successRate.excellent + successRate.good) * 100) /
+                  (successRate.excellent +
+                    successRate.good +
+                    successRate.average +
+                    successRate.poor)
+              )
+            : 0}
+          % success
+        </div>
+      </div>
+      <div className="rounded-2xl bg-white p-6 relative">
+        <div className="absolute top-4 right-4 text-gray-500 hover:cursor-pointer group-hover:text-primary-600">
+          <EllipsisVerticalIcon className="w-6 h-6" />
+        </div>
+        <div>
+          <PieChart
+            data={
+              progressRate
+                ? [progressRate, item.n_questions - progressRate]
+                : [0, 1]
+            }
+            color={["#475467", "#F2F4F7"]}
+          />
+        </div>
+        <div className="py-4">Progress rate</div>
+        <div className="text-green-500 text-4xl font-extrabold">
+          {progressRate 
+            ? Math.round((progressRate * 100) / item.n_questions)
+            : 0}
+          % done
+        </div>
+      </div>
+    </>
+  );
+};
 
 export default Overview;

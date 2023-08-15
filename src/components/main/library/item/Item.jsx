@@ -12,12 +12,13 @@ import Overview from "./Overview";
 import SavedQuestions from "./SavedQuestions";
 import Cards from "./Cards";
 import Toolbox from "./Toolbox";
+import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
 
 const Item = () => {
+  const authHttpClient = useAuthHttpClient();
+  const [item, setItem] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   const [tabs, setTabs] = useState([
     { name: "Overview", icon: ViewColumnsIcon, current: true },
@@ -38,10 +39,31 @@ const Item = () => {
   };
 
   useEffect(() => {
+    const fetchItem = async () => {
+      try {
+        const response = await authHttpClient.get(`/item/${id}`);
+        setItem(response.data.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchItem();
+  }, []);
+
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const pages = [{ name: "Library", href: "/library/", current: false },{ name: "230. Douleur thoracique aiguë", href: "#", current: true }];
+  const pages = [
+    { name: "Library", href: "/library/", current: false },
+    {
+      name: item ? item.item_number + ". " + item.name : "",
+      href: "#",
+      current: true,
+    },
+  ];
+
   return (
     <div>
       <div className="-mt-4 mb-6">
@@ -52,16 +74,22 @@ const Item = () => {
       </div>
       <Tabs tabs={tabs} setCurrentTab={setCurrentTab} />
 
-      <div
-        className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50"
-      >
-        {tabs.find((tab) => tab.current).name === "Overview" && (<Overview />)}
-        {tabs.find((tab) => tab.current).name === "Saved questions" && (<SavedQuestions />)}
-        {tabs.find((tab) => tab.current).name === "Cards" && (<Cards />)}
-        {tabs.find((tab) => tab.current).name === "Toolbox" && (<Toolbox />)}
+      <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
+        {tabs.find((tab) => tab.current).name === "Overview" && (
+          <Overview item={item} />
+        )}
+        {tabs.find((tab) => tab.current).name === "Saved questions" && (
+          <SavedQuestions item_id={id} />
+        )}
+        {tabs.find((tab) => tab.current).name === "Cards" && (
+          <Cards item_id={id} />
+        )}
+        {tabs.find((tab) => tab.current).name === "Toolbox" && (
+          <Toolbox item_id={id} />
+        )}
       </div>
     </div>
   );
-}
+};
 
 export default Item;

@@ -9,21 +9,32 @@ import SettingsIcon from "../icons/SettingsIcon";
 import SupportIcon from "../icons/SupportIcon";
 import { Link, NavLink } from "react-router-dom";
 import Search from "./GlobalSearch";
-
-const navigation = [
-  { name: "Home", href: "/", icon: HomeIcon },
-  { name: "Library", href: "/library/", icon: LibraryIcon },
-  { name: "Annales", href: "/annales/", icon: AnnalesIcon },
-  { name: "Planner", href: "/planner/", icon: PlannerIcon },
-  { name: "Playlists", href: "/playlists/", icon: PlaylistIcon },
-  { name: "Toolbox", href: "/toolbox/", icon: ToolboxIcon },
-];
+import { useAuth } from "../../providers/authProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 function Sidebar() {
+  const { user } = useAuth();
+  const navigation =
+    user.role === "admin"
+      ? [
+          { name: "Home", href: "/", icon: HomeIcon },
+          { name: "Users", href: "/users/", icon: ToolboxIcon },
+          { name: "Library", href: "/library/", icon: LibraryIcon },
+          { name: "Analytics", href: "/analytics/", icon: AnnalesIcon },
+          { name: "Reports", href: "/reports/", icon: PlannerIcon },
+        ]
+      : [
+          { name: "Home", href: "/", icon: HomeIcon },
+          { name: "Library", href: "/library/", icon: LibraryIcon },
+          { name: "Annales", href: "/annales/", icon: AnnalesIcon },
+          { name: "Planner", href: "/planner/", icon: PlannerIcon },
+          { name: "Playlists", href: "/playlists/", icon: PlaylistIcon },
+          { name: "Toolbox", href: "/toolbox/", icon: ToolboxIcon },
+        ];
+
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
       <div className="flex h-16 shrink-0 items-center">
@@ -65,37 +76,39 @@ function Sidebar() {
               ))}
             </ul>
           </li>
-          <li>
-            <div className="text-sm font-semibold leading-6 text-gray-500">
-              QUICK ACCESS
-            </div>
-            <ul className="-mx-2 mt-2 space-y-1">
-              <li>
-                <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600 click-action">
-                  <div className="h-8 w-8 grounded flex justify-center items-center border-2 border-inherit rounded border-dashed text-[22px] pb-[1px]">
-                    +
-                  </div>
-                  Add an item
-                </Link>
-              </li>
-              <li>
-                <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600 click-action">
-                  <div className="h-8 w-8 grounded flex justify-center items-center border-2 border-inherit rounded border-dashed text-[22px] pb-[1px]">
-                    +
-                  </div>
-                  Add an item
-                </Link>
-              </li>
-              <li>
-                <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600 click-action">
-                  <div className="h-8 w-8 grounded flex justify-center items-center border-2 border-inherit rounded border-dashed text-[22px] pb-[1px]">
-                    +
-                  </div>
-                  Add an item
-                </Link>
-              </li>
-            </ul>
-          </li>
+          {user.role === "user" && (
+            <li>
+              <div className="text-sm font-semibold leading-6 text-gray-500">
+                QUICK ACCESS
+              </div>
+              <ul className="-mx-2 mt-2 space-y-1">
+                <li>
+                  <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600 click-action">
+                    <div className="h-8 w-8 grounded flex justify-center items-center border-2 border-inherit rounded border-dashed text-[22px] pb-[1px]">
+                      +
+                    </div>
+                    Add an item
+                  </Link>
+                </li>
+                <li>
+                  <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600 click-action">
+                    <div className="h-8 w-8 grounded flex justify-center items-center border-2 border-inherit rounded border-dashed text-[22px] pb-[1px]">
+                      +
+                    </div>
+                    Add an item
+                  </Link>
+                </li>
+                <li>
+                  <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600 click-action">
+                    <div className="h-8 w-8 grounded flex justify-center items-center border-2 border-inherit rounded border-dashed text-[22px] pb-[1px]">
+                      +
+                    </div>
+                    Add an item
+                  </Link>
+                </li>
+              </ul>
+            </li>
+          )}
           <li className="mt-auto mb-8">
             <ul className="-mx-2 space-y-1">
               <li>
