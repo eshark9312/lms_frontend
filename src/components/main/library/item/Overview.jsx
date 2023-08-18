@@ -45,9 +45,9 @@ const StatisticsChart = ({ item }) => {
   useEffect(() => {
     const getSuccessRate = async () => {
       try {
-        const response = await authHttpClient.post(`/progress/matiere/filter`, {
+        const response = await authHttpClient.post(`/progress/item/filter`, {
           user_id: user._id,
-          matiere_id: item._id,
+          item_id: item._id,
         });
         console.log(response);
         setSuccessRate(response.data.data[0]?.success_rate);

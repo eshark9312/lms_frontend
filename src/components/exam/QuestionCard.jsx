@@ -17,28 +17,38 @@ import NotiStat from "./NotiStat";
 import SlideConcept from "./SlideConcept";
 import NotiRef from "./NotiRef";
 import SlideReport from "./SlideReport";
+import useAuthHttpClient from "../../hooks/useAuthHttpClient";
+import { useAuth } from "../../providers/authProvider";
+import { useCard } from "../../providers/cardProvider";
+import { useQuiz } from "../../hooks/useQuiz";
 
-function QuestionCard({ question, index, next }) {
-  const [discordance, setDiscordance] = useState(null);
+function QuestionCard({ question: _question, setQuestions, index, next }) {
+  const { setCurrentQuestion } = useQuiz();
+  const { user } = useAuth();
+  const authHttpClient = useAuthHttpClient();
+  const [question, setQuestion] = useState(_question);
+  const { showCard } = useCard();
   useEffect(() => {
-    if (question.result) {
-      const correctItems = question.result.choices.filter(
-        ({ correctAnswer, yourAnswer }) => correctAnswer !== yourAnswer
-      );
-      setDiscordance(correctItems.length);
-    }
-  }, [question]);
+    setQuestion(_question);
+  }, [_question]);
+  const [answer, setAnswer] = useState();
+  useEffect(() => {
+    _question.type === "MultiChoice" &&
+      setAnswer(Array(question.choices.length).fill(false));
+    _question.type === "ShortAnswer" && setAnswer("");
+    _question.type === "TrueOrFalse" && setAnswer(false);
+  }, [question?.choices.length, _question]);
 
   var bgColor, borderColor, textColor;
-  if (!question.result) {
+  if (!question?.result) {
     borderColor = "border-gray-300";
     textColor = "text-gray-800";
     bgColor = "bg-white";
-  } else if (discordance === 0) {
+  } else if (question.result.score > 15) {
     borderColor = "border-green-dark";
     textColor = "text-green-dark";
     bgColor = "bg-green-bg";
-  } else if (discordance < 3) {
+  } else if (question.result.score > 3) {
     borderColor = "border-orange-dark";
     textColor = "text-orange-dark";
     bgColor = "bg-orange-bg";
@@ -47,11 +57,71 @@ function QuestionCard({ question, index, next }) {
     textColor = "text-red-dark";
     bgColor = "bg-red-bg";
   }
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitAnswer = async () => {
+    console.log(_question.type, answer);
+    setIsSubmitting(true);
+    let parsedAnswer;
+    switch (_question.type) {
+      case "MultiChoice":
+        parsedAnswer = answer;
+        break;
+      case "ShortAnswer":
+        parsedAnswer = answer.split(",").map((item) => item.trim());
+        break;
+      default:
+        parsedAnswer = answer;
+        break;
+    }
+    console.log(parsedAnswer);
+    try {
+      const response = await authHttpClient.post("/answer", {
+        user_id: user._id,
+        question: {
+          question_id: question._id,
+          type: question.__t,
+        },
+        answer: parsedAnswer,
+      });
+      let answeredQuestion = {
+        ...question,
+        result: {
+          score: response.data.data.score,
+          comment: response.data.data.question.comment,
+          cards: response.data.data.question.cards,
+        },
+      };
+      switch (_question.type) {
+        case "MultiChoice":
+          answeredQuestion.result.choices = question.choices.map((_, i) => ({
+            correctAnswer: response.data.data.question.answers[i].answer,
+            yourAnswer: answer[i],
+            desc: response.data.data.question.answers[i].desc,
+          }));
+          break;
+        case "ShortAnswer":
+          answeredQuestion.result.yourAnswer = answer;
+          break;
+        default:
+          answeredQuestion.result.yourAnswer = answer;
+          break;
+      }
+      setQuestion(answeredQuestion);
+      setQuestions((questions) => [
+        ...questions.slice(0, index),
+        answeredQuestion,
+        ...questions.slice(index + 1),
+      ]);
+      setIsSubmitting(false);
+    } catch (error) {
+      setIsSubmitting(false);
+      console.log(error);
+    }
+  };
 
   const [showShareLinkModal, openShareLinkModal] = useState(false);
   const [showPlaylistSlide, openPlaylistSlide] = useState(false);
   const [showStatisticNoti, openStatisticNoti] = useState(false);
-  const [showConceptSlide, openConceptSlide] = useState(false);
   const [showReportSlide, openReportSlide] = useState(false);
   const [showRefNoti, openRefNoti] = useState(false);
 
@@ -63,7 +133,7 @@ function QuestionCard({ question, index, next }) {
             className={`border-2 ${borderColor} ${bgColor} ${textColor} rounded-t-xl px-12 py-3 flex justify-between`}
           >
             <Label colorInherit>
-              Question {index}
+              Question {index + 1}
               <span className="rounded bg-blue-light text-white ml-2 my-1 px-1 text-xs text-center">
                 {question.level}
               </span>
@@ -72,20 +142,52 @@ function QuestionCard({ question, index, next }) {
           </div>
           <div className="flex-1 overflow-auto border-x-2 border-gray-300">
             <div className="px-12 py-6">{question.content}</div>
-            {question.choices.map((item, index) => (
-              <Choice
-                key={`${question._id}_${index}`}
-                label={String.fromCharCode("A".charCodeAt(0) + index)}
-                content={item}
-                checked={question.result?.choices[index].yourAnswer}
-                isRight={
-                  question.result?.choices[index].yourAnswer ===
-                  question.result?.choices[index].correctAnswer
-                }
-                desc={question.result?.choices[index].desc}
-              />
-            ))}
-
+            {question.type === "MultiChoice" &&
+              question.choices.map((item, idx) => (
+                <Choice
+                  key={`${question._id}_${idx}`}
+                  label={String.fromCharCode("A".charCodeAt(0) + idx)}
+                  content={item}
+                  answered={!!question.result}
+                  checked={
+                    question.result
+                      ? question.result.choices[idx].yourAnswer
+                      : answer?.[idx]
+                  }
+                  clickAction={
+                    question.result
+                      ? () => {}
+                      : () => {
+                          setAnswer((prev) => {
+                            return prev.map((_, i) => {
+                              return i === idx ? !prev[i] : prev[i];
+                            });
+                          });
+                        }
+                  }
+                  isRight={
+                    question.result?.choices[idx].yourAnswer ===
+                    question.result?.choices[idx].correctAnswer
+                  }
+                  desc={question.result?.choices[idx].desc}
+                />
+              ))}
+            {question.type === "ShortAnswer" && (
+              <div className="px-16 mb-3">
+                <input
+                  className="w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                  type="text"
+                  value={question.result ? question.result.yourAnswer : answer}
+                  onChange={
+                    question.result
+                      ? () => {}
+                      : (e) => {
+                          setAnswer(e.target.value);
+                        }
+                  }
+                />
+              </div>
+            )}
             {question.result && (
               <>
                 <div className="flex gap-2 items-center">
@@ -101,64 +203,19 @@ function QuestionCard({ question, index, next }) {
                 </div>
                 <div className="px-8">
                   <div className="px-6 bg-gray-100 rounded-lg p-2">
-                    <p>
-                      Les questions d’anatomie deviennent assez fréquentes sur
-                      les dernières éditions des ECNi.
-                    </p>
-                    <p>
-                      Veillez à bien maîtriser les différentes causes
-                      traumatiques de paralysie des nerfs crâniens.
-                    </p>
+                    <p>{question.result.comment}</p>
                   </div>
                   <div className="mt-2 flex gap-2 flex-wrap">
-                    <Label
-                      onClick={() => {
-                        openConceptSlide(true);
-                      }}
-                    >
-                      Les nerfs crâniens
-                      <ArrowSmallRightIcon className="w-4 h-4" />
-                    </Label>
-                    <Label
-                      onClick={() => {
-                        openConceptSlide(true);
-                      }}
-                    >
-                      Méningites virales
-                      <ArrowSmallRightIcon className="w-4 h-4" />
-                    </Label>
-                    <Label
-                      onClick={() => {
-                        openConceptSlide(true);
-                      }}
-                    >
-                      Méningites virales
-                      <ArrowSmallRightIcon className="w-4 h-4" />
-                    </Label>
-                    <Label
-                      onClick={() => {
-                        openConceptSlide(true);
-                      }}
-                    >
-                      Méningites virales
-                      <ArrowSmallRightIcon className="w-4 h-4" />
-                    </Label>
-                    <Label
-                      onClick={() => {
-                        openConceptSlide(true);
-                      }}
-                    >
-                      Syndrome anticholinergique
-                      <ArrowSmallRightIcon className="w-4 h-4" />
-                    </Label>
-                    <Label
-                      onClick={() => {
-                        openConceptSlide(true);
-                      }}
-                    >
-                      Diphtérie
-                      <ArrowSmallRightIcon className="w-4 h-4" />
-                    </Label>
+                    {question.result.cards.map((card) => (
+                      <Label
+                        onClick={() => {
+                          showCard(card);
+                        }}
+                      >
+                        {card.name}
+                        <ArrowSmallRightIcon className="w-4 h-4" />
+                      </Label>
+                    ))}
                   </div>
                 </div>
               </>
@@ -177,6 +234,7 @@ function QuestionCard({ question, index, next }) {
               <div
                 className="hover:cursor-pointer hover:text-blue-500"
                 onClick={() => {
+                  setCurrentQuestion(question._id);
                   openPlaylistSlide(true);
                 }}
               >
@@ -208,8 +266,14 @@ function QuestionCard({ question, index, next }) {
               </div>
             </div>
             <button
-              onClick={question.result ? next : () => {}}
-              className="px-8 py-4 text-lg bg-primary-600 rounded-lg text-white border-transparent border-2 hover:border-sky-500 hover:bg-primary-600"
+              onClick={
+                question.result
+                  ? next
+                  : () => {
+                      submitAnswer();
+                    }
+              }
+              className="click-action px-8 py-4 text-lg bg-primary-600 rounded-lg text-white border-transparent border-2 hover:bg-primary-600"
             >
               {question.result ? "Suivant" : "Soumettre"}
             </button>
@@ -220,7 +284,6 @@ function QuestionCard({ question, index, next }) {
       <ShareLinkModal open={showShareLinkModal} setOpen={openShareLinkModal} />
       <SlidePlaylist open={showPlaylistSlide} setOpen={openPlaylistSlide} />
       <NotiStat show={showStatisticNoti} setShow={openStatisticNoti} />
-      <SlideConcept open={showConceptSlide} setOpen={openConceptSlide} />
       <NotiRef show={showRefNoti} setShow={openRefNoti} />
       <SlideReport open={showReportSlide} setOpen={openReportSlide} />
     </>

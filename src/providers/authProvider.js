@@ -10,7 +10,7 @@ import useAuthHttpClient from "../hooks/useAuthHttpClient";
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const authHttpClient = useAuthHttpClient();
 
   authHttpClient
@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
         password,
       });
       setUser(data.user);
+      localStorage.set("user", JSON.stringify(data.user));
       setAccessToken(data.user.token);
     } catch (error) {
       if (isAxiosError(error)) {

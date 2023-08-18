@@ -1,5 +1,5 @@
 import React from "react";
-import ProgressCircle from "../../common/ProgressCircle";
+import ProgressCircle from "../../../common/ProgressCircle";
 import { useNavigate } from "react-router-dom";
 
 function MatiereCard({ matiere }) {

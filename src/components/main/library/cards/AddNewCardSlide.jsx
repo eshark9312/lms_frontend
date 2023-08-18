@@ -3,29 +3,29 @@ import { Dialog, Transition } from "@headlessui/react";
 import { PhotoIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox } from "@headlessui/react";
-import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
-import { Spinner } from "../../icons/Spinner";
+import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
+import { Spinner } from "../../../icons/Spinner";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
+function AddNewCardSlide({ open, setOpen, setCards }) {
   const authHttpClient = useAuthHttpClient();
+  const [isUploading, setIsUploading] = useState(false);
   const [card, setCard] = useState({});
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [selectedItems, setSelectedItems] = useState([]);
+
+  useEffect(()=>{
+    setCard({
+      name: "",
+      def: "",
+      title: "",
+      content: "",
+      instruction: "",
+      image: "",
+      image_desc: "",
+    })
+  },[])
   const [items, setItems] = useState([]);
-  useEffect(() => {
-    if (selectedCard) {
-      setSelectedItems(
-        items.filter((item) =>
-          selectedCard.items.map((item) => item._id).includes(item._id)
-        )
-      );
-      setCard(selectedCard);
-    }
-  }, [selectedCard, items]);
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -37,38 +37,28 @@ function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
     };
     fetchItems();
   }, []);
-  const updateCard = async (e) => {
-    setIsUpdating(true);
+  const handleSubmit = async (e) => {
+    setIsUploading(true);
     try {
-      const response = await authHttpClient.put(`/card/${card._id}`, {
+      const response = await authHttpClient.post("/card", {
         ...card,
         items: selectedItems.map((item) => item._id),
       });
-      console.log(response.data.data);
-      setIsUpdating(false);
+      setIsUploading(false);
       setOpen(false);
-      setCards((cards) =>
-        cards.map((_) => (card._id === _._id ? response.data.data : _))
-      );
+      setCards((cards)=>[
+        ...cards,
+        {
+          _id: response.data.data.id,
+          ...card,
+          items: selectedItems,
+        },
+      ]);
     } catch (error) {
-      setIsUpdating(false);
+      setIsUploading(false);
       console.log(error);
     }
   };
-
-  const deleteCard = async (e) => {
-    setIsDeleting(true);
-    try {
-      await authHttpClient.delete(`/card/${card._id}`);
-      setIsUpdating(false);
-      setOpen(false);
-      setCards((cards) => cards.filter((_) => card._id !== _._id));
-    } catch (error) {
-      setIsDeleting(false);
-      console.log(error);
-    }
-  };
-
   const convert = (e) => {
     if (e.target.files[0].size > 2000000) {
       console.log("File too large");
@@ -86,6 +76,7 @@ function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
       console.log("Error: ", error);
     };
   };
+  const [selectedItems, setSelectedItems] = useState([]);
 
   const [query, setQuery] = useState("");
   const filteredItems =
@@ -198,10 +189,10 @@ function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
 
                             {filteredItems.length > 0 && (
                               <Combobox.Options className="absolute z-50 mt-1 max-h-52 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                {filteredItems.map((item) => (
+                                {filteredItems.map((matiere) => (
                                   <Combobox.Option
-                                    key={item._id}
-                                    value={item}
+                                    key={matiere._id}
+                                    value={matiere}
                                     className={({ active }) =>
                                       classNames(
                                         "relative cursor-default select-none py-2 pl-3 pr-9",
@@ -220,9 +211,10 @@ function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
                                               selected && "font-semibold"
                                             )}
                                           >
-                                            {item.name}
+                                            {matiere.name}
                                           </span>
                                         </div>
+
                                         {selected && (
                                           <span
                                             className={classNames(
@@ -354,24 +346,15 @@ function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
                           }}
                         />
                       </i>
-                      <div className="mt-4 flex flex-row-reverse justify-between gap-2">
+                      <div className="mt-4 flex flex-row-reverse">
                         <button
                           onClick={() => {
-                            updateCard();
+                            handleSubmit();
                           }}
                           type="button"
                           className="click-action inline-flex justify-between border border-gray-300 items-center gap-x-1.5 rounded-md bg-primary-600 text-white px-2.5 py-1.5 text-sm font-semibol focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
                         >
-                          {isUpdating && <Spinner small />}Update Card
-                        </button>
-                        <button
-                          onClick={() => {
-                            deleteCard();
-                          }}
-                          type="button"
-                          className="click-action inline-flex justify-between border border-gray-300 items-center gap-x-1.5 rounded-md bg-red-600 text-white px-2.5 py-1.5 text-sm font-semibol focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
-                        >
-                          {isDeleting && <Spinner small />}Delete Card
+                          {isUploading && <Spinner small />}Add Card
                         </button>
                       </div>
                     </div>
@@ -386,4 +369,4 @@ function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
   );
 }
 
-export default EditCardSlide;
+export default AddNewCardSlide;

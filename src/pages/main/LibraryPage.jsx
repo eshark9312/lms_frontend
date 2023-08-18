@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import Tabs from "../../components/main/Tabs";
-import Matieres from "../../components/main/library/Matieres";
+import Matieres from "../../components/main/library/matieres/Matieres";
 import Breadcrumb from "../../components/main/Breadcrumb";
-import Items from "../../components/main/library/Items";
-import { BriefcaseIcon, ClipboardIcon, DocumentIcon, FolderIcon, Square3Stack3DIcon, TagIcon } from "@heroicons/react/24/outline";
+import Items from "../../components/main/library/items/Items";
+import { BriefcaseIcon, ClipboardIcon, DocumentIcon, FolderIcon, Square3Stack3DIcon, TagIcon, RectangleGroupIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "../../providers/authProvider";
-import Sessions from "../../components/main/library/Sessions";
-import Questions from "../../components/main/library/Questions";
-import Cards from "../../components/main/library/Cards";
-import Tags from "../../components/main/library/Tags";
+import Sessions from "../../components/main/library/sessions/Sessions";
+import DPs from "../../components/main/library/dps/DPs";
+import Questions from "../../components/main/library/questions/Questions";
+import Cards from "../../components/main/library/cards/Cards";
+import Tags from "../../components/main/library/tags/Tags";
 
 function LibraryPage() {
   const {user} = useAuth()
@@ -18,6 +19,7 @@ function LibraryPage() {
     { name: "Cards", icon: ClipboardIcon, current: false },
     { name: "Tags", icon: TagIcon, current: false },
     { name: "Sessions", icon: Square3Stack3DIcon, current: false },
+    { name: "DPs", icon: RectangleGroupIcon, current: false },
     { name: "Questions", icon: DocumentIcon, current: false },
   ] :[
     { name: "Matières", icon: BriefcaseIcon, current: true },
@@ -63,6 +65,7 @@ function LibraryPage() {
       {tabs.find((tab) => tab.current).name === "Cards" && (<Cards />)}
       {tabs.find((tab) => tab.current).name === "Tags" && (<Tags />)}
       {tabs.find((tab) => tab.current).name === "Sessions" && (<Sessions />)}
+      {tabs.find((tab) => tab.current).name === "DPs" && (<DPs />)}
       {tabs.find((tab) => tab.current).name === "Questions" && (<Questions />)}
     </div>
   );

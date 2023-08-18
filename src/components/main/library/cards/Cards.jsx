@@ -1,10 +1,10 @@
-import Search from "../Search";
-import Filter from "../Filter";
+import Search from "../../Search";
+import Filter from "../../Filter";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
-import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
-import { useAuth } from "../../../providers/authProvider";
-import { Spinner } from "../../icons/Spinner";
+import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
+import { useAuth } from "../../../../providers/authProvider";
+import { Spinner } from "../../../icons/Spinner";
 import AddNewCardSlide from "./AddNewCardSlide";
 import EditCardSlide from "./EditCardSlide";
 
@@ -86,12 +86,12 @@ export default function Cards() {
         setOpen={setOpenNewCardSlide}
         setCards={setCards}
       />
-        <EditCardSlide
-          open={openEditCardSlide}
-          setOpen={setOpenEditCardSlide}
-          setCards={setCards}
-          selectedCard={selectedCard}
-        />
+      <EditCardSlide
+        open={openEditCardSlide}
+        setOpen={setOpenEditCardSlide}
+        setCards={setCards}
+        selectedCard={selectedCard}
+      />
       {/* <AddNewCardSlide open={openNewCardSlide} setOpen={setOpenNewCardSlide} /> */}
     </>
   );

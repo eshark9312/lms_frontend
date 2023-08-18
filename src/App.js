@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { AuthProvider } from "./providers/authProvider";
 import { QuizContextProvider } from "./providers/quizProvider";
+import { CardProvider } from "./providers/cardProvider"
 import { useAuth } from "./providers/authProvider";
 import Layout from "./components/main/Layout";
 import Sidebar from "./components/main/Sidebar";
@@ -17,6 +18,8 @@ import Quiz from "./pages/exam/Quiz";
 import Signin from "./components/auth/Signin";
 import Signup from "./components/auth/Signup";
 import Users from "./pages/main/Users";
+import TakeTestModal from "./components/exam/TakeTestModal";
+import CardSlider from "./components/common/CardSlider";
 
 const ProtectedRoute = () => {
   const { user } = useAuth();
@@ -30,6 +33,7 @@ function App() {
       <QuizContextProvider>
         <BrowserRouter>
           <AuthProvider>
+            <CardProvider>
             <Routes>
               <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Layout Sidebar={Sidebar}><Dashboard /></Layout>} />
@@ -48,6 +52,9 @@ function App() {
               <Route path="/auth/signup" element={<Signup />} />
               <Route path="*" element={<Navigate to="/"/>} />
             </Routes>
+            <TakeTestModal />
+            <CardSlider />
+            </CardProvider>
           </AuthProvider>
         </BrowserRouter>
       </QuizContextProvider>

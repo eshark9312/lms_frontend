@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import { ProgressBar } from "../../common/ProgressBar";
-import Pagination from "../Pagination";
-import Search from "../Search";
-import Filter from "../Filter";
+import { ProgressBar } from "../../../common/ProgressBar";
+import Pagination from "../../Pagination";
+import Search from "../../Search";
+import Filter from "../../Filter";
 import {
   ArrowDownIcon,
   Bars3Icon,
@@ -15,11 +15,11 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
-import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
-import { useAuth } from "../../../providers/authProvider";
-import Label from "../../common/Label";
-import Modal from "../../common/Modal";
-import { Spinner } from "../../icons/Spinner";
+import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
+import { useAuth } from "../../../../providers/authProvider";
+import Label from "../../../common/Label";
+import Modal from "../../../common/Modal";
+import { Spinner } from "../../../icons/Spinner";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox, Switch } from "@headlessui/react";
 
@@ -287,7 +287,7 @@ export default function Sessions() {
         </div>
         {show && (
           <>
-            <div className="p-4 bg-white flex justify-between gap-2">
+            {/* <div className="p-4 bg-white flex justify-between gap-2">
               <div className="flex gap-2">
                 <Search />
                 <Filter />
@@ -302,7 +302,7 @@ export default function Sessions() {
                 <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
                 Add New DP
               </button>
-            </div>
+            </div> */}
             <table className="min-w-full divide-y divide-gray-300">
               <thead className="divide-y divide-gray-200 bg-white">
                 <tr>
@@ -362,7 +362,7 @@ export default function Sessions() {
                     </td>
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <Link
-                        to="/quiz"
+                        // to="/quiz"
                         className="text-indigo-600 hover:text-indigo-900"
                       >
                         <PencilSquareIcon className="w-5 h-5 stroke-2" />

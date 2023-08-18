@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import { ProgressBar } from "../../common/ProgressBar";
-import Pagination from "../Pagination";
-import Search from "../Search";
-import Filter from "../Filter";
+import { ProgressBar } from "../../../common/ProgressBar";
+import Pagination from "../../Pagination";
+import Search from "../../Search";
+import Filter from "../../Filter";
 import {
   ArrowDownIcon,
   Bars3Icon,
@@ -15,11 +15,11 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
-import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
-import { useAuth } from "../../../providers/authProvider";
-import Label from "../../common/Label";
-import Modal from "../../common/Modal";
-import { Spinner } from "../../icons/Spinner";
+import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
+import { useAuth } from "../../../../providers/authProvider";
+import Label from "../../../common/Label";
+import Modal from "../../../common/Modal";
+import { Spinner } from "../../../icons/Spinner";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox, Switch } from "@headlessui/react";
 

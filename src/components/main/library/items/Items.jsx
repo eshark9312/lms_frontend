@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import { ProgressBar } from "../../common/ProgressBar";
-import Pagination from "../Pagination";
-import Search from "../Search";
-import Filter from "../Filter";
+import { ProgressBar } from "../../../common/ProgressBar";
+import Pagination from "../../Pagination";
+import Search from "../../Search";
+import Filter from "../../Filter";
 import {
   Bars3Icon,
   ChevronDownIcon,
@@ -13,18 +13,20 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
-import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
-import { useAuth } from "../../../providers/authProvider";
-import Label from "../../common/Label";
-import Modal from "../../common/Modal";
-import { Spinner } from "../../icons/Spinner";
+import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
+import { useAuth } from "../../../../providers/authProvider";
+import Label from "../../../common/Label";
+import Modal from "../../../common/Modal";
+import { Spinner } from "../../../icons/Spinner";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox, Switch } from "@headlessui/react";
+import { useQuiz } from "../../../../hooks/useQuiz";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 export default function Items() {
+  const {setOpenTakeTestModal} = useQuiz();
   const { user } = useAuth();
   const [matieres, setMatieres] = useState([]);
   const [items, setItems] = useState([]);
@@ -123,7 +125,8 @@ export default function Items() {
                     </td>
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <Link
-                        to="/quiz"
+                        // to="/quiz"
+                        onClick={() => {setOpenTakeTestModal(true)}}
                         className="text-primary-600 hover:text-primary-900"
                       >
                         <PencilSquareIcon className="w-5 h-5 stroke-2" />

@@ -16,7 +16,7 @@ import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
 
 const Matiere = () => {
   const authHttpClient = useAuthHttpClient();
-  const [matiere, setMatiere] = useState([]);
+  const [matiere, setMatiere] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
   useEffect(() => {
@@ -26,8 +26,8 @@ const Matiere = () => {
   const [tabs, setTabs] = useState([
     { name: "Overview", icon: ViewColumnsIcon, current: true },
     { name: "Saved questions", icon: PaperClipIcon, current: false },
-    { name: "Cards", icon: ClipboardIcon, current: false },
-    { name: "Toolbox", icon: WrenchScrewdriverIcon, current: false },
+    // { name: "Cards", icon: ClipboardIcon, current: false },
+    // { name: "Toolbox", icon: WrenchScrewdriverIcon, current: false },
   ]);
 
   const setCurrentTab = (selectedTab) => {
@@ -57,7 +57,6 @@ const Matiere = () => {
     { name: "Library", href: "/library/", current: false },
     { name: matiere?.name, href: "#", current: true },
   ];
-
   return (
     <div>
       <div className="-mt-4 mb-6">

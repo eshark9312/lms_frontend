@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import Search from "../Search";
+import Search from "../../Search";
 import MatiereCard from "./MatiereCard";
-import { Spinner } from "../../icons/Spinner";
-import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
-import { useAuth } from "../../../providers/authProvider";
+import { Spinner } from "../../../icons/Spinner";
+import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
+import { useAuth } from "../../../../providers/authProvider";
 import EditableMatiereCard from "./EditableMatiereCard";
 import { PlusIcon, PhotoIcon } from "@heroicons/react/24/outline";
-import Modal from "../../common/Modal";
+import Modal from "../../../common/Modal";
 
 function Matieres() {
   const { user } = useAuth();

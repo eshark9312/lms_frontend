@@ -4,12 +4,17 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Sidebar from "../../components/exam/Sidebar";
 import QuestionCard from "../../components/exam/QuestionCard";
 import { useQuiz } from "../../hooks/useQuiz";
+import { useNavigate } from "react-router-dom";
 
 export default function Quiz() {
-  const { questions } = useQuiz();
+  const { questions, setQuestions } = useQuiz();
   const [currentQuestion, setQuestion] = useState(0);
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigator = useNavigate();
+  if (questions.length < 1) {
+    navigator(-1);
+    return;
+  }
 
   return (
     <>
@@ -99,7 +104,8 @@ export default function Quiz() {
         <div className="lg:pr-72">
           <QuestionCard
             question={questions[currentQuestion]}
-            index={currentQuestion + 1}
+            setQuestions={setQuestions}
+            index={currentQuestion}
             next={() => {
               setQuestion((state) =>
                 state + 1 < questions.length ? state + 1 : state

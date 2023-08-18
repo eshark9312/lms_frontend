@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import Search from "../Search";
-import Filter from "../Filter";
+import Search from "../../Search";
+import Filter from "../../Filter";
 import {
   ArrowDownIcon,
   Bars3Icon,
@@ -13,37 +13,44 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
-import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
-import { useAuth } from "../../../providers/authProvider";
-import Modal from "../../common/Modal";
-import { Spinner } from "../../icons/Spinner";
+import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
+import { useAuth } from "../../../../providers/authProvider";
+import Modal from "../../../common/Modal";
+import { Spinner } from "../../../icons/Spinner";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox, Switch } from "@headlessui/react";
+import QuestionForm from "./QuestionForm";
 
+const questionTypes = [
+  { type: "Basic question", n: 5, modelType: "MultiChoice" },
+  { type: "QROC", n: 3, modelType: "ShortAnswer" },
+  { type: "Long question", n: 12, modelType: "MultiChoice" },
+];
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-export default function Questions() {
+export default function DPs() {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const authHttpClient = useAuthHttpClient();
-  const [openNewItemModal, setOpenNewQuestionModal] = useState(false);
+  const [openNewItemModal, setOpenNewDPModal] = useState(false);
   const [openEditItemModal, setOpenEditItemModal] = useState(false);
   const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(false);
   const [questions, setQuestions] = useState([]);
+  const [dps, setDps] = useState([]);
+  const [selectedDp, setSelectedDp] = useState(null);
 
   useEffect(() => {
-    const fetchQuestions = async () => {
+    const fetchDPs = async () => {
       try {
-        const response = await authHttpClient.get("/question");
-        setQuestions(response.data.data);
-        console.log(response.data.data);
+        const response = await authHttpClient.get("/dp");
+        setDps(response.data.data);
         // setIsLoading(false);
       } catch (error) {
         console.log(error);
       }
     };
-    fetchQuestions();
+    fetchDPs();
   }, []);
 
   return (
@@ -55,12 +62,12 @@ export default function Questions() {
               <button
                 type="button"
                 onClick={() => {
-                  setOpenNewQuestionModal(true);
+                  setOpenNewDPModal(true);
                 }}
                 className="click-action inline-flex justify-between border-2 border-gray-300 items-center gap-x-1.5 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold hover:text-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
               >
                 <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
-                Add New Question
+                Add New DP
               </button>
               <div className="flex items-center space-x-2">
                 <Search />
@@ -80,6 +87,12 @@ export default function Questions() {
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
+                    Session
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
                     Matiere
                   </th>
                   <th
@@ -87,12 +100,6 @@ export default function Questions() {
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
                     Item
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Cards
                   </th>
                   <th
                     scope="col"
@@ -109,32 +116,23 @@ export default function Questions() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
-                {questions.map((question) => (
-                  <tr key={question._id} className="even:bg-gray-50">
-                    <td className="font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 flex questions-center gap-2">
-                      {question.question_number}
+                {dps.map((dp) => (
+                  <tr key={dp._id} className="even:bg-gray-50">
+                    <td className="font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 flex dps-center gap-2">
+                      {dp.dp_number}
                     </td>
                     <td className=" px-3 py-4 text-sm text-gray-500">
-                      {question.matiere_id.name}
+                      {dp.session_id?.name}
                     </td>
                     <td className=" px-3 py-4 text-sm text-gray-500">
-                      {`${question.item_id.item_number}. ${question.item_id.name}`}
+                      {dp.matiere_id.name}
                     </td>
-                    <td className=" px-3 py-1 text-sm text-gray-500">
-                      <div className="flex flex-wrap">
-                        {question.cards.map((card) => (
-                          <div
-                            key={card._id}
-                            className="px-2 m-1 max-w-fit border border-gray-400 rounded-md text-[12px]"
-                          >
-                            {card.name}
-                          </div>
-                        ))}
-                      </div>
+                    <td className=" px-3 py-4 text-sm text-gray-500">
+                      {`${dp.item_id.item_number}. ${dp.item_id.name}`}
                     </td>
                     <td className=" px-3 py-1 text-sm text-gray-500 ">
                       <div className="flex flex-wrap">
-                        {question.tags.map((tag) => (
+                        {dp.tags.map((tag) => (
                           <div
                             key={tag._id}
                             className="px-2 m-1 max-w-fit border border-gray-400 rounded-md text-[12px]"
@@ -147,14 +145,18 @@ export default function Questions() {
                     <td className="relative  py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <Link
                         href="#"
-                        className="text-primary-600 hover:text-primary-900"
+                        onClick={() => {
+                          setSelectedDp(dp);
+                          setOpenDeleteConfirmModal(true);
+                        }}
+                        className="text-red-600 hover:text-primary-900"
                       >
                         <TrashIcon className="w-5 h-5 stroke-2" />
                       </Link>
                     </td>
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <Link
-                        to="/quiz"
+                        // to="/quiz"
                         className="text-primary-600 hover:text-primary-900"
                       >
                         <PencilSquareIcon className="w-5 h-5 stroke-2" />
@@ -165,15 +167,38 @@ export default function Questions() {
               </tbody>
             </table>
           </div>
-          <AddNewItemModal />
+          <AddNewDPModal />
           {/* <EditItemModal /> */}
-          {/* <DeleteConformModal /> */}
+          <DeleteConformModal />
         </>
       )}
     </div>
   );
 
-  function AddNewItemModal() {
+  function AddNewDPModal() {
+    const [sessions, setSessions] = useState([]);
+    const [selectedSession, setSelectedSession] = useState(null);
+    const [sessionQuery, setSessionQuery] = useState("");
+    const filteredSessions =
+      sessionQuery === ""
+        ? sessions
+        : sessions.filter((session) => {
+            return session.name
+              .toLowerCase()
+              .includes(sessionQuery.toLowerCase());
+          });
+    useEffect(() => {
+      const fetchSessions = async () => {
+        try {
+          const response = await authHttpClient.get(`/session/`);
+          setSessions(response.data.data);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      fetchSessions();
+    }, []);
+
     const [matieres, setMatieres] = useState([]);
     const [selectedMatiere, setSelectedMatiere] = useState(null);
     const [matiereQuery, setMatiereQuery] = useState("");
@@ -188,7 +213,7 @@ export default function Questions() {
     useEffect(() => {
       const fetchMatieres = async () => {
         try {
-          const response = await authHttpClient.get(`/Matiere/`);
+          const response = await authHttpClient.get(`/matiere/`);
           setMatieres(response.data.data);
         } catch (error) {
           console.log(error);
@@ -242,14 +267,6 @@ export default function Questions() {
     }, []);
 
     const [cards, setCards] = useState([]);
-    const [selectedCards, setSelectedCards] = useState([]);
-    const [cardQuery, setCardQuery] = useState("");
-    const filteredCards =
-      cardQuery === ""
-        ? cards
-        : cards.filter((card) => {
-            return card.name.toLowerCase().includes(cardQuery.toLowerCase());
-          });
     useEffect(() => {
       const fetchCards = async () => {
         try {
@@ -263,10 +280,73 @@ export default function Questions() {
     }, []);
 
     const [isUploading, setIsUploading] = useState(false);
-    const [newQuestion, setNewQuestion] = useState({});
+    const [newDP, setNewDP] = useState({});
+    const [idx, setIdx] = useState(0);
+    const [n_questions, setN_questions] = useState(5);
+    const [selectedQuestion, setSelectedQuestion] = useState({
+      type: "Basic question",
+      question: "",
+      answers: Array(5).fill({
+        choice: "",
+        desc: "",
+        answer: false,
+      }),
+      comment: "",
+      cards: [],
+    });
+    const changeQuestionForm = (question) => {
+      setNewDP({
+        ...newDP,
+        questions: [
+          ...newDP.questions.slice(0, idx),
+          question,
+          ...newDP.questions.slice(idx + 1),
+        ],
+      });
+      setSelectedQuestion({ ...question });
+    };
+
     useEffect(() => {
-      setNewQuestion({
-        // question_number: "",
+      if (n_questions > idx) return;
+      setIdx(n_questions - 1);
+      setSelectedQuestion(newDP.questions[n_questions - 1]);
+    }, [n_questions, idx]);
+
+    useEffect(() => {
+      setNewDP(() => ({
+        matiere_id: "",
+        item_id: "",
+        tags: [],
+        desc: "",
+        questions: Array(5).fill({
+          type: "Basic question",
+          question: "",
+          answers: Array(5).fill({
+            choice: "",
+            desc: "",
+            answer: false,
+          }),
+          comment: "",
+          cards: [],
+        }),
+      }));
+    }, []);
+
+    useEffect(() => {
+      // if(selectedMatiere && selectedItem && selectedTags.length)
+      setNewDP((newDP) => ({
+        ...newDP,
+        session_id: selectedSession?._id,
+        matiere_id: selectedMatiere?._id,
+        item_id: selectedItem?._id,
+        tags: selectedTags.map((tag) => tag._id),
+      }));
+    }, [selectedMatiere, selectedItem, selectedTags, selectedSession]);
+
+    const increaseQuestions = () => {
+      const temp_DP = { ...newDP };
+      temp_DP.questions.push({
+        type: "Basic question",
         question: "",
         answers: Array(5).fill({
           choice: "",
@@ -274,104 +354,40 @@ export default function Questions() {
           answer: false,
         }),
         comment: "",
-        matiere_id: "",
-        item_id: "",
-        tags: [],
         cards: [],
       });
-    }, []);
-    const [n_choices, setN_choices] = useState(5);
-    const [questionTypes, setQuestionTypes] = useState([
-      {
-        type: "Basic question",
-        selected: true,
-        n: 5,
-        modelType: "MultiChoice",
-      },
-      { type: "QROC", selected: false, n: 3, modelType: "ShortAnswer" },
-      {
-        type: "Long question",
-        selected: false,
-        n: 12,
-        modelType: "MultiChoice",
-      },
-    ]);
-
-    useEffect(() => {
-      setNewQuestion((newQuestion) => {
-        return {
-          ...newQuestion,
-          matiere_id: selectedMatiere?._id,
-          item_id: selectedItem?._id,
-          tags: selectedTags.map((tag) => tag._id),
-          cards: selectedCards.map((card) => card._id),
-          question_number: 0,
-        };
-      });
-    }, [selectedMatiere, selectedItem, selectedTags, selectedCards]);
-
-    const changeType = ({ type, selected, n }) => {
-      if (selected) return;
-      setN_choices(n);
-      setNewQuestion((question) => ({
-        ...question,
-        answers: Array(n).fill(
-          type === "Basic question" || type === "Long question"
-            ? {
-                choice: "",
-                desc: "",
-                answer: false,
-              }
-            : ""
-        ),
-      }));
-      setQuestionTypes((questionTypes) => {
-        return questionTypes.map((questionType) => ({
-          ...questionType,
-          selected: questionType.type === type,
-        }));
-      });
+      setNewDP(temp_DP);
+      setN_questions(n_questions + 1);
     };
-    const plusN_choices = () => {
-      const temp_question = newQuestion;
-      temp_question.answers.push(
-        questionTypes.find((_) => _.selected).type === "Basic question" ||
-          questionTypes.find((_) => _.selected).type === "Long question"
-          ? {
-              choice: "",
-              desc: "",
-              answer: false,
-            }
-          : ""
-      );
-      setNewQuestion(temp_question);
-      setN_choices(n_choices + 1);
-    };
-    const minusN_choices = () => {
-      if (n_choices < 2) return;
-      setN_choices(n_choices - 1);
-      const temp_question = newQuestion;
-      temp_question.answers.pop();
-      setNewQuestion(temp_question);
+
+    const decreaseQuestions = () => {
+      if (newDP.questions.length < 2) return;
+      const temp_DP = { ...newDP };
+      temp_DP.questions.pop();
+      setNewDP(temp_DP);
+      setN_questions(n_questions - 1);
     };
     const handleSubmit = async (e) => {
       setIsUploading(true);
+      const temp_DP = { ...newDP };
+      temp_DP.questions = temp_DP.questions.map((question) => ({
+        ...question,
+        type: questionTypes.find(({ type }) => type === question.type)
+          .modelType,
+      }));
       try {
-        const response = await authHttpClient.post("/question/", {
-          question: newQuestion,
-          type: questionTypes.find((_) => _.selected).modelType,
-        });
+        const response = await authHttpClient.post("/dp/", temp_DP);
         setIsUploading(false);
-        setOpenNewQuestionModal(false);
+        setOpenNewDPModal(false);
         console.log(response.data.data);
-        setQuestions([
-          ...questions,
+        setDps([
+          ...dps,
           {
-            ...newQuestion,
+            ...newDP,
             _id: response.data.data._id,
             matiere_id: selectedMatiere,
             item_id: selectedItem,
-            cards: selectedCards,
+            session_id: selectedSession,
             tags: selectedTags,
           },
         ]);
@@ -380,11 +396,83 @@ export default function Questions() {
         console.log(error);
       }
     };
-
+    console.log(newDP);
     return (
-      <Modal open={openNewItemModal} setOpen={setOpenNewQuestionModal}>
+      <Modal open={openNewItemModal} setOpen={setOpenNewDPModal}>
         <div className="p-10 border-2 border-gray-500 rounded-lg bg-white sm:w-[900px]">
-          <div className="text-xl flex justify-center font-bold">Create QI</div>
+          <div className="text-xl flex justify-center font-bold">Create DP</div><div className="grid grid-cols-1 sm:grid-cols-2 my-2 gap-2">
+            {/*   select session   */}
+            <Combobox
+              as="div"
+              value={selectedSession}
+              onChange={setSelectedSession}
+            >
+              <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
+                Select Session
+              </Combobox.Label>
+              <div className="relative mt-2">
+                <Combobox.Input
+                  className="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                  onChange={(event) => setSessionQuery(event.target.value)}
+                  displayValue={(session) => session?.name}
+                />
+                <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+                  <ChevronUpDownIcon
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                </Combobox.Button>
+
+                {filteredSessions.length > 0 && (
+                  <Combobox.Options className="absolute z-50 mt-1 max-h-52 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                    {filteredSessions.map((session) => (
+                      <Combobox.Option
+                        key={session._id}
+                        value={session}
+                        className={({ active }) =>
+                          classNames(
+                            "relative cursor-default select-none py-2 pl-3 pr-9",
+                            active
+                              ? "bg-primary-600 text-white"
+                              : "text-gray-900"
+                          )
+                        }
+                      >
+                        {({ active, selected }) => (
+                          <>
+                            <div className="flex items-center">
+                              <span
+                                className={classNames(
+                                  "ml-3 truncate",
+                                  selected && "font-semibold"
+                                )}
+                              >
+                                {session.name}
+                              </span>
+                            </div>
+
+                            {selected && (
+                              <span
+                                className={classNames(
+                                  "absolute inset-y-0 right-0 flex items-center pr-4",
+                                  active ? "text-white" : "text-primary-600"
+                                )}
+                              >
+                                <CheckIcon
+                                  className="h-5 w-5"
+                                  aria-hidden="true"
+                                />
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </Combobox.Option>
+                    ))}
+                  </Combobox.Options>
+                )}
+              </div>
+            </Combobox>
+            </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 my-2 gap-2">
             {/*   select matiere   */}
             <Combobox
@@ -622,274 +710,69 @@ export default function Questions() {
               </div>
             </div>
           </Combobox>
-
           <label className="mt-4 text-left block text font-bold leading-6 text-gray-900">
-            Question
+            Description
           </label>
-          <div className="mt-2 flex flex-wrap justify-between items-center gap-2">
-            {/* question type */}
-            <div className="flex rounded-lg border border-gray-300 shadow-sm text-sm font-bold divide-x divide-gray-300">
-              {questionTypes.map(({ type, selected, n }) => (
-                <div
-                  onClick={() => changeType({ type, selected, n })}
-                  className="flex gap-2 items-center min-w-fit px-4 py-2 border-gray-300 hover:cursor-pointer hover:bg-gray-100"
-                >
-                  <div
-                    className={classNames(
-                      `w-4 h-4 rounded-full border-2 border-gray-400`,
-                      selected && "bg-gray-400"
-                    )}
-                  />
-                  {type}
-                </div>
-              ))}
+          <textarea
+            type="text"
+            className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+            value={newDP.desc}
+            placeholder="Type the DP here..."
+            onChange={(e) => {
+              const tempDP = { ...newDP };
+              tempDP.desc = e.target.value;
+              setNewDP(tempDP);
+            }}
+          />
+          <label className="mt-4 text-left block text font-bold leading-6 text-gray-900">
+            Number of questions
+          </label>
+          <div className="mt-2 max-w-fit flex items-center rounded-lg border border-gray-300 shadow-sm text-sm font-bold divide-x divide-gray-300">
+            <div
+              className="flex items-center min-w-fit p-2 border-gray-300 hover:cursor-pointer hover:bg-gray-100 rounded-l-lg"
+              onClick={() => decreaseQuestions()}
+            >
+              <MinusIcon className="h-5" />
             </div>
-            {/* number of answers */}
-            <div className="flex items-center gap-2">
-              <div className="text-center max-w-fit">Number of answers</div>
-              <div className="flex items-center rounded-lg border border-gray-300 shadow-sm text-sm font-bold divide-x divide-gray-300">
-                <div
-                  className="flex items-center min-w-fit p-2 border-gray-300 hover:cursor-pointer hover:bg-gray-100 rounded-l-lg"
-                  onClick={() => minusN_choices()}
-                >
-                  <MinusIcon className="h-5" />
-                </div>
-                <div className="flex items-center min-w-fit px-4 py-2 border-gray-300 hover:cursor-pointer hover:bg-gray-100">
-                  {n_choices}
-                </div>
-                <div
-                  className="flex items-center min-w-fit p-2 border-gray-300 hover:cursor-pointer hover:bg-gray-100 rounded-r-lg"
-                  onClick={() => plusN_choices()}
-                >
-                  <PlusIcon className="h-5" />
-                </div>
-              </div>
+            <div className="flex items-center min-w-fit px-4 py-2 border-gray-300 hover:cursor-pointer hover:bg-gray-100">
+              {n_questions}
+            </div>
+            <div
+              className="flex items-center min-w-fit p-2 border-gray-300 hover:cursor-pointer hover:bg-gray-100 rounded-r-lg"
+              onClick={() => increaseQuestions()}
+            >
+              <PlusIcon className="h-5" />
             </div>
           </div>
-          <div className="my-2 flex gap-2">
-            <textarea
-              type="text"
-              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-              value={newQuestion.question}
-              placeholder="Type the question here..."
-              onChange={(e) => {
-                setNewQuestion(() => ({
-                  ...newQuestion,
-                  question: e.target.value,
-                }));
-              }}
-            />
-          </div>
-          {/* <div className="h-[1px] bg-gray-300 my-4 -mx-6"/> */}
-          {/* answers */}
-          {(questionTypes.find((_) => _.selected).type === "Basic question" ||
-            questionTypes.find((_) => _.selected).type === "Long question") && (
-            <div className="text-left my-2 ml-2 flex flex-col gap-2 text-sm">
-              {newQuestion.answers?.map(({ choice, desc, answer }, index) => (
-                <div key={index} className="mt-2 w-full">
-                  Proposition {String.fromCharCode("A".charCodeAt(0) + index)}
-                  <div className="flex gap-2">
-                    <div className="mt-2.5">
-                      <input
-                        type="checkbox"
-                        checked={answer}
-                        className="h-5 w-5 mx-2 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
-                        onChange={(e) => {
-                          setNewQuestion({
-                            ...newQuestion,
-                            answers: newQuestion.answers.map((_, _i) => {
-                              if (_i === index) {
-                                return {
-                                  ..._,
-                                  answer: e.target.checked,
-                                };
-                              }
-                              return _;
-                            }),
-                          });
-                        }}
-                      />
-                    </div>
-                    <div className="flex-1 flex flex-col gap-1 my-1">
-                      <div>
-                        <input
-                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-                          type="text"
-                          value={choice}
-                          onChange={(e) => {
-                            setNewQuestion({
-                              ...newQuestion,
-                              answers: newQuestion.answers.map((_, _i) => {
-                                if (_i === index) {
-                                  return {
-                                    ..._,
-                                    choice: e.target.value,
-                                  };
-                                }
-                                return _;
-                              }),
-                            });
-                          }}
-                        />
-                      </div>
-                      <div>
-                        <textarea
-                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 bg-gray-100"
-                          type="text"
-                          value={desc}
-                          onChange={(e) => {
-                            setNewQuestion({
-                              ...newQuestion,
-                              answers: newQuestion.answers.map((_, _i) => {
-                                if (_i === index)
-                                  return {
-                                    ..._,
-                                    desc: e.target.value,
-                                  };
-                                return _;
-                              }),
-                            });
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
+          {newDP.questions && (
+            <div className="isolate inline-flex py-4 flex-wrap gap-2">
+              {newDP.questions.map((_, i) => (
+                <div
+                  className={classNames(
+                    "hover:cursor-pointer relative inline-flex items-center justify-center w-11 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300",
+                    idx === i && "bg-primary-600 text-white"
+                  )}
+                  onClick={() => {
+                    setIdx(i);
+                    setSelectedQuestion(newDP.questions[i]);
+                  }}
+                >
+                  {i + 1}
                 </div>
               ))}
             </div>
           )}
-          {questionTypes.find((_) => _.selected).type === "QROC" && (
-            <div className="my-2 text-left text-sm">
-              Answer
-              <div className="my-2 grid grid-cols-3 gap-2">
-                {newQuestion.answers?.map((answer, index) => (
-                  <div key={index} className="min-w-fit">
-                    <input
-                      className="w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-                      type="text"
-                      value={answer}
-                      onChange={(e) => {
-                        setNewQuestion({
-                          ...newQuestion,
-                          answers: newQuestion.answers.map((_, _i) => {
-                            if (_i === index) return e.target.value;
-                            return _;
-                          }),
-                        });
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          <label className="mt-2 text-left block text-sm font-medium leading-6 text-gray-900">
-            Commentaire
+          <div className="h-[1px] bg-gray-300 my-4 -mx-10" />
+          <label className="mt-4 text-left block text font-bold leading-6 text-gray-900">
+            Question {idx + 1}
           </label>
-          <div className="my-2 flex gap-2">
-            <textarea
-              type="text"
-              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 bg-gray-100"
-              value={newQuestion.comment}
-              onChange={(e) => {
-                setNewQuestion(() => ({
-                  ...newQuestion,
-                  comment: e.target.value,
-                }));
-              }}
+          {selectedQuestion && (
+            <QuestionForm
+              selectedQuestion={selectedQuestion}
+              setSelectedQuestion={changeQuestionForm}
+              cards={cards}
             />
-          </div>
-          <Combobox
-            as="div"
-            value={selectedCards}
-            onChange={setSelectedCards}
-            multiple
-          >
-            <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
-              Select Cards
-            </Combobox.Label>
-            <div className="flex gap-2">
-              <div className="relative mt-2 max-w-fit">
-                <Combobox.Input
-                  className="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-                  onChange={(event) => setCardQuery(event.target.value)}
-                  // displayValue={(items) => { return items.map((item) => item.name).join(", "); }}
-                />
-                <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
-                  <ChevronUpDownIcon
-                    className="h-5 w-5 text-gray-400"
-                    aria-hidden="true"
-                  />
-                </Combobox.Button>
-
-                {filteredCards.length > 0 && (
-                  <Combobox.Options className="absolute z-50 mt-1 max-h-52 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                    {filteredCards.map((card) => (
-                      <Combobox.Option
-                        key={card._id}
-                        value={card}
-                        className={({ active }) =>
-                          classNames(
-                            "relative cursor-default select-none py-2 pl-3 pr-9",
-                            active
-                              ? "bg-primary-600 text-white"
-                              : "text-gray-900"
-                          )
-                        }
-                      >
-                        {({ active, selected }) => (
-                          <>
-                            <div className="flex items-center">
-                              <span
-                                className={classNames(
-                                  "ml-3 truncate",
-                                  selected && "font-semibold"
-                                )}
-                              >
-                                {card.name}
-                              </span>
-                            </div>
-
-                            {selected && (
-                              <span
-                                className={classNames(
-                                  "absolute inset-y-0 right-0 flex items-center pr-4",
-                                  active ? "text-white" : "text-primary-600"
-                                )}
-                              >
-                                <CheckIcon
-                                  className="h-5 w-5"
-                                  aria-hidden="true"
-                                />
-                              </span>
-                            )}
-                          </>
-                        )}
-                      </Combobox.Option>
-                    ))}
-                  </Combobox.Options>
-                )}
-              </div>
-              <div className="mt-1.5 flex-1 rounded-lg border-dashed border-2 border-gray-200 p-2">
-                <div className="flex gap-2 flex-wrap ">
-                  {selectedCards.map((card) => (
-                    <div
-                      className="px-2  hover:text-red-900 hover:border-red-900 hover:cursor-pointer min-w-fit border border-gray-400 rounded-md text-[12px]"
-                      onClick={() =>
-                        setSelectedCards(
-                          selectedCards.filter(
-                            (selectedCard) => selectedCard._id !== card._id
-                          )
-                        )
-                      }
-                    >
-                      {card.name}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </Combobox>
+          )}
 
           <div className="mt-12 m-4 flex flex-row-reverse">
             <button
@@ -906,4 +789,49 @@ export default function Questions() {
       </Modal>
     );
   }
+  
+  function DeleteConformModal(){
+    const [deleting, setDeleting] = useState(false);
+    const handleSubmit = async (e) => {
+      setDeleting(true);
+      try {
+        await authHttpClient.delete(
+          `/dp/${selectedDp._id}`
+        );
+        setDeleting(false);
+        setOpenDeleteConfirmModal(false);
+        setDps((questions) =>{
+          return questions.filter((item) => 
+            item._id !== selectedDp._id
+          );
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    return (
+      <Modal open={openDeleteConfirmModal} setOpen={setOpenDeleteConfirmModal}>
+        <div className="mt-20 p-6 border-2 border-gray-500 rounded-lg bg-white sm:w-[400px]">
+          <label
+            htmlFor="matiere"
+            className="block text-sm font-medium leading-6 text-gray-900 text-left"
+          >
+            Do you really want to delete this DP?
+          </label>
+          <div className="mt-4 flex flex-row-reverse">
+            <button
+              onClick={() => {
+                handleSubmit();
+              }}
+              type="button"
+              className="click-action inline-flex justify-between border border-gray-300 items-center gap-x-1.5 rounded-md bg-red-600 text-white px-2.5 py-1.5 text-sm font-semibol focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
+            >
+              {deleting && <Spinner small />} Delete
+            </button>
+          </div>
+        </div>
+      </Modal>
+    );
+  }
+
 }

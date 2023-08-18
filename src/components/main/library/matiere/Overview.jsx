@@ -15,72 +15,29 @@ import Pagination from "../../Pagination";
 import { Spinner } from "../../../icons/Spinner";
 import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
 import { useAuth } from "../../../../providers/authProvider";
+import { useQuiz } from "../../../../hooks/useQuiz";
 
 function Overview({ matiere }) {
+  const {setOpenTakeTestModal} = useQuiz();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const authHttpClient = useAuthHttpClient();
 
   useEffect(() => {
+    if(!matiere) return;
     const fetchItems = async () => {
       try {
         const response = await authHttpClient.post(`/item/filter/`, {
           matiere_id: matiere._id,
         });
         setItems(response.data.data);
-        console.log(response.data.data);
         setIsLoading(false);
       } catch (error) {
         console.log(error);
       }
     };
     fetchItems();
-  }, []);
-
-  // const items = [
-  //   {
-  //     title: "152. Endocardite infectieuse",
-  //     status: "Fait",
-  //     questions: "24 questions",
-  //     progressRate: 60,
-  //   },
-  //   {
-  //     title: "153. Surveillance des porteurs de prothèses valvulaires",
-  //     status: "Fait",
-  //     questions: "24 questions",
-  //     progressRate: 60,
-  //   },
-  //   {
-  //     title: "230. Douleur thoracique aiguë",
-  //     status: "Fait",
-  //     questions: "24 questions",
-  //     progressRate: 60,
-  //   },
-  //   {
-  //     title: "231. Électrocardiogramme : indications et interprétations",
-  //     status: "Fait",
-  //     questions: "24 questions",
-  //     progressRate: 60,
-  //   },
-  //   {
-  //     title: "232. Fibrillation atriale",
-  //     status: "Fait",
-  //     questions: "24 questions",
-  //     progressRate: 60,
-  //   },
-  //   {
-  //     title: "233. Valvulopathies",
-  //     status: "Fait",
-  //     questions: "24 questions",
-  //     progressRate: 60,
-  //   },
-  //   {
-  //     title: "234. Insuffisance cardiaque",
-  //     status: "Fait",
-  //     questions: "24 questions",
-  //     progressRate: 60,
-  //   },
-  // ];
+  }, [matiere]);
 
   if (isLoading)
     return (
@@ -151,7 +108,8 @@ function Overview({ matiere }) {
                   </td>
                   <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                     <Link
-                      to="/quiz"
+                      // to="/quiz"
+                        onClick={() => {setOpenTakeTestModal(true)}}
                       className="text-indigo-600 hover:text-indigo-900"
                     >
                       <PencilSquareIcon className="w-5 h-5 stroke-2" />
@@ -180,11 +138,15 @@ const StatisticsChart = ({ matiere }) => {
   useEffect(() => {
     const getSuccessRate = async () => {
       try {
+        console.log({
+          user_id: user._id,
+          matiere_id: matiere._id,
+        })
         const response = await authHttpClient.post(`/progress/matiere/filter`, {
           user_id: user._id,
           matiere_id: matiere._id,
         });
-        console.log(response);
+        console.log(response.data.data);
         setSuccessRate(response.data.data[0]?.success_rate);
         setProgressRate(response.data.data[0]?.progress_rate);
       } catch (error) {

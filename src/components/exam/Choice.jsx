@@ -1,15 +1,19 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useState } from "react";
 
 import Check from "../common/Check";
 import { Transition } from "@headlessui/react";
 import MessageAlertIcon from "../icons/MessageAlertIcon";
 
-function Choice({ label, content, checked, desc, isRight }) {
-  const [check, setCheck] = useState(false);
-  useEffect(() => {
-    setCheck(checked);
-  }, [checked]);
-  const { borderColor, bgColor } = desc
+function Choice({
+  label,
+  content,
+  checked,
+  clickAction,
+  desc,
+  answered,
+  isRight,
+}) {
+  const { borderColor, bgColor } = answered
     ? isRight
       ? { borderColor: "border-green-dark", bgColor: "bg-green-bg" }
       : { borderColor: "border-red-dark", bgColor: "bg-red-bg" }
@@ -27,17 +31,16 @@ function Choice({ label, content, checked, desc, isRight }) {
           <span className="bg-gray-200 w-6 h-6 rounded-full text-gray-400 px-1 text-center font-bold">
             {label}
           </span>
-          <div
-            className="flex gap-3"
-            onClick={() => {
-              setCheck((state) => !state);
-            }}
-          >
-            <Check checked={check} styleFill/>
+          <div className="flex gap-3" onClick={clickAction}>
+            <Check checked={checked} styleFill />
             {content}
           </div>
         </div>
-        {desc && isRight === false && (<div><MessageAlertIcon strokeWidth={3} /></div>)}
+        {desc && isRight === false && (
+          <div>
+            <MessageAlertIcon strokeWidth={3} />
+          </div>
+        )}
         {desc &&
           (dropdown ? (
             <i
