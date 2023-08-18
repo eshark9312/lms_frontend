@@ -13,13 +13,15 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const authHttpClient = useAuthHttpClient();
 
-  authHttpClient
-    .get("auth/refresh")
-    .then((res) => {
-      console.log(res);
-      setUser(res.data.data.user);
-    })
-    .catch((e) => e);
+  useEffect(() => {
+    authHttpClient
+      .get("auth/refresh")
+      .then((res) => {
+        console.log(res);
+        setUser(res.data.data.user);
+      })
+      .catch((e) => e);
+  }, []);
 
   const navigate = useNavigate();
   const login = async ({ email, password }) => {
@@ -30,13 +32,14 @@ export const AuthProvider = ({ children }) => {
         password,
       });
       setUser(data.user);
-      localStorage.set("user", JSON.stringify(data.user));
+      localStorage.setItem("user", JSON.stringify(data.user));
       setAccessToken(data.user.token);
     } catch (error) {
       if (isAxiosError(error)) {
         console.log(error);
         err = error.response.data.error;
       } else {
+        console.log(error);
         err = "Opps! Something Unexpected happens";
       }
     }
@@ -58,8 +61,9 @@ export const AuthProvider = ({ children }) => {
   const signout = async () => {
     let err = "";
     try {
-      await httpClient.get("/auth/signout");
+      // await httpClient.get("/auth/signout");
       setUser(undefined);
+      localStorage.removeItem("user");
       setAccessToken("");
       navigate("/");
     } catch (error) {

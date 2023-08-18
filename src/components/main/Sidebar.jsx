@@ -1,4 +1,5 @@
 import React from "react";
+import {ArrowLeftOnRectangleIcon} from "@heroicons/react/24/outline"
 import HomeIcon from "../icons/HomeIcon";
 import LibraryIcon from "../icons/LibraryIcon";
 import AnnalesIcon from "../icons/AnnalesIcon";
@@ -16,7 +17,7 @@ function classNames(...classes) {
 }
 
 function Sidebar() {
-  const { user } = useAuth();
+  const { user, signout } = useAuth();
   const navigation =
     user.role === "admin"
       ? [
@@ -131,6 +132,21 @@ function Sidebar() {
                     <SettingsIcon />
                   </div>
                   Settings
+                </Link>
+              </li>
+              <li>
+                <Link
+                 onClick={()=>{
+                  signout();
+                 }}
+                 className="text-gray-700 hover:text-primary-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 leading-6 font-semibold click-action">
+                  <div
+                    className="text-gray-500 group-hover:text-primary-600 h-6 w-6 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <ArrowLeftOnRectangleIcon className="w-6 h-6"/>
+                  </div>
+                  Log out
                 </Link>
               </li>
             </ul>
