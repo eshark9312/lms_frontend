@@ -1,7 +1,7 @@
-export const Spinner = ({small=false}) => (
+export const Spinner = ({small=false, center=false}) => (
   <svg
     aria-hidden="true"
-    className={`${small ? "w-6 h-6":"w-12 h-12" } mr-2 text-gray-400 animate-spin fill-primary-600`}
+    className={`${small ? "w-6 h-6":"w-12 h-12" } ${!center && "mr-2"} text-gray-400 animate-spin fill-primary-600`}
     viewBox="0 0 100 101"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

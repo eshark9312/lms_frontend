@@ -344,7 +344,7 @@ export default function Sessions() {
               </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
                 {session.dps?.map((dp) => (
-                  <tr key={dp.id} className="even:bg-gray-50">
+                  <tr key={dp.dp_number} className="even:bg-gray-50">
                     <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 flex items-center gap-2">
                       {dp.title}
                     </td>

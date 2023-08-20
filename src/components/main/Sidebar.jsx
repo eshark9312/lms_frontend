@@ -1,5 +1,8 @@
-import React from "react";
-import {ArrowLeftOnRectangleIcon} from "@heroicons/react/24/outline"
+import React, { useEffect, useState } from "react";
+import {
+  ArrowLeftOnRectangleIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import HomeIcon from "../icons/HomeIcon";
 import LibraryIcon from "../icons/LibraryIcon";
 import AnnalesIcon from "../icons/AnnalesIcon";
@@ -11,6 +14,8 @@ import SupportIcon from "../icons/SupportIcon";
 import { Link, NavLink } from "react-router-dom";
 import Search from "./GlobalSearch";
 import { useAuth } from "../../providers/authProvider";
+import useAuthHttpClient from "../../hooks/useAuthHttpClient";
+import NewQuickAccessModal from "./NewQuickAccessModal";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -18,6 +23,24 @@ function classNames(...classes) {
 
 function Sidebar() {
   const { user, signout } = useAuth();
+  const authHttpClient = useAuthHttpClient();
+  const [openNewQuickAccess, setOpenNewQuickAccess] = useState(false);
+  const [quickAccessItems, setQuickAccessItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    const fetchQuickAccess = async () => {
+      setIsLoading(true);
+      try {
+        const response = await authHttpClient.get(`/quickaccess/sidebar/`);
+        setQuickAccessItems(response.data.data);
+        setIsLoading(false);
+      } catch (err) {
+        setIsLoading(false);
+        console.log(err);
+      }
+    };
+    fetchQuickAccess();
+  }, []);
   const navigation =
     user.role === "admin"
       ? [
@@ -35,6 +58,63 @@ function Sidebar() {
           { name: "Playlists", href: "/playlists/", icon: PlaylistIcon },
           { name: "Toolbox", href: "/toolbox/", icon: ToolboxIcon },
         ];
+
+  const SidebarQuickAccessItem = ({ id, itemType, matiere_or_item_id }) => {
+    const [item, setItem] = useState();
+    const endpoint = itemType === "Matiere" ? "matiere" : "item";
+    useEffect(() => {
+      const fetchItem = async () => {
+        try {
+          const response = await authHttpClient.get(
+            `/${endpoint}/${matiere_or_item_id}`
+          );
+          setItem(response.data.data);
+          setIsLoading(false);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      fetchItem();
+    }, [endpoint, matiere_or_item_id]);
+
+    const remove = async () => {
+      try {
+        await authHttpClient.delete(`/quickaccess/sidebar/${id}`);
+        setQuickAccessItems((_) => _.filter((_item) => _item._id !== id));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    return (
+      <NavLink
+        to={`/library/${endpoint}/${matiere_or_item_id}`}
+        className={({ isActive }) =>
+          classNames(
+            isActive
+              ? "bg-gray-50 text-primary-600"
+              : "text-gray-700 hover:text-primary-600 hover:bg-gray-50",
+            "group relative px-2 text-sm flex gap-x-3 rounded-md p-2 leading-6 font-semibold click-action justify-between items-center"
+          )
+        }
+      >
+        <div className="flex-1 max-w-full truncate ">
+          {item &&
+            (itemType === "Matiere"
+              ? item.name
+              : `${item.item_number}. ${item.name}`)}
+        </div>
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            remove();
+          }}
+          className="hidden group-hover:block right-2 hover:text-red-600"
+        >
+          <XMarkIcon className="w-4 h-4" />
+        </div>
+      </NavLink>
+    );
+  };
 
   return (
     <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
@@ -83,24 +163,23 @@ function Sidebar() {
                 QUICK ACCESS
               </div>
               <ul className="-mx-2 mt-2 space-y-1">
+                {quickAccessItems.map((item, index) => (
+                  <li>
+                    <SidebarQuickAccessItem
+                      key={index}
+                      id={item._id}
+                      itemType={item.MatiereOrItem}
+                      matiere_or_item_id={item.matiere_or_item_id}
+                    />
+                  </li>
+                ))}
                 <li>
-                  <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600 click-action">
-                    <div className="h-8 w-8 grounded flex justify-center items-center border-2 border-inherit rounded border-dashed text-[22px] pb-[1px]">
-                      +
-                    </div>
-                    Add an item
-                  </Link>
-                </li>
-                <li>
-                  <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600 click-action">
-                    <div className="h-8 w-8 grounded flex justify-center items-center border-2 border-inherit rounded border-dashed text-[22px] pb-[1px]">
-                      +
-                    </div>
-                    Add an item
-                  </Link>
-                </li>
-                <li>
-                  <Link className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600 click-action">
+                  <Link
+                    onClick={() => {
+                      setOpenNewQuickAccess(true);
+                    }}
+                    className="group flex items-center gap-x-3 rounded-md p-2 leading-6 font-semibold hover:text-primary-600 hover:bg-gray-50 border-gray-500 hover:border-primary-600 text-gray-600 click-action"
+                  >
                     <div className="h-8 w-8 grounded flex justify-center items-center border-2 border-inherit rounded border-dashed text-[22px] pb-[1px]">
                       +
                     </div>
@@ -136,15 +215,16 @@ function Sidebar() {
               </li>
               <li>
                 <Link
-                 onClick={()=>{
-                  signout();
-                 }}
-                 className="text-gray-700 hover:text-primary-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 leading-6 font-semibold click-action">
+                  onClick={() => {
+                    signout();
+                  }}
+                  className="text-gray-700 hover:text-primary-600 hover:bg-gray-50 group flex gap-x-3 rounded-md p-2 leading-6 font-semibold click-action"
+                >
                   <div
                     className="text-gray-500 group-hover:text-primary-600 h-6 w-6 shrink-0"
                     aria-hidden="true"
                   >
-                    <ArrowLeftOnRectangleIcon className="w-6 h-6"/>
+                    <ArrowLeftOnRectangleIcon className="w-6 h-6" />
                   </div>
                   Log out
                 </Link>
@@ -153,6 +233,12 @@ function Sidebar() {
           </li>
         </ul>
       </nav>
+      <NewQuickAccessModal
+        open={openNewQuickAccess}
+        setOpen={setOpenNewQuickAccess}
+        isSidebar
+        setQuickAccessItems={setQuickAccessItems}
+      />
     </div>
   );
 }

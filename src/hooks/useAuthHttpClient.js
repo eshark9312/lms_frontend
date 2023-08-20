@@ -52,7 +52,7 @@ const useAuthHttpClient = () => {
 
       if (
         error.response?.status === 401 &&
-        error.response.data.error?.name === "TokenExpiredError"
+        error.response.data.message === "Unauthorized!"
       ) {
         const accessToken = (await refreshAccessToken());
         setAccessToken(accessToken);

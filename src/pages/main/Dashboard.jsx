@@ -1,13 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TrandingItem from "../../components/main/dashboard/TrendingItem";
 import QuickAccess from "../../components/main/dashboard/QuickAccess";
 import RecentItem from "../../components/main/dashboard/RecentItem";
 import Calendar from "../../components/main/Calendar";
 import ImageConverter from "../../components/common/ImageConverter";
 import { useAuth } from "../../providers/authProvider";
+import NewQuickAccessModal from "../../components/main/NewQuickAccessModal";
+import useAuthHttpClient from "../../hooks/useAuthHttpClient";
 
 function Dashboard() {
   const { user } = useAuth();
+  const authHttpClient = useAuthHttpClient();
+  const [openNewQuickAccess, setOpenNewQuickAccess] = useState(false);
+  const [quickAccessItems, setQuickAccessItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchQuickAccess = async () => {
+      setIsLoading(true);
+      try {
+        const response = await authHttpClient.get(`/quickaccess/`);
+        setQuickAccessItems(response.data.data);
+        setIsLoading(false);
+      } catch (err) {
+        setIsLoading(false);
+        console.log(err);
+      }
+    };
+    fetchQuickAccess();
+  },[]);
   const trandingItems = [
     "Tuberculose",
     "Coqueluche",
@@ -77,10 +98,17 @@ function Dashboard() {
             Quick access
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
-            <QuickAccess />
-            <QuickAccess />
-            <QuickAccess />
-            <QuickAccess />
+            {quickAccessItems.map((item) => (
+              <QuickAccess item={item} setQuickAccessItems={setQuickAccessItems}/>
+            ))}
+            {quickAccessItems.length < 4 && (
+              <QuickAccess
+              setQuickAccessItems={setQuickAccessItems}
+                clickAction={() => {
+                  setOpenNewQuickAccess(true);
+                }}
+              />
+            )}
           </div>
           <div className="grid sm:h-[520px] sm:grid-cols-2">
             <div>
@@ -123,15 +151,17 @@ function Dashboard() {
               <TrandingItem>{item}</TrandingItem>
             )
           )}
-          <TrandingItem
-            withIcon={false}
-            action={() => {
-              alert("add new tranding item");
-            }}
-            className="text-primary-600"
-          >
-            +
-          </TrandingItem>
+          {user.role === "admin" && (
+            <TrandingItem
+              withIcon={false}
+              action={() => {
+                alert("add new tranding item");
+              }}
+              className="text-primary-600"
+            >
+              +
+            </TrandingItem>
+          )}
         </div>
       </div>
       <div>
@@ -144,9 +174,22 @@ function Dashboard() {
               <RecentItem>{item}</RecentItem>
             )
           )}
-          <RecentItem action={()=>{alert("add new library item")}}>+</RecentItem>
+          {user.role === "admin" && (
+            <RecentItem
+              action={() => {
+                alert("add new library item");
+              }}
+            >
+              +
+            </RecentItem>
+          )}
         </div>
       </div>
+      <NewQuickAccessModal
+        open={openNewQuickAccess}
+        setOpen={setOpenNewQuickAccess}
+        setQuickAccessItems={setQuickAccessItems}
+      />
     </div>
   );
 }

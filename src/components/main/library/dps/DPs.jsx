@@ -367,6 +367,7 @@ export default function DPs() {
       setNewDP(temp_DP);
       setN_questions(n_questions - 1);
     };
+    
     const handleSubmit = async (e) => {
       setIsUploading(true);
       const temp_DP = { ...newDP };
@@ -379,11 +380,12 @@ export default function DPs() {
         const response = await authHttpClient.post("/dp/", temp_DP);
         setIsUploading(false);
         setOpenNewDPModal(false);
-        console.log(response.data.data);
+        // console.log(response.data.data);
         setDps([
           ...dps,
           {
             ...newDP,
+            dp_number: response.data.data.dp_number,
             _id: response.data.data._id,
             matiere_id: selectedMatiere,
             item_id: selectedItem,
@@ -396,7 +398,7 @@ export default function DPs() {
         console.log(error);
       }
     };
-    console.log(newDP);
+    // console.log(newDP);
     return (
       <Modal open={openNewItemModal} setOpen={setOpenNewDPModal}>
         <div className="p-10 border-2 border-gray-500 rounded-lg bg-white sm:w-[900px]">
@@ -419,7 +421,6 @@ export default function DPs() {
                 <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                   <ChevronUpDownIcon
                     className="h-5 w-5 text-gray-400"
-                    aria-hidden="true"
                   />
                 </Combobox.Button>
 
@@ -782,7 +783,7 @@ export default function DPs() {
               type="button"
               className="click-action inline-flex justify-between border border-gray-300 items-center gap-x-1.5 rounded-md bg-primary-600 text-white px-2.5 py-1.5 text-sm font-semibol focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
             >
-              {isUploading && <Spinner small />}Upload QI
+              {isUploading && <Spinner small />}Upload DP
             </button>
           </div>
         </div>

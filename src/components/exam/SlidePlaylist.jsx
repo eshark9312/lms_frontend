@@ -52,7 +52,6 @@ function SlidePlaylist({ open, setOpen }) {
         });
         let allPlaylists;
         allPlaylists = response1.data.data;
-        console.log(allPlaylists);
         const response2 = await authHttpClient.post(
           "/playlist/filterQuestion",
           {
@@ -61,8 +60,6 @@ function SlidePlaylist({ open, setOpen }) {
           }
         );
         const temp = response2.data.data;
-        console.log(temp);
-        console.log(temp.map((_) => _.playlist_id));
         setSavedQuestions(temp);
         setPlaylists(
           allPlaylists.map((playlist) => ({
@@ -114,9 +111,6 @@ function SlidePlaylist({ open, setOpen }) {
         playlists.filter(({ _id, checked }) => checked && playlist_id === _id)
           .length === 0
     );
-    console.log(`to be added: ${playlistsToBeAdded.length}`);
-    console.log(`to be removed: ${playlistsToBeRemoved.length}`);
-    console.log(savedQuestions)
     try {
       for (let i = 0; i < playlistsToBeAdded.length; i++) {
         const response = await authHttpClient.post("/playlist/question", {
@@ -125,7 +119,6 @@ function SlidePlaylist({ open, setOpen }) {
           playlist_id: playlistsToBeAdded[i]._id,
         });
         setSavedQuestions(_=>[..._, response.data.data]);
-        console.log("saved");
       }
       for (let i = 0; i < playlistsToBeRemoved.length; i++) {
         await authHttpClient.delete(
@@ -133,7 +126,6 @@ function SlidePlaylist({ open, setOpen }) {
         );
         setSavedQuestions(_=>
           _.filter(({ _id }) => {
-            if(_id === playlistsToBeRemoved[i]._id) console.log("removed");
             return _id !== playlistsToBeRemoved[i]._id;
           })
         );

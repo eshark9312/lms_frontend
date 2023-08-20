@@ -169,7 +169,7 @@ export default function Questions() {
               </tbody>
             </table>
           </div>
-          <AddNewItemModal />
+          <AddNewQuestionModal />
           {/* <EditItemModal /> */}
           <DeleteConformModal />
         </>
@@ -177,7 +177,7 @@ export default function Questions() {
     </div>
   );
 
-  function AddNewItemModal() {
+  function AddNewQuestionModal() {
     const [matieres, setMatieres] = useState([]);
     const [selectedMatiere, setSelectedMatiere] = useState(null);
     const [matiereQuery, setMatiereQuery] = useState("");
@@ -372,6 +372,7 @@ export default function Questions() {
           ...questions,
           {
             ...newQuestion,
+            question_number: response.data.data.question_number,
             _id: response.data.data._id,
             matiere_id: selectedMatiere,
             item_id: selectedItem,
@@ -608,8 +609,9 @@ export default function Questions() {
               </div>
               <div className="mt-1.5 flex-1 rounded-lg border-dashed border-2 border-gray-200 p-2">
                 <div className="flex gap-2 flex-wrap ">
-                  {selectedTags.map((tag) => (
+                  {selectedTags.map((tag, index) => (
                     <div
+                      key={index}
                       className="px-2  hover:text-red-900 hover:border-red-900 hover:cursor-pointer min-w-fit border border-gray-400 rounded-md text-[12px]"
                       onClick={() =>
                         setSelectedTags(
@@ -633,8 +635,9 @@ export default function Questions() {
           <div className="mt-2 flex flex-wrap justify-between items-center gap-2">
             {/* question type */}
             <div className="flex rounded-lg border border-gray-300 shadow-sm text-sm font-bold divide-x divide-gray-300">
-              {questionTypes.map(({ type, selected, n }) => (
+              {questionTypes.map(({ type, selected, n }, index) => (
                 <div
+                  key={index}
                   onClick={() => changeType({ type, selected, n })}
                   className="flex gap-2 items-center min-w-fit px-4 py-2 border-gray-300 hover:cursor-pointer hover:bg-gray-100"
                 >
@@ -878,6 +881,7 @@ export default function Questions() {
                 <div className="flex gap-2 flex-wrap ">
                   {selectedCards.map((card) => (
                     <div
+                      key={card._id}
                       className="px-2  hover:text-red-900 hover:border-red-900 hover:cursor-pointer min-w-fit border border-gray-400 rounded-md text-[12px]"
                       onClick={() =>
                         setSelectedCards(

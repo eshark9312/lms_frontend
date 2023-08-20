@@ -1,455 +1,52 @@
-import React from 'react'
-import Session from './Session';
+import { Link } from "react-router-dom";
+import { ProgressBar } from "../../common/ProgressBar";
+import Pagination from "../Pagination";
+import Search from "../Search";
+import Filter from "../Filter";
+import {  PlusIcon} from "@heroicons/react/24/outline";
+import { useEffect, useState } from "react";
+import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
+import { useAuth } from "../../../providers/authProvider";
+import Session from "./Session"
 
-function Sessions() {
-  const sessions = [
-    {
-      title: "ECNi 2023",
-      num_questions: 450,
-      color: "primary",
-      dps : [
-        {
-          id: 3066,
-          title:"DP 1",
-          lastAssessed: "Jan 6, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3065,
-          title:"DP 2",
-          lastAssessed: "",
-          item: "",
-          matiere: "Cardiologie, Pneumologie, Néphrologie",
-          lastScore: null,
-        },
-        {
-          id: 3064,
-          title:"DP 3",
-          lastAssessed: "",
-          item: "",
-          matiere: "Cardiologie, Pneumologie, Néphrologie",
-          lastScore: null,
-        },
-        {
-          id: 3063,
-          title:"DP 4",
-          lastAssessed: "Jan 5, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 20,
-        },
-        {
-          id: 3062,
-          title:"DP 5",
-          lastAssessed: "Jan 5, 2022",
-          item: "154. Dissection Aortique",
-          matiere: "",
-          lastScore: 20,
-        },
-        {
-          id: 3061,
-          title:"DP 6",
-          lastAssessed: "Jan 4, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3060,
-          title:"LCA 1",
-          lastAssessed: "",
-          item: "",
-          matiere: "",
-          lastScore: null,
-        },
-        {
-          id: 3059,
-          title:"LCA 2",
-          lastAssessed: "",
-          item: "",
-          matiere: "",
-          lastScore: null,
-        },
-        {
-          id: 3058,
-          title:"DP 7",
-          lastAssessed: "Jan 3, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3057,
-          title:"DP 8",
-          lastAssessed: "Jan 3, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-      ]
-    },
-    {
-      title: "ECNi 2022",
-      num_questions: 235,
-      color: "indigo",
-      dps : [
-        {
-          id: 3066,
-          title:"DP 1",
-          lastAssessed: "Jan 6, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3065,
-          title:"DP 2",
-          lastAssessed: "",
-          item: "",
-          matiere: "Cardiologie, Pneumologie, Néphrologie",
-          lastScore: null,
-        },
-        {
-          id: 3064,
-          title:"DP 3",
-          lastAssessed: "",
-          item: "",
-          matiere: "Cardiologie, Pneumologie, Néphrologie",
-          lastScore: null,
-        },
-        {
-          id: 3063,
-          title:"DP 4",
-          lastAssessed: "Jan 5, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 20,
-        },
-        {
-          id: 3062,
-          title:"DP 5",
-          lastAssessed: "Jan 5, 2022",
-          item: "154. Dissection Aortique",
-          matiere: "",
-          lastScore: 20,
-        },
-        {
-          id: 3061,
-          title:"DP 6",
-          lastAssessed: "Jan 4, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3060,
-          title:"LCA 1",
-          lastAssessed: "",
-          item: "",
-          matiere: "",
-          lastScore: null,
-        },
-        {
-          id: 3059,
-          title:"LCA 2",
-          lastAssessed: "",
-          item: "",
-          matiere: "",
-          lastScore: null,
-        },
-        {
-          id: 3058,
-          title:"DP 7",
-          lastAssessed: "Jan 3, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3057,
-          title:"DP 8",
-          lastAssessed: "Jan 3, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-      ]
-    },
-    {
-      title: "CCB 2023",
-      num_questions: 504,
-      color: "pink",
-      dps : [
-        {
-          id: 3066,
-          title:"DP 1",
-          lastAssessed: "Jan 6, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3065,
-          title:"DP 2",
-          lastAssessed: "",
-          item: "",
-          matiere: "Cardiologie, Pneumologie, Néphrologie",
-          lastScore: null,
-        },
-        {
-          id: 3064,
-          title:"DP 3",
-          lastAssessed: "",
-          item: "",
-          matiere: "Cardiologie, Pneumologie, Néphrologie",
-          lastScore: null,
-        },
-        {
-          id: 3063,
-          title:"DP 4",
-          lastAssessed: "Jan 5, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 20,
-        },
-        {
-          id: 3062,
-          title:"DP 5",
-          lastAssessed: "Jan 5, 2022",
-          item: "154. Dissection Aortique",
-          matiere: "",
-          lastScore: 20,
-        },
-        {
-          id: 3061,
-          title:"DP 6",
-          lastAssessed: "Jan 4, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3060,
-          title:"LCA 1",
-          lastAssessed: "",
-          item: "",
-          matiere: "",
-          lastScore: null,
-        },
-        {
-          id: 3059,
-          title:"LCA 2",
-          lastAssessed: "",
-          item: "",
-          matiere: "",
-          lastScore: null,
-        },
-        {
-          id: 3058,
-          title:"DP 7",
-          lastAssessed: "Jan 3, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3057,
-          title:"DP 8",
-          lastAssessed: "Jan 3, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-      ]
-    },
-    {
-      title: "CCB 2022",
-      num_questions: 201,
-      color: "success",
-      dps : [
-        {
-          id: 3066,
-          title:"DP 1",
-          lastAssessed: "Jan 6, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3065,
-          title:"DP 2",
-          lastAssessed: "",
-          item: "",
-          matiere: "Cardiologie, Pneumologie, Néphrologie",
-          lastScore: null,
-        },
-        {
-          id: 3064,
-          title:"DP 3",
-          lastAssessed: "",
-          item: "",
-          matiere: "Cardiologie, Pneumologie, Néphrologie",
-          lastScore: null,
-        },
-        {
-          id: 3063,
-          title:"DP 4",
-          lastAssessed: "Jan 5, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 20,
-        },
-        {
-          id: 3062,
-          title:"DP 5",
-          lastAssessed: "Jan 5, 2022",
-          item: "154. Dissection Aortique",
-          matiere: "",
-          lastScore: 20,
-        },
-        {
-          id: 3061,
-          title:"DP 6",
-          lastAssessed: "Jan 4, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3060,
-          title:"LCA 1",
-          lastAssessed: "",
-          item: "",
-          matiere: "",
-          lastScore: null,
-        },
-        {
-          id: 3059,
-          title:"LCA 2",
-          lastAssessed: "",
-          item: "",
-          matiere: "",
-          lastScore: null,
-        },
-        {
-          id: 3058,
-          title:"DP 7",
-          lastAssessed: "Jan 3, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3057,
-          title:"DP 8",
-          lastAssessed: "Jan 3, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-      ]
-    },
-    {
-      title: "ECNi 2021",
-      num_questions: 605,
-      color: "orange",
-      dps : [
-        {
-          id: 3066,
-          title:"DP 1",
-          lastAssessed: "Jan 6, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3065,
-          title:"DP 2",
-          lastAssessed: "",
-          item: "",
-          matiere: "Cardiologie, Pneumologie, Néphrologie",
-          lastScore: null,
-        },
-        {
-          id: 3064,
-          title:"DP 3",
-          lastAssessed: "",
-          item: "",
-          matiere: "Cardiologie, Pneumologie, Néphrologie",
-          lastScore: null,
-        },
-        {
-          id: 3063,
-          title:"DP 4",
-          lastAssessed: "Jan 5, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 20,
-        },
-        {
-          id: 3062,
-          title:"DP 5",
-          lastAssessed: "Jan 5, 2022",
-          item: "154. Dissection Aortique",
-          matiere: "",
-          lastScore: 20,
-        },
-        {
-          id: 3061,
-          title:"DP 6",
-          lastAssessed: "Jan 4, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3060,
-          title:"LCA 1",
-          lastAssessed: "",
-          item: "",
-          matiere: "",
-          lastScore: null,
-        },
-        {
-          id: 3059,
-          title:"LCA 2",
-          lastAssessed: "",
-          item: "",
-          matiere: "",
-          lastScore: null,
-        },
-        {
-          id: 3058,
-          title:"DP 7",
-          lastAssessed: "Jan 3, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-        {
-          id: 3057,
-          title:"DP 8",
-          lastAssessed: "Jan 3, 2022",
-          item: "",
-          matiere: "",
-          lastScore: 4,
-        },
-      ]
-    },
-  ];
+export default function Sessions() {
+  const { user } = useAuth();
+  const authHttpClient = useAuthHttpClient();
+  const [sessions, setSessions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [openNewSessionModal, setOpenNewSessionModal] = useState(false);
+  const [openEditSessionModal, setOpenEditSessionModal] = useState(false);
+  const [selectedSession, setSelectedSession] = useState(null);
+
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        const response = await authHttpClient.get(`/session/`);
+        setSessions(response.data.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchSessions();
+  }, []);
+
   return (
-    <>
-      <div className="inline-block min-w-full py-2 align-middle">
-        <div className="flex flex-col gap-4">
-          {sessions.map((session, idx) => (
-            <Session key={idx} session={session}/>
-          ))}
+    <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
+      <div className="inline-block min-w-full align-middle">
+        <div className="flex justify-between">
         </div>
+        {sessions.map((session, index) => (
+          <Session
+            index={index}
+            session={session}
+            editAction={() => {
+              setSelectedSession(session);
+              setOpenEditSessionModal(true);
+            }}
+          />
+        ))}
       </div>
-    </>
+    </div>
   );
 }
-
-export default Sessions
