@@ -120,7 +120,7 @@ export default function Questions() {
               <tbody className="divide-y divide-gray-200 bg-white">
                 {questions.map((question) => (
                   <tr key={question._id} className="even:bg-gray-50">
-                    <td className="font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 flex questions-center gap-2">
+                    <td className="font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 gap-2">
                       {question.question_number}
                     </td>
                     <td className=" px-3 py-4 text-sm text-gray-500 w-1/4 whitespace-nowrap  max-w-xs flex-auto truncate ">

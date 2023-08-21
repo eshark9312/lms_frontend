@@ -91,6 +91,12 @@ export default function DPs() {
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
+                    Description
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
                     Session
                   </th>
                   <th
@@ -105,12 +111,6 @@ export default function DPs() {
                   >
                     Item
                   </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Tags
-                  </th>
                   <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                     <span className="sr-only">Delete</span>
                   </th>
@@ -122,8 +122,11 @@ export default function DPs() {
               <tbody className="divide-y divide-gray-200 bg-white">
                 {dps.map((dp) => (
                   <tr key={dp._id} className="even:bg-gray-50">
-                    <td className="font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 flex dps-center gap-2">
+                    <td className="font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 gap-2">
                       {dp.dp_number}
+                    </td>
+                    <td className=" px-3 py-4 text-sm text-gray-500 w-1/4 whitespace-nowrap  max-w-xs flex-auto truncate ">
+                      {dp.desc}
                     </td>
                     <td className=" px-3 py-4 text-sm text-gray-500">
                       {dp.session_id?.name}
@@ -132,19 +135,7 @@ export default function DPs() {
                       {dp.matiere_id.name}
                     </td>
                     <td className=" px-3 py-4 text-sm text-gray-500">
-                      {`${dp.item_id.item_number}. ${dp.item_id.name}`}
-                    </td>
-                    <td className=" px-3 py-1 text-sm text-gray-500 ">
-                      <div className="flex flex-wrap">
-                        {dp.tags.map((tag) => (
-                          <div
-                            key={tag._id}
-                            className="px-2 m-1 max-w-fit border border-gray-400 rounded-md text-[12px]"
-                          >
-                            {tag.name}
-                          </div>
-                        ))}
-                      </div>
+                      {dp.item_id && `${dp.item_id.item_number}. ${dp.item_id.name}`}
                     </td>
                     <td className="relative  py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <Link

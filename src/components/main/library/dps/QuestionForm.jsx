@@ -30,7 +30,7 @@ export default function QuestionForm({
     if (selectedQuestion.type === type) return;
     const tempQuestion = { ...selectedQuestion };
     tempQuestion.type = type;
-    tempQuestion.answers = Array(
+    const answers = Array(
       questionTypes.find((questionType) => questionType.type === type).n
     ).fill(
       type === "Basic question" || type === "Long question"
@@ -41,11 +41,12 @@ export default function QuestionForm({
           }
         : ""
     );
-    setSelectedQuestion(tempQuestion);
+    setSelectedQuestion({ ...tempQuestion, answers: answers });
   };
   const increaseAnswers = () => {
     const tempQuestion = { ...selectedQuestion };
-    tempQuestion.answers.push(
+    const answers = [...selectedQuestion.answers];
+    answers.push(
       tempQuestion.type === "Basic question" ||
         tempQuestion.type === "Long question"
         ? {
@@ -55,13 +56,15 @@ export default function QuestionForm({
           }
         : ""
     );
-    setSelectedQuestion(tempQuestion);
+    setSelectedQuestion({ ...tempQuestion, answers: answers });
   };
+  
   const decreaseAnswers = () => {
     if (selectedQuestion.answers.length < 2) return;
     const tempQuestion = { ...selectedQuestion };
-    tempQuestion.answers.pop();
-    setSelectedQuestion(tempQuestion);
+    const answers = [...selectedQuestion.answers];
+    answers.pop();
+    setSelectedQuestion({ ...tempQuestion, answers: answers });
   };
 
   return (
@@ -130,7 +133,7 @@ export default function QuestionForm({
       {(selectedQuestion.type === "Basic question" ||
         selectedQuestion.type === "Long question") && (
         <div className="text-left my-2 ml-2 flex flex-col gap-2 text-sm">
-          {selectedQuestion.answers?.map(({..._}, index) => {
+          {selectedQuestion.answers?.map(({ ..._ }, index) => {
             return (
               <MultiChoice
                 key={index}
@@ -144,7 +147,7 @@ export default function QuestionForm({
                     setErr(errTemp);
                   }
                   const tempQuestion = { ...selectedQuestion };
-                  const answers = [...selectedQuestion.answers]
+                  const answers = [...selectedQuestion.answers];
                   answers[index] = content;
                   tempQuestion.answers = answers;
                   setSelectedQuestion(tempQuestion);

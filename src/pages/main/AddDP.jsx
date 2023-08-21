@@ -157,6 +157,7 @@ function AddNewDPPage() {
       tags: [],
       desc: "",
       questions: Array(5).fill({
+        validated: false,
         type: "Basic question",
         question: "",
         answers: Array(5).fill({
@@ -198,6 +199,7 @@ function AddNewDPPage() {
   const increaseQuestions = () => {
     const temp_DP = { ...newDP };
     temp_DP.questions.push({
+      validated: false,
       type: "Basic question",
       question: "",
       answers: Array(5).fill({
@@ -221,7 +223,11 @@ function AddNewDPPage() {
   };
 
   const handleSubmit = async () => {
-    if (isUploading) return;
+    if (
+      isUploading ||
+      newDP.questions.filter(({ validated }) => !validated).length > 0
+    )
+      return;
     setIsUploading(true);
     const temp_DP = { ...newDP };
     temp_DP.questions = temp_DP.questions.map((question) => ({
@@ -234,7 +240,9 @@ function AddNewDPPage() {
       setN_questions(5);
       setNewDP({
         ...newDP,
+        desc: "",
         questions: Array(5).fill({
+          validated: false,
           type: "Basic question",
           question: "",
           answers: Array(5).fill({
@@ -247,7 +255,9 @@ function AddNewDPPage() {
         }),
       });
       setIdx(0);
+      setErr({});
       setSelectedQuestion({
+        validated: false,
         type: "Basic question",
         question: "",
         answers: Array(5).fill({
@@ -267,21 +277,31 @@ function AddNewDPPage() {
 
   const handleClick = () => {
     if (!validate()) return;
-    if (idx === n_questions - 1) handleSubmit();
-    else {
+    if (idx === n_questions - 1) {
+      if (!validateHeader()) {
+        window.scrollTo(0, 0);
+        return;
+      }
+      handleSubmit();
+    } else {
       setIdx(idx + 1);
       setSelectedQuestion(newDP.questions[idx + 1]);
-  window.scrollTo(0, 500);
+      window.scrollTo(0, 500);
     }
   };
 
-  const validate = () => {
+  const validateHeader = () => {
     if (!newDP.session_id)
       setErr((err) => ({ ...err, session_id: "required" }));
     if (!newDP.matiere_id)
       setErr((err) => ({ ...err, matiere_id: "required" }));
     if (!newDP.item_id) setErr((err) => ({ ...err, item_id: "required" }));
     if (newDP.desc === "") setErr((err) => ({ ...err, desc: "required" }));
+    if (newDP.session_id && newDP.matiere_id && newDP.item_id && newDP.desc)
+      return true;
+    else return false;
+  };
+  const validate = () => {
     if (selectedQuestion.question === "")
       setErr((err) => ({ ...err, question: "required" }));
     if (selectedQuestion.comment === "")
@@ -298,16 +318,16 @@ function AddNewDPPage() {
     if (answers.filter((_) => _).length > 0)
       setErr((err) => ({ ...err, answers: answers }));
     if (
-      newDP.session_id &&
-      newDP.matiere_id &&
-      newDP.item_id &&
-      newDP.desc &&
       selectedQuestion.question &&
       selectedQuestion.comment &&
       answers.filter((_) => _).length === 0
-    )
+    ) {
+      newDP.questions[idx].validated = true;
       return true;
-    else return false;
+    } else {
+      newDP.questions[idx].validated = false;
+      return false;
+    }
   };
 
   function onKeyDown(event) {
@@ -682,11 +702,14 @@ function AddNewDPPage() {
                 key={i}
                 className={classNames(
                   "hover:cursor-pointer relative inline-flex items-center justify-center w-11 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300",
-                  idx === i && "bg-primary-600 text-white"
+                  idx === i && "bg-primary-600 text-white",
+                  _.validated && "ring-primary-600"
                 )}
                 onClick={() => {
-                  setIdx(i);
-                  setSelectedQuestion(newDP.questions[i]);
+                  if (validate()) {
+                    setIdx(i);
+                    setSelectedQuestion(newDP.questions[i]);
+                  }
                 }}
               >
                 {i + 1}
