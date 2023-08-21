@@ -16,6 +16,8 @@ export default function QuestionForm({
   selectedQuestion,
   setSelectedQuestion,
   cards,
+  err,
+  setErr,
 }) {
   const [cardQuery, setCardQuery] = useState("");
   const filteredCards =
@@ -43,9 +45,9 @@ export default function QuestionForm({
   };
   const increaseAnswers = () => {
     const tempQuestion = { ...selectedQuestion };
-    selectedQuestion.answers.push(
-      selectedQuestion.type === "Basic question" ||
-        selectedQuestion.type === "Long question"
+    tempQuestion.answers.push(
+      tempQuestion.type === "Basic question" ||
+        tempQuestion.type === "Long question"
         ? {
             choice: "",
             desc: "",
@@ -58,7 +60,7 @@ export default function QuestionForm({
   const decreaseAnswers = () => {
     if (selectedQuestion.answers.length < 2) return;
     const tempQuestion = { ...selectedQuestion };
-    selectedQuestion.answers.pop();
+    tempQuestion.answers.pop();
     setSelectedQuestion(tempQuestion);
   };
 
@@ -67,8 +69,9 @@ export default function QuestionForm({
       <div className="mt-2 flex flex-wrap justify-between items-center gap-2">
         {/* question type */}
         <div className="flex rounded-lg border border-gray-300 shadow-sm text-sm font-bold divide-x divide-gray-300">
-          {questionTypes.map(({ type }) => (
+          {questionTypes.map(({ type }, index) => (
             <div
+              key={index}
               onClick={() => changeType(type)}
               className="flex gap-2 items-center min-w-fit px-4 py-2 border-gray-300 hover:cursor-pointer hover:bg-gray-100"
             >
@@ -107,10 +110,16 @@ export default function QuestionForm({
       <div className="my-2 flex gap-2">
         <textarea
           type="text"
-          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+          className={classNames(
+            "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6",
+            err.question && "ring-red-600"
+          )}
           value={selectedQuestion.question}
           placeholder="Type the question here..."
           onChange={(e) => {
+            const tempErr = { ...err };
+            tempErr.question = null;
+            setErr(tempErr);
             const tempQuestion = { ...selectedQuestion };
             tempQuestion.question = e.target.value;
             setSelectedQuestion(tempQuestion);
@@ -121,16 +130,28 @@ export default function QuestionForm({
       {(selectedQuestion.type === "Basic question" ||
         selectedQuestion.type === "Long question") && (
         <div className="text-left my-2 ml-2 flex flex-col gap-2 text-sm">
-          {selectedQuestion.answers?.map((_,index) => {
+          {selectedQuestion.answers?.map(({..._}, index) => {
             return (
-            <MultiChoice key={index} content={_} index={index} contentChange={
-                (content)=> {
-                    const tempQuestion = {...selectedQuestion };
-                    tempQuestion.answers[index]= content;
-                    setSelectedQuestion(tempQuestion);
-                }
-            } />
-          )})}
+              <MultiChoice
+                key={index}
+                index={index}
+                content={_}
+                err={err}
+                contentChange={(content) => {
+                  if (err.answers) {
+                    const errTemp = { ...err };
+                    errTemp.answers[index] = null;
+                    setErr(errTemp);
+                  }
+                  const tempQuestion = { ...selectedQuestion };
+                  const answers = [...selectedQuestion.answers]
+                  answers[index] = content;
+                  tempQuestion.answers = answers;
+                  setSelectedQuestion(tempQuestion);
+                }}
+              />
+            );
+          })}
         </div>
       )}
       {selectedQuestion.type === "QROC" && (
@@ -140,12 +161,20 @@ export default function QuestionForm({
             {selectedQuestion.answers?.map((answer, i) => (
               <div key={i} className="min-w-fit">
                 <input
-                  className="w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                  className={classNames(
+                    "w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6",
+                    err.answers && err.answers[i] && "ring-red-600"
+                  )}
                   type="text"
                   value={answer}
                   onChange={(e) => {
-                      const tempQuestion = { ...selectedQuestion };
-                      tempQuestion.answers[i] = e.target.value;
+                    if (err.answers) {
+                      const errTemp = { ...err };
+                      errTemp.answers[i] = null;
+                      setErr(errTemp);
+                    }
+                    const tempQuestion = { ...selectedQuestion };
+                    tempQuestion.answers[i] = e.target.value;
                     setSelectedQuestion(tempQuestion);
                   }}
                 />
@@ -160,9 +189,15 @@ export default function QuestionForm({
       <div className="my-2 flex gap-2">
         <textarea
           type="text"
-          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 bg-gray-100"
+          className={classNames(
+            "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 bg-gray-100",
+            err.comment && "ring-red-600"
+          )}
           value={selectedQuestion.comment}
           onChange={(e) => {
+            const errTemp = { ...err };
+            errTemp.comment = null;
+            setErr(errTemp);
             setSelectedQuestion({
               ...selectedQuestion,
               comment: e.target.value,
@@ -262,53 +297,54 @@ export default function QuestionForm({
   );
 }
 
-
-const MultiChoice = ({content, contentChange, index}) => {
-    const { choice, desc, answer } = content;
-    return <div className="mt-2 w-full">
-    Proposition {String.fromCharCode("A".charCodeAt(0) + index)}
-    <div className="flex gap-2">
-      <div className="mt-2.5">
-        <input
-          type="checkbox"
-          checked={answer}
-          className="h-5 w-5 mx-2 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
-          onChange={(e) => {
-              contentChange({
-                ...content,
-                  answer: e.target.checked,
-              });
-          }}
-        />
-      </div>
-      <div className="flex-1 flex flex-col gap-1 my-1">
-        <div>
+const MultiChoice = ({ content, contentChange, index, err }) => {
+  const { choice, desc, answer } = content;
+  return (
+    <div className="mt-2 w-full">
+      Proposition {String.fromCharCode("A".charCodeAt(0) + index)}
+      <div className="flex gap-2">
+        <div className="mt-2.5">
           <input
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-            type="text"
-            value={choice}
+            type="checkbox"
+            checked={answer}
+            className="h-5 w-5 mx-2 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
             onChange={(e) => {
-                contentChange({
-                    ...content,
-                      choice: e.target.value,
-                  });
-                }}
-          />
-        </div>
-        <div>
-          <textarea
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 bg-gray-100"
-            type="text"
-            value={desc}
-            onChange={(e) => {
-                contentChange({
-                    ...content,
-                      desc: e.target.value,
-                  });
+              const tempContent = { ...content };
+              tempContent.answer = e.target.checked;
+              contentChange(tempContent);
             }}
           />
         </div>
+        <div className="flex-1 flex flex-col gap-1 my-1">
+          <div>
+            <input
+              className={classNames(
+                "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6",
+                err.answers && err.answers[index] && "ring-red-600"
+              )}
+              type="text"
+              value={choice}
+              onChange={(e) => {
+                const tempContent = { ...content };
+                tempContent.choice = e.target.value;
+                contentChange(tempContent);
+              }}
+            />
+          </div>
+          <div>
+            <textarea
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6 bg-gray-100"
+              type="text"
+              value={desc}
+              onChange={(e) => {
+                const tempContent = { ...content };
+                tempContent.desc = e.target.value;
+                contentChange(tempContent);
+              }}
+            />
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  }
+  );
+};

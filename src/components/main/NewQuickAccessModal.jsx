@@ -34,7 +34,7 @@ export default function NewQuickAccessModal({
   useEffect(() => {
     const fetchMatieres = async () => {
       try {
-        const response = await authHttpClient.get(`/Matiere/`);
+        const response = await authHttpClient.get(`/matiere/`);
         setMatieres(response.data.data);
       } catch (error) {
         console.log(error);

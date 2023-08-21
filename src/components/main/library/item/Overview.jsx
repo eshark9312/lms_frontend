@@ -56,8 +56,8 @@ const StatisticsChart = ({ item }) => {
         console.log(error);
       }
     };
-    getSuccessRate();
-  }, []);
+    if(item) getSuccessRate();
+  }, [item]);
 
   return (
     <>

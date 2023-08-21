@@ -53,6 +53,10 @@ export default function DPs() {
     fetchDPs();
   }, []);
 
+  const createDP = ()=>{
+    var win = window.open("/addDP/", '_blank');
+    win.focus();
+  }
   return (
     <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
       {user.role === "admin" && (
@@ -62,7 +66,7 @@ export default function DPs() {
               <button
                 type="button"
                 onClick={() => {
-                  setOpenNewDPModal(true);
+                  createDP();
                 }}
                 className="click-action inline-flex justify-between border-2 border-gray-300 items-center gap-x-1.5 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold hover:text-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
               >
@@ -167,7 +171,7 @@ export default function DPs() {
               </tbody>
             </table>
           </div>
-          <AddNewDPModal />
+          {/* <AddNewDPModal /> */}
           {/* <EditItemModal /> */}
           <DeleteConformModal />
         </>

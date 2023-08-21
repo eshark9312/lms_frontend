@@ -20,6 +20,8 @@ import Signup from "./components/auth/Signup";
 import Users from "./pages/main/Users";
 import TakeTestModal from "./components/exam/TakeTestModal";
 import CardSlider from "./components/common/CardSlider";
+import AddNewQuestionPage from "./pages/main/AddQuestion";
+import AddNewDPPage from "./pages/main/AddDP";
 
 const ProtectedRoute = () => {
   const { user } = useAuth();
@@ -46,6 +48,8 @@ function App() {
                 <Route path="/toolbox/" element={<Layout Sidebar={Sidebar}><Toolbox /></Layout>} />
                 <Route path="/users/" element={<Layout Sidebar={Sidebar}><Users /></Layout>} />
                 <Route path="/quiz/" element={<Quiz />} />
+                <Route path="/addQuestion/" element={<AddNewQuestionPage />} />
+                <Route path="/addDP/" element={<AddNewDPPage />} />
                 <Route path="/colors/" element={<Colors />} />
               </Route>
               <Route path="/auth/signin" element={<Signin />} />
