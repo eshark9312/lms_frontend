@@ -18,7 +18,7 @@ function SavedQuestions({ item_id }) {
         const response = await authHttpClient.post(
           `/playlist/getQuestionsWithDetail`,
           {
-            user_id: user.id,
+            user_id: user._id,
             item_id,
           }
         );

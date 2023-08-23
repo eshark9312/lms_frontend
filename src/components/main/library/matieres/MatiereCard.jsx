@@ -14,7 +14,7 @@ function MatiereCard({ matiere }) {
     >
       <div className="flex justify-between items-center">
         <img
-          className="h-20 bg-gray-100 rounded-lg flex flex-col justify-end items-center"
+          className="max-h-[80px] max-w-[160px] bg-gray-100 rounded-lg justify-end items-center"
           src={matiere.image}
           alt="card"
         />

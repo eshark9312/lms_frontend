@@ -5,7 +5,7 @@ const EditableMatiereCard = ({ matiere, editAction, deleteAction }) => {
   return (
     <div className="border-2 rounded-lg min-h-[200px] bg-white p-6 hover:shadow-lg hover:shadow-gray-300 hover:cursor-pointer">
       <div className="flex justify-between items-center">
-          <img className="h-20 bg-gray-100 rounded-lg flex flex-col justify-end items-center" src={matiere.image} alt="card" />
+          <img className="max-h-[80px] max-w-[160px] bg-gray-100 rounded-lg flex flex-col justify-end items-center" src={matiere.image} alt="card" />
         <div className="flex flex-col gap-2 pl-4">
           <button
             onClick={editAction}

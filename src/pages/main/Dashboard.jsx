@@ -19,7 +19,9 @@ function Dashboard() {
     const fetchQuickAccess = async () => {
       setIsLoading(true);
       try {
-        const response = await authHttpClient.get(`/quickaccess/`);
+        const response = await authHttpClient.post(`/quickaccess/filter`,{
+          user_id: user._id
+        });
         setQuickAccessItems(response.data.data);
         setIsLoading(false);
       } catch (err) {

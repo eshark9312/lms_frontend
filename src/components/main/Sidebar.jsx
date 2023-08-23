@@ -31,7 +31,12 @@ function Sidebar() {
     const fetchQuickAccess = async () => {
       setIsLoading(true);
       try {
-        const response = await authHttpClient.get(`/quickaccess/sidebar/`);
+        const response = await authHttpClient.post(
+          `/quickaccess/sidebar/filter`,
+          {
+            user_id: user._id,
+          }
+        );
         setQuickAccessItems(response.data.data);
         setIsLoading(false);
       } catch (err) {
@@ -86,33 +91,35 @@ function Sidebar() {
       }
     };
     return (
-      <NavLink
-        to={`/library/${endpoint}/${matiere_or_item_id}`}
-        className={({ isActive }) =>
-          classNames(
-            isActive
-              ? "bg-gray-50 text-primary-600"
-              : "text-gray-700 hover:text-primary-600 hover:bg-gray-50",
-            "group relative px-2 text-sm flex gap-x-3 rounded-md p-2 leading-6 font-semibold click-action justify-between items-center"
-          )
-        }
-      >
-        <div className="flex-1 max-w-full truncate ">
-          {item &&
-            (itemType === "Matiere"
-              ? item.name
-              : `${item.item_number}. ${item.name}`)}
-        </div>
+      <div className="flex w-full group relative items-center rounded-md hover:text-primary-600 hover:bg-gray-50">
+        <NavLink
+          to={`/library/${endpoint}/${matiere_or_item_id}`}
+          className={({ isActive }) =>
+            classNames(
+              isActive
+                ? "bg-gray-50 text-primary-600"
+                : "text-gray-700 ",
+              "flex-1 px-2 text-sm flex gap-x-3 p-2 leading-6 font-semibold click-action justify-between items-center"
+            )
+          }
+        >
+          <div className="flex-1 max-w-full truncate ">
+            {item &&
+              (itemType === "Matiere"
+                ? item.name
+                : `${item.item_number}. ${item.name}`)}
+          </div>
+        </NavLink>
         <div
           onClick={(e) => {
             e.stopPropagation();
             remove();
           }}
-          className="hidden group-hover:block right-2 hover:text-red-600"
+          className="hidden group-hover:block right-2 hover:text-red-600 px-2"
         >
           <XMarkIcon className="w-4 h-4" />
         </div>
-      </NavLink>
+      </div>
     );
   };
 

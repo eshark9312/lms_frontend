@@ -95,7 +95,7 @@ export default function ExamPage() {
           <QuestionCardSimple
             desc={dps[currentDp].desc}
             question={dps[currentDp].questions[currentQuestion]}
-            answer={dps[currentDp].questions[currentQuestion].userAnswer}
+            answer={dps[currentDp].questions[currentQuestion]?.userAnswer}
             currentDp={currentDp}
             currentQuestion={currentQuestion}
             isLastQuestion={isLastQuestion}
