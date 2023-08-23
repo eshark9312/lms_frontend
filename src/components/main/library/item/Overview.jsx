@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import PieChart from "../../PieChart";
 import { useAuth } from "../../../../providers/authProvider";
 import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
+import { Spinner } from "../../../icons/Spinner";
 
 function Overview({ item }) {
   return (
@@ -39,11 +40,12 @@ function Overview({ item }) {
 const StatisticsChart = ({ item }) => {
   const [successRate, setSuccessRate] = useState(null);
   const [progressRate, setProgressRate] = useState(0);
-
+  const [isLoading, setIsLoading] = useState(true);
   const authHttpClient = useAuthHttpClient();
   const { user } = useAuth();
   useEffect(() => {
     const getSuccessRate = async () => {
+      setIsLoading(true)
       try {
         const response = await authHttpClient.post(`/progress/item/filter`, {
           user_id: user._id,
@@ -52,6 +54,7 @@ const StatisticsChart = ({ item }) => {
         console.log(response);
         setSuccessRate(response.data.data[0]?.success_rate);
         setProgressRate(response.data.data[0]?.progress_rate);
+        setIsLoading(false)
       } catch (error) {
         console.log(error);
       }
@@ -60,7 +63,14 @@ const StatisticsChart = ({ item }) => {
   }, [item]);
 
   return (
-    <>
+    isLoading ? (
+      <div
+        role="status"
+        className="h-[70vh] pb-20 flex justify-center items-center"
+      >
+        <Spinner />
+      </div>
+    ) : (<>
       <div className="rounded-2xl bg-white p-6 relative">
         <div className="absolute top-4 right-4 text-gray-500 hover:cursor-pointer group-hover:text-primary-600">
           <EllipsisVerticalIcon className="w-6 h-6" />
@@ -116,7 +126,7 @@ const StatisticsChart = ({ item }) => {
           % done
         </div>
       </div>
-    </>
+    </>)
   );
 };
 

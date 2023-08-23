@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import Tabs from "../../Tabs";
 import Breadcrumb from "../../Breadcrumb";
 import {
+  AcademicCapIcon,
   ClipboardIcon,
   PaperClipIcon,
   ViewColumnsIcon,
@@ -13,13 +14,19 @@ import SavedQuestions from "./SavedQuestions";
 import Cards from "./Cards";
 import Toolbox from "./Toolbox";
 import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
+import { useQuiz } from "../../../../hooks/useQuiz";
 
 const Item = () => {
   const authHttpClient = useAuthHttpClient();
+  const {setOpenTakeTestModal, setSelectedMatiere, setSelectedItem} = useQuiz()
   const [item, setItem] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
-
+  const createTest=()=>{
+    setSelectedItem(item._id)
+    setSelectedMatiere(item.matiere_id)
+    setOpenTakeTestModal(true)
+  }
   const [tabs, setTabs] = useState([
     { name: "Overview", icon: ViewColumnsIcon, current: true },
     { name: "Saved questions", icon: PaperClipIcon, current: false },
@@ -70,7 +77,13 @@ const Item = () => {
         <Breadcrumb pages={pages} />
       </div>
       <div className="flex justify-between">
-        <div className="text-3xl font-bold">Library</div>
+        <div className="text-3xl font-bold">{item?.name}</div>
+        <div className="flex gap-4">
+          <div onClick={()=>createTest()} className="border-2 border-primary-600 rounded-full text-primary-600 flex gap-2 font-extrabold items-center px-4 click-action hover:cursor-pointer">
+              <AcademicCapIcon className="w-6 h-6" />
+              <p>Create a test</p>
+          </div>
+        </div>
       </div>
       <Tabs tabs={tabs} setCurrentTab={setCurrentTab} />
 

@@ -26,7 +26,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 export default function Items() {
-  const {setOpenTakeTestModal} = useQuiz();
+  const { setOpenTakeTestModal } = useQuiz();
   const { user } = useAuth();
   const [matieres, setMatieres] = useState([]);
   const [items, setItems] = useState([]);
@@ -66,113 +66,136 @@ export default function Items() {
     <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
       {user.role === "user" && (
         <div className="inline-block min-w-full py-2 align-middle">
-          <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
-            <div className="p-6 bg-white text-xl font-extrabold">
-              Liste des items
+          {isLoading ? (
+            <div
+              role="status"
+              className="h-[70vh] pb-20 flex justify-center items-center"
+            >
+              <Spinner />
             </div>
-            <div className="p-4 bg-white flex justify-between">
-              <Search />
-              <Filter />
-            </div>
-            <table className="min-w-full divide-y divide-gray-300">
-              <thead className="divide-y divide-gray-200 bg-white">
-                <tr>
-                  <th
-                    scope="col"
-                    className="w-1/3 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-                  >
-                    Title
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Status
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Number of questions
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Progress rate
-                  </th>
-                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                    <span className="sr-only">Edit</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
-                {items.map((item) => (
-                  <tr key={item._id}>
-                    <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 hover:text-primary-600 hover:cursor-pointer click-action">
-                      <Link to={`/library/item/${item._id}`}>
-                        {item.item_number}. {item.name}
-                      </Link>
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {item.status}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {item.n_questions} questions
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <ProgressBar item={item} />
-                    </td>
-                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                      <Link
-                        // to="/quiz"
-                        onClick={() => {setOpenTakeTestModal(true)}}
-                        className="text-primary-600 hover:text-primary-900"
-                      >
-                        <PencilSquareIcon className="w-5 h-5 stroke-2" />
-                      </Link>
-                    </td>
+          ) : (
+            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
+              <div className="p-6 bg-white text-xl font-extrabold">
+                Liste des items
+              </div>
+              <div className="p-4 bg-white flex justify-between">
+                <Search />
+                <Filter />
+              </div>
+              <table className="min-w-full divide-y divide-gray-300">
+                <thead className="divide-y divide-gray-200 bg-white">
+                  <tr>
+                    <th
+                      scope="col"
+                      className="w-1/3 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                    >
+                      Title
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
+                      Status
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
+                      Number of questions
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
+                      Progress rate
+                    </th>
+                    <th
+                      scope="col"
+                      className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                    >
+                      <span className="sr-only">Edit</span>
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <Pagination />
-          </div>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {items.map((item) => (
+                    <tr key={item._id}>
+                      <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 hover:text-primary-600 hover:cursor-pointer click-action">
+                        <Link to={`/library/item/${item._id}`}>
+                          {item.item_number}. {item.name}
+                        </Link>
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {item.status}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {item.n_questions} questions
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <ProgressBar item={item} />
+                      </td>
+                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                        <Link
+                          // to="/quiz"
+                          onClick={() => {
+                            setOpenTakeTestModal(true);
+                          }}
+                          className="text-primary-600 hover:text-primary-900"
+                        >
+                          <PencilSquareIcon className="w-5 h-5 stroke-2" />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <Pagination />
+            </div>
+          )}
         </div>
       )}
       {user.role === "admin" && (
         <>
-          <div className="inline-block min-w-full align-middle">
-            <div className="flex justify-between">
-              <button
-                type="button"
-                onClick={() => {
-                  setOpenNewItemModal(true);
-                }}
-                className="click-action inline-flex justify-between border-2 border-gray-300 items-center gap-x-1.5 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold hover:text-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
-              >
-                <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
-                Add New Item
-              </button>
-              <div className="flex items-center space-x-2">
-                <Search />
-                <Filter />
-              </div>
+          {isLoading ? (
+            <div
+              role="status"
+              className="h-[70vh] pb-20 flex justify-center items-center"
+            >
+              <Spinner />
             </div>
-            {items.map((item) => (
-              <EditableItem
-                item={item}
-                editAction={() => {
-                  setSelectedItem(item);
-                  setOpenEditItemModal(true);
-                }}
-                deleteAction={() => {
-                  setSelectedItem(item);
-                  setOpenDeleteConfirmModal(true);
-                }}
-              />
-            ))}
-          </div>
+          ) : (
+            <div className="inline-block min-w-full align-middle">
+              <div className="flex justify-between">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenNewItemModal(true);
+                  }}
+                  className="click-action inline-flex justify-between border-2 border-gray-300 items-center gap-x-1.5 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold hover:text-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
+                >
+                  <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
+                  Add New Item
+                </button>
+                <div className="flex items-center space-x-2">
+                  <Search />
+                  <Filter />
+                </div>
+              </div>
+              {items.map((item) => (
+                <EditableItem
+                  item={item}
+                  editAction={() => {
+                    setSelectedItem(item);
+                    setOpenEditItemModal(true);
+                  }}
+                  deleteAction={() => {
+                    setSelectedItem(item);
+                    setOpenDeleteConfirmModal(true);
+                  }}
+                />
+              ))}
+            </div>
+          )}
           <AddNewItemModal />
           <EditItemModal />
           <DeleteConformModal />
@@ -391,7 +414,8 @@ export default function Items() {
       setNumber(selectedItem?.item_number);
       setName(selectedItem?.name ?? "");
       setSelectedMatiere(
-        matieres.find((matiere) => matiere._id === selectedItem?.matiere_id._id));
+        matieres.find((matiere) => matiere._id === selectedItem?.matiere_id._id)
+      );
       setObjects(
         selectedItem?.objects ?? [
           {
@@ -412,32 +436,30 @@ export default function Items() {
     const handleSubmit = async (e) => {
       setIsUploading(true);
       try {
-        const response = await authHttpClient.put(
-          `/item/${selectedItem._id}`,
-          {
-            item_number,
-            name,
-            matiere_id: selectedMatiere._id,
-            n_questions: 0,
-            objects,
-          }
-        );
+        const response = await authHttpClient.put(`/item/${selectedItem._id}`, {
+          item_number,
+          name,
+          matiere_id: selectedMatiere._id,
+          n_questions: 0,
+          objects,
+        });
         setIsUploading(false);
         setOpenEditItemModal(false);
         console.log(response.data.data);
         setItems(
-          items.map((item)=>{
-            if(item._id === selectedItem._id){
+          items.map((item) => {
+            if (item._id === selectedItem._id) {
               return {
-              ...item,
+                ...item,
                 item_number,
                 name,
                 matiere_id: selectedMatiere,
                 objects,
-              }
+              };
             }
             return item;
-          }));
+          })
+        );
       } catch (error) {
         setIsUploading(false);
         console.log(error);
@@ -582,20 +604,16 @@ export default function Items() {
     );
   }
 
-  function DeleteConformModal(){
+  function DeleteConformModal() {
     const [deleting, setDeleting] = useState(false);
     const handleSubmit = async (e) => {
       setDeleting(true);
       try {
-        await authHttpClient.delete(
-          `/item/${selectedItem._id}`
-        );
+        await authHttpClient.delete(`/item/${selectedItem._id}`);
         setDeleting(false);
         setOpenDeleteConfirmModal(false);
-        setItems((items) =>{
-          return items.filter((item) => 
-            item._id !== selectedItem._id
-          );
+        setItems((items) => {
+          return items.filter((item) => item._id !== selectedItem._id);
         });
       } catch (error) {
         console.log(error);

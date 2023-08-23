@@ -53,10 +53,10 @@ export default function DPs() {
     fetchDPs();
   }, []);
 
-  const createDP = ()=>{
-    var win = window.open("/addDP/", '_blank');
+  const createDP = () => {
+    var win = window.open("/addDP/", "_blank");
     win.focus();
-  }
+  };
   return (
     <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
       {user.role === "admin" && (
@@ -132,10 +132,28 @@ export default function DPs() {
                       {dp.session_id?.name}
                     </td>
                     <td className=" px-3 py-4 text-sm text-gray-500">
-                      {dp.matiere_id.name}
+                      <div className="flex flex-wrap">
+                        {dp.matieres.map((matiere) => (
+                          <div
+                            key={matiere._id}
+                            className="px-2 m-1 max-w-fit border border-gray-400 rounded-md text-[12px]"
+                          >
+                            {matiere.name}
+                          </div>
+                        ))}
+                      </div>
                     </td>
                     <td className=" px-3 py-4 text-sm text-gray-500">
-                      {dp.item_id && `${dp.item_id.item_number}. ${dp.item_id.name}`}
+                      <div className="flex flex-wrap">
+                        {dp.items.map((item) => (
+                          <div
+                            key={item._id}
+                            className="px-2 m-1 max-w-fit border border-gray-400 rounded-md text-[12px]"
+                          >
+                            {`${item.item_number}. ${item.name}`}
+                          </div>
+                        ))}
+                      </div>
                     </td>
                     <td className="relative  py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <Link
@@ -362,7 +380,7 @@ export default function DPs() {
       setNewDP(temp_DP);
       setN_questions(n_questions - 1);
     };
-    
+
     const handleSubmit = async (e) => {
       setIsUploading(true);
       const temp_DP = { ...newDP };
@@ -397,7 +415,8 @@ export default function DPs() {
     return (
       <Modal open={openNewItemModal} setOpen={setOpenNewDPModal}>
         <div className="p-10 border-2 border-gray-500 rounded-lg bg-white sm:w-[900px]">
-          <div className="text-xl flex justify-center font-bold">Create DP</div><div className="grid grid-cols-1 sm:grid-cols-2 my-2 gap-2">
+          <div className="text-xl flex justify-center font-bold">Create DP</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 my-2 gap-2">
             {/*   select session   */}
             <Combobox
               as="div"
@@ -414,9 +433,7 @@ export default function DPs() {
                   displayValue={(session) => session?.name}
                 />
                 <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
-                  <ChevronUpDownIcon
-                    className="h-5 w-5 text-gray-400"
-                  />
+                  <ChevronUpDownIcon className="h-5 w-5 text-gray-400" />
                 </Combobox.Button>
 
                 {filteredSessions.length > 0 && (
@@ -468,7 +485,7 @@ export default function DPs() {
                 )}
               </div>
             </Combobox>
-            </div>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 my-2 gap-2">
             {/*   select matiere   */}
             <Combobox
@@ -785,21 +802,17 @@ export default function DPs() {
       </Modal>
     );
   }
-  
-  function DeleteConformModal(){
+
+  function DeleteConformModal() {
     const [deleting, setDeleting] = useState(false);
     const handleSubmit = async (e) => {
       setDeleting(true);
       try {
-        await authHttpClient.delete(
-          `/dp/${selectedDp._id}`
-        );
+        await authHttpClient.delete(`/dp/${selectedDp._id}`);
         setDeleting(false);
         setOpenDeleteConfirmModal(false);
-        setDps((questions) =>{
-          return questions.filter((item) => 
-            item._id !== selectedDp._id
-          );
+        setDps((questions) => {
+          return questions.filter((item) => item._id !== selectedDp._id);
         });
       } catch (error) {
         console.log(error);
@@ -829,5 +842,4 @@ export default function DPs() {
       </Modal>
     );
   }
-
 }

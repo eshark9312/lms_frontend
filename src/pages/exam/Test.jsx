@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Sidebar from "../../components/exam/Sidebar";
@@ -6,16 +6,20 @@ import QuestionCard from "../../components/exam/QuestionCard";
 import { useQuiz } from "../../hooks/useQuiz";
 import { useNavigate } from "react-router-dom";
 
-export default function Quiz() {
+export default function TestPage() {
   const { questions, setQuestions } = useQuiz();
   const [currentQuestion, setQuestion] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigator = useNavigate();
-  if (questions.length < 1) {
-    navigator(-1);
-    return;
-  }
 
+  useEffect(() => {
+    if (questions.length < 1) {
+      navigator(-1);
+      return;
+    }
+  }, []);
+
+  if (questions.length < 1) return null;
   return (
     <>
       <div>

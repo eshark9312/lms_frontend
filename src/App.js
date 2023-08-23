@@ -1,7 +1,13 @@
-import { BrowserRouter, Routes, Route, Outlet, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Outlet,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider } from "./providers/authProvider";
 import { QuizContextProvider } from "./providers/quizProvider";
-import { CardProvider } from "./providers/cardProvider"
+import { CardProvider } from "./providers/cardProvider";
 import { useAuth } from "./providers/authProvider";
 import Layout from "./components/main/Layout";
 import Sidebar from "./components/main/Sidebar";
@@ -14,7 +20,6 @@ import Item from "./components/main/library/item/Item";
 import Colors from "./components/common/Colors";
 import LibraryPage from "./pages/main/LibraryPage";
 import AnnalesPage from "./pages/main/AnnlaesPage";
-import Quiz from "./pages/exam/Quiz";
 import Signin from "./components/auth/Signin";
 import Signup from "./components/auth/Signup";
 import Users from "./pages/main/Users";
@@ -22,6 +27,10 @@ import TakeTestModal from "./components/exam/TakeTestModal";
 import CardSlider from "./components/common/CardSlider";
 import AddNewQuestionPage from "./pages/main/AddQuestion";
 import AddNewDPPage from "./pages/main/AddDP";
+import ExamPage from "./pages/exam/Exam";
+import TestPage from "./pages/exam/Test";
+import { ExamContextProvider } from "./providers/examProvider";
+import ExamResultPage from "./pages/exam/ExamResult";
 
 const ProtectedRoute = () => {
   const { user } = useAuth();
@@ -29,37 +38,106 @@ const ProtectedRoute = () => {
 };
 
 function App() {
-  
   return (
     <div className="App">
       <QuizContextProvider>
         <BrowserRouter>
-          <AuthProvider>
-            <CardProvider>
-            <Routes>
-              <Route element={<ProtectedRoute />}>
-                <Route path="/" element={<Layout Sidebar={Sidebar}><Dashboard /></Layout>} />
-                <Route path="/library/" element={<Layout Sidebar={Sidebar}><LibraryPage /></Layout>} />
-                <Route path="/library/matiere/:id?" element={<Layout Sidebar={Sidebar}><Matiere /></Layout>} />
-                <Route path="/library/item/:id?" element={<Layout Sidebar={Sidebar}><Item /></Layout>} />
-                <Route path="/annales/" element={<Layout Sidebar={Sidebar}><AnnalesPage /></Layout>} />
-                <Route path="/planner/" element={<Layout Sidebar={Sidebar}><Planner /></Layout>} />
-                <Route path="/playlists/" element={<Layout Sidebar={Sidebar}><PlaylistsPage /></Layout>} />
-                <Route path="/toolbox/" element={<Layout Sidebar={Sidebar}><Toolbox /></Layout>} />
-                <Route path="/users/" element={<Layout Sidebar={Sidebar}><Users /></Layout>} />
-                <Route path="/quiz/" element={<Quiz />} />
-                <Route path="/addQuestion/" element={<AddNewQuestionPage />} />
-                <Route path="/addDP/" element={<AddNewDPPage />} />
-                <Route path="/colors/" element={<Colors />} />
-              </Route>
-              <Route path="/auth/signin" element={<Signin />} />
-              <Route path="/auth/signup" element={<Signup />} />
-              <Route path="*" element={<Navigate to="/"/>} />
-            </Routes>
-            <TakeTestModal />
-            <CardSlider />
-            </CardProvider>
-          </AuthProvider>
+            <AuthProvider>
+          <ExamContextProvider>
+              <CardProvider>
+                <Routes>
+                  <Route element={<ProtectedRoute />}>
+                    <Route
+                      path="/"
+                      element={
+                        <Layout Sidebar={Sidebar}>
+                          <Dashboard />
+                        </Layout>
+                      }
+                    />
+                    <Route
+                      path="/library/"
+                      element={
+                        <Layout Sidebar={Sidebar}>
+                          <LibraryPage />
+                        </Layout>
+                      }
+                    />
+                    <Route
+                      path="/library/matiere/:id?"
+                      element={
+                        <Layout Sidebar={Sidebar}>
+                          <Matiere />
+                        </Layout>
+                      }
+                    />
+                    <Route
+                      path="/library/item/:id?"
+                      element={
+                        <Layout Sidebar={Sidebar}>
+                          <Item />
+                        </Layout>
+                      }
+                    />
+                    <Route
+                      path="/annales/"
+                      element={
+                        <Layout Sidebar={Sidebar}>
+                          <AnnalesPage />
+                        </Layout>
+                      }
+                    />
+                    <Route
+                      path="/planner/"
+                      element={
+                        <Layout Sidebar={Sidebar}>
+                          <Planner />
+                        </Layout>
+                      }
+                    />
+                    <Route
+                      path="/playlists/"
+                      element={
+                        <Layout Sidebar={Sidebar}>
+                          <PlaylistsPage />
+                        </Layout>
+                      }
+                    />
+                    <Route
+                      path="/toolbox/"
+                      element={
+                        <Layout Sidebar={Sidebar}>
+                          <Toolbox />
+                        </Layout>
+                      }
+                    />
+                    <Route
+                      path="/users/"
+                      element={
+                        <Layout Sidebar={Sidebar}>
+                          <Users />
+                        </Layout>
+                      }
+                    />
+                    <Route path="/quiz/" element={<TestPage />} />
+                    <Route path="/exam/" element={<ExamPage />} />
+                    <Route path="/result/" element={<ExamResultPage />} />
+                    <Route
+                      path="/addQuestion/"
+                      element={<AddNewQuestionPage />}
+                    />
+                    <Route path="/addDP/" element={<AddNewDPPage />} />
+                    <Route path="/colors/" element={<Colors />} />
+                  </Route>
+                  <Route path="/auth/signin" element={<Signin />} />
+                  <Route path="/auth/signup" element={<Signup />} />
+                  <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
+                <TakeTestModal />
+                <CardSlider />
+              </CardProvider>
+          </ExamContextProvider>
+            </AuthProvider>
         </BrowserRouter>
       </QuizContextProvider>
     </div>

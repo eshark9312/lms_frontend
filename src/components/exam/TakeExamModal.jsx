@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-export default function TakeTestModal() {
+export default function TakeExamModal() {
   const {
     openTakeTestModal,
     setOpenTakeTestModal,

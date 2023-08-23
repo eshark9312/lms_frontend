@@ -65,15 +65,14 @@ const parseQuestion = (question) => {
   return parsedQuestion;
 };
 export const QuizContextProvider = (props) => {
-
-  const [questions, setQuestions] = useState();
+  const [questions, setQuestions] = useState([]);
   const [openTakeTestModal, setOpenTakeTestModal] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState()
-  const [currentDp, setCurrentDp] = useState()
+  const [selectedMatiere, setSelectedMatiere] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
   const loadQuestions = (rawQuestions) => {
     setQuestions(rawQuestions.map(parseQuestion));
   };
-
   const value = {
     questions,
     setQuestions,
@@ -82,8 +81,10 @@ export const QuizContextProvider = (props) => {
     setOpenTakeTestModal,
     currentQuestion,
     setCurrentQuestion,
-    currentDp,
-    setCurrentDp,
+    selectedItem,
+    selectedMatiere,
+    setSelectedItem,
+    setSelectedMatiere,
   };
 
   return (

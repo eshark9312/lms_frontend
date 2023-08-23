@@ -4,6 +4,7 @@ import Pagination from "../../Pagination";
 import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
 import { useAuth } from "../../../../providers/authProvider";
 import QuestionItem from "../../QuestionItem";
+import { Spinner } from "../../../icons/Spinner";
 
 function SavedQuestions({ item_id }) {
   const { user } = useAuth();
@@ -35,7 +36,14 @@ function SavedQuestions({ item_id }) {
   }, []);
   return (
     <div>
-      <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
+      {isLoading ? (
+        <div
+          role="status"
+          className="h-[70vh] pb-20 flex justify-center items-center"
+        >
+          <Spinner />
+        </div>
+      ) : (<div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
         <table className="min-w-full divide-y divide-gray-300">
           <thead className="divide-y divide-gray-200 bg-white">
             <tr>
@@ -85,7 +93,7 @@ function SavedQuestions({ item_id }) {
           </tbody>
         </table>
         <Pagination />
-      </div>
+      </div>)}
     </div>
   );
 }

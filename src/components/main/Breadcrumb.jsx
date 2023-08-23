@@ -13,8 +13,8 @@ export default function Breadcrumb({ pages }) {
             </Link>
           </div>
         </li>
-        {pages.map((page) => (
-          <li key={page.name}>
+        {pages.map((page, index) => (
+          <li key={index}>
             <div className="flex items-center">
               <ChevronRightIcon
                 className="h-5 w-5 flex-shrink-0 text-gray-400"

@@ -16,6 +16,7 @@ import { useAuth } from "../../../providers/authProvider";
 import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
 import QuestionItem from "../QuestionItem";
 import Pagination from "../Pagination";
+import { Spinner } from "../../icons/Spinner";
 
 function Playlist({ playlist }) {
   const [show, setShow] = useState(false);
@@ -46,7 +47,14 @@ function Playlist({ playlist }) {
   }, []);
   return (
     <>
-      <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
+      {isLoading ? (
+        <div
+          role="status"
+          className="h-[70vh] pb-20 flex justify-center items-center"
+        >
+          <Spinner />
+        </div>
+      ) : (<div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
         <div className="p-4 bg-white flex justify-between items-center gap-2">
           <div className="flex items-center gap-2">
             <Label color={playlist.color}>{playlist.name}</Label>
@@ -126,7 +134,7 @@ function Playlist({ playlist }) {
           <Pagination />
           </>
         )}
-      </div>
+      </div>)}
     </>
   );
 }

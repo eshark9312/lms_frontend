@@ -15,6 +15,7 @@ import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
 import { useAuth } from "../../../providers/authProvider";
 import Label from "../../common/Label";
 import DPItem from "../DPItem";
+import { Spinner } from "../../icons/Spinner";
 
 const colors = [
   "primary",
@@ -45,7 +46,7 @@ export default function Session({ session, index, editAction }) {
           session_id: session._id,
         });
         setDps(response.data.data);
-        // setIsLoading(false);
+        setIsLoading(false);
       } catch (error) {
         console.log(error);
       }
@@ -54,7 +55,14 @@ export default function Session({ session, index, editAction }) {
   }, []);
 
   const [show, setShow] = useState(false);
-  return (
+  return isLoading ? (
+    <div
+      role="status"
+      className="h-[70vh] pb-20 flex justify-center items-center"
+    >
+      <Spinner />
+    </div>
+  ) : (
     <div className="mt-2 overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
       <div className="p-4 bg-white flex justify-between items-center gap-2">
         <div className="flex items-center gap-2">

@@ -3,6 +3,7 @@ import Playlist from "./Playlist";
 import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
 import { useAuth } from "../../../providers/authProvider";
 import { useQuiz } from "../../../hooks/useQuiz";
+import { Spinner } from "../../icons/Spinner";
 
 function Playlists() {
   const authHttpClient = useAuthHttpClient();
@@ -25,13 +26,20 @@ function Playlists() {
   }, [user]);
   return (
     <>
-      <div className="inline-block min-w-full py-2 align-middle">
+      {isLoading ? (
+        <div
+          role="status"
+          className="h-[70vh] pb-20 flex justify-center items-center"
+        >
+          <Spinner />
+        </div>
+      ) : (<div className="inline-block min-w-full py-2 align-middle">
         <div className="flex flex-col gap-4">
           {playlists.map((playlist, idx) => (
             <Playlist key={idx} playlist={playlist} />
           ))}
         </div>
-      </div>
+      </div>)}
     </>
   );
 }

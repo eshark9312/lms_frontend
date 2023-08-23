@@ -18,13 +18,13 @@ import { useAuth } from "../../../../providers/authProvider";
 import { useQuiz } from "../../../../hooks/useQuiz";
 
 function Overview({ matiere }) {
-  const {setOpenTakeTestModal} = useQuiz();
+  const { setOpenTakeTestModal } = useQuiz();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const authHttpClient = useAuthHttpClient();
 
   useEffect(() => {
-    if(!matiere) return;
+    if (!matiere) return;
     const fetchItems = async () => {
       try {
         const response = await authHttpClient.post(`/item/filter/`, {
@@ -46,7 +46,14 @@ function Overview({ matiere }) {
       </div>
     );
 
-  return (
+  return isLoading ? (
+    <div
+      role="status"
+      className="h-[70vh] pb-20 flex justify-center items-center"
+    >
+      <Spinner />
+    </div>
+  ) : (
     <>
       <div className="inline-block min-w-full py-2 align-middle">
         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
@@ -109,7 +116,9 @@ function Overview({ matiere }) {
                   <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                     <Link
                       // to="/quiz"
-                        onClick={() => {setOpenTakeTestModal(true)}}
+                      onClick={() => {
+                        setOpenTakeTestModal(true);
+                      }}
                       className="text-indigo-600 hover:text-indigo-900"
                     >
                       <PencilSquareIcon className="w-5 h-5 stroke-2" />
@@ -141,7 +150,7 @@ const StatisticsChart = ({ matiere }) => {
         console.log({
           user_id: user._id,
           matiere_id: matiere._id,
-        })
+        });
         const response = await authHttpClient.post(`/progress/matiere/filter`, {
           user_id: user._id,
           matiere_id: matiere._id,

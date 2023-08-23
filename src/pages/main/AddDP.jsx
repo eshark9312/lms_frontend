@@ -42,7 +42,7 @@ function AddNewDPPage() {
   }, []);
 
   const [matieres, setMatieres] = useState([]);
-  const [selectedMatiere, setSelectedMatiere] = useState(null);
+  const [selectedMatieres, setSelectedMatieres] = useState([]);
   const [matiereQuery, setMatiereQuery] = useState("");
   const filteredMatieres =
     matiereQuery === ""
@@ -65,7 +65,7 @@ function AddNewDPPage() {
   }, []);
 
   const [items, setItems] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItems, setSelectedItems] = useState([]);
   const [itemQuery, setItemQuery] = useState("");
   const filteredItems =
     itemQuery === ""
@@ -76,16 +76,14 @@ function AddNewDPPage() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await authHttpClient.post(`/item/filter/`, {
-          matiere_id: selectedMatiere._id,
-        });
+        const response = await authHttpClient.get(`/item/`);
         setItems(response.data.data);
       } catch (error) {
         console.log(error);
       }
     };
-    if (selectedMatiere) fetchItems();
-  }, [selectedMatiere]);
+    fetchItems();
+  }, []);
 
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -152,8 +150,8 @@ function AddNewDPPage() {
 
   useEffect(() => {
     setNewDP(() => ({
-      matiere_id: "",
-      item_id: "",
+      matieres: [],
+      items: [],
       tags: [],
       desc: "",
       questions: Array(5).fill({
@@ -177,24 +175,14 @@ function AddNewDPPage() {
         ...err,
         session_id: null,
       }));
-    if (selectedMatiere)
-      setErr((err) => ({
-        ...err,
-        matiere_id: null,
-      }));
-    if (selectedItem)
-      setErr((err) => ({
-        ...err,
-        item_id: null,
-      }));
     setNewDP((newDP) => ({
       ...newDP,
       session_id: selectedSession?._id,
-      matiere_id: selectedMatiere?._id,
-      item_id: selectedItem?._id,
+      matieres:  selectedMatieres.map((matiere) => matiere._id),
+      items:  selectedItems.map((item) => item._id),
       tags: selectedTags.map((tag) => tag._id),
     }));
-  }, [selectedMatiere, selectedItem, selectedTags, selectedSession]);
+  }, [selectedMatieres, selectedItems, selectedTags, selectedSession]);
 
   const increaseQuestions = () => {
     const temp_DP = { ...newDP };
@@ -293,11 +281,8 @@ function AddNewDPPage() {
   const validateHeader = () => {
     if (!newDP.session_id)
       setErr((err) => ({ ...err, session_id: "required" }));
-    if (!newDP.matiere_id)
-      setErr((err) => ({ ...err, matiere_id: "required" }));
-    if (!newDP.item_id) setErr((err) => ({ ...err, item_id: "required" }));
     if (newDP.desc === "") setErr((err) => ({ ...err, desc: "required" }));
-    if (newDP.session_id && newDP.matiere_id && newDP.item_id && newDP.desc)
+    if (newDP.session_id && newDP.desc)
       return true;
     else return false;
   };
@@ -418,24 +403,22 @@ function AddNewDPPage() {
             </div>
           </Combobox>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 my-2 gap-2">
-          {/*   select matiere   */}
-          <Combobox
-            as="div"
-            value={selectedMatiere}
-            onChange={setSelectedMatiere}
-          >
-            <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
-              Select Matiere
-            </Combobox.Label>
-            <div className="relative mt-2">
+        {/*   select matieres   */}
+        <Combobox
+          as="div"
+          value={selectedMatieres}
+          onChange={setSelectedMatieres}
+          multiple
+        >
+          <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
+            Select Matieres
+          </Combobox.Label>
+          <div className="flex gap-2">
+            <div className="relative mt-2 max-w-fit">
               <Combobox.Input
-                className={classNames(
-                  "w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6",
-                  err.matiere_id && "ring-red-600"
-                )}
+                className="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
                 onChange={(event) => setMatiereQuery(event.target.value)}
-                displayValue={(matiere) => matiere?.name}
+                // displayValue={(items) => { return items.map((item) => item.name).join(", "); }}
               />
               <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                 <ChevronUpDownIcon
@@ -460,11 +443,6 @@ function AddNewDPPage() {
                       {({ active, selected }) => (
                         <>
                           <div className="flex items-center">
-                            <img
-                              src={matiere.image}
-                              alt={matiere.name}
-                              className="h-6 w-6 flex-shrink-0 rounded-full"
-                            />
                             <span
                               className={classNames(
                                 "ml-3 truncate",
@@ -495,20 +473,42 @@ function AddNewDPPage() {
                 </Combobox.Options>
               )}
             </div>
-          </Combobox>
-          {/*   select item    */}
-          <Combobox as="div" value={selectedItem} onChange={setSelectedItem}>
-            <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
-              Select Item
-            </Combobox.Label>
-            <div className="relative mt-2">
+            <div className="mt-1.5 flex-1 rounded-lg border-dashed border-2 border-gray-200 p-2">
+              <div className="flex gap-2 flex-wrap ">
+                {selectedMatieres.map((matiere) => (
+                  <div
+                    className="px-2  hover:text-red-900 hover:border-red-900 hover:cursor-pointer min-w-fit border border-gray-400 rounded-md text-[12px]"
+                    onClick={() =>
+                      setSelectedMatieres(
+                        selectedMatieres.filter(
+                          (selectedTag) => selectedTag._id !== matiere._id
+                        )
+                      )
+                    }
+                  >
+                    {matiere.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Combobox>
+        {/*   select items   */}
+        <Combobox
+          as="div"
+          value={selectedItems}
+          onChange={setSelectedItems}
+          multiple
+        >
+          <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
+            Select Items
+          </Combobox.Label>
+          <div className="flex gap-2">
+            <div className="relative mt-2 max-w-fit">
               <Combobox.Input
-                className={classNames(
-                  "w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6",
-                  err.item_id && "ring-red-600"
-                )}
+                className="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
                 onChange={(event) => setItemQuery(event.target.value)}
-                displayValue={(item) => item?.name}
+                // displayValue={(items) => { return items.map((item) => item.name).join(", "); }}
               />
               <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                 <ChevronUpDownIcon
@@ -563,8 +563,26 @@ function AddNewDPPage() {
                 </Combobox.Options>
               )}
             </div>
-          </Combobox>
-        </div>
+            <div className="mt-1.5 flex-1 rounded-lg border-dashed border-2 border-gray-200 p-2">
+              <div className="flex gap-2 flex-wrap ">
+                {selectedItems.map((item) => (
+                  <div
+                    className="px-2  hover:text-red-900 hover:border-red-900 hover:cursor-pointer min-w-fit border border-gray-400 rounded-md text-[12px]"
+                    onClick={() =>
+                      setSelectedItems(
+                        selectedItems.filter(
+                          (selectedItem) => selectedItem._id !== item._id
+                        )
+                      )
+                    }
+                  >
+                    {item.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Combobox>
         {/*   select tags   */}
         <Combobox
           as="div"

@@ -13,6 +13,7 @@ import Filter from "../Filter";
 import { useAuth } from "../../../providers/authProvider";
 import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
 import QuestionItem from "../QuestionItem";
+import { Spinner } from "../../icons/Spinner";
 
 function All() {
   const { user } = useAuth();
@@ -41,7 +42,14 @@ function All() {
   }, []);
   return (
     <div>
-      <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
+      {isLoading ? (
+        <div
+          role="status"
+          className="h-[70vh] pb-20 flex justify-center items-center"
+        >
+          <Spinner />
+        </div>
+      ) : (<div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
         <div className="p-4 bg-white flex justify-between">
           <Search />
           <Filter />
@@ -97,7 +105,7 @@ function All() {
           </table>
           <Pagination />
         </div>
-      </div>
+      </div>)}
     </div>
   );
 }
