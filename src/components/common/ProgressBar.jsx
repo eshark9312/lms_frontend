@@ -23,7 +23,7 @@ export const ProgressBar = ({ item }) => {
         });
     };
     fetchItemProgress();
-  }, [item, user, authHttpClient]);
+  }, [item, user]);
   return (
     <div className="flex items-center gap-2">
       <div className="h-2 rounded-full min-w-[200px] bg-gray-300">

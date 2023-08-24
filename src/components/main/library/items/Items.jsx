@@ -26,21 +26,36 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 export default function Items() {
-  const { setOpenTakeTestModal } = useQuiz();
+  const authHttpClient = useAuthHttpClient();
   const { user } = useAuth();
+  const { setOpenTakeTestModal } = useQuiz();
+
   const [matieres, setMatieres] = useState([]);
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const authHttpClient = useAuthHttpClient();
   const [openNewItemModal, setOpenNewItemModal] = useState(false);
   const [openEditItemModal, setOpenEditItemModal] = useState(false);
   const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
+  const [totalNumber, setTotalNumber] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [searchText, setSearchText] = useState("");
+  const [filter, setFilter] = useState({});
+  const [sort, setSort] = useState({});
+
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await authHttpClient.get(`/item/`);
+        const response = await authHttpClient.post(`/item/getPage`, {
+          pageSize,
+          pageNumber,
+          searchText,
+          filter,
+          sort,
+        });
+        setTotalNumber(response.data.total_number);
         setItems(response.data.data);
         setIsLoading(false);
       } catch (error) {
@@ -48,7 +63,7 @@ export default function Items() {
       }
     };
     fetchItems();
-  }, []);
+  }, [pageSize, pageNumber, searchText, filter, sort]);
 
   useEffect(() => {
     const fetchMatieres = async () => {
@@ -60,8 +75,8 @@ export default function Items() {
         console.log(error);
       }
     };
-    fetchMatieres();
-  }, []);
+    if (user.role === "admin") fetchMatieres();
+  }, [user]);
   return (
     <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
       {user.role === "user" && (
@@ -149,7 +164,13 @@ export default function Items() {
                   ))}
                 </tbody>
               </table>
-              <Pagination />
+              <Pagination
+                totalNumber={totalNumber}
+                pageNumber={pageNumber}
+                setPageNumber={setPageNumber}
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+              />
             </div>
           )}
         </div>
@@ -196,6 +217,14 @@ export default function Items() {
               ))}
             </div>
           )}
+
+          <Pagination
+            totalNumber={totalNumber}
+            pageNumber={pageNumber}
+            setPageNumber={setPageNumber}
+            pageSize={pageSize}
+            setPageSize={setPageSize}
+          />
           <AddNewItemModal />
           <EditItemModal />
           <DeleteConformModal />
