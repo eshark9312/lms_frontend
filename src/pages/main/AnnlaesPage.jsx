@@ -21,7 +21,7 @@ function AnnalesPage() {
 
   const [tabs, setTabs] = useState([
     { name: "All", icon: FolderOpenIcon, current: true },
-    { name: "Matière/Items", icon: BriefcaseIcon, current: false },
+    // { name: "Matière/Items", icon: BriefcaseIcon, current: false },
     { name: "Session", icon: Square3Stack3DIcon, current: false },
   ]);
 

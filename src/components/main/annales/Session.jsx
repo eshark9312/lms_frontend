@@ -39,12 +39,25 @@ export default function Session({ session, index, editAction }) {
   const [dps, setDps] = useState([]);
   const [selectedDp, setSelectedDp] = useState(null);
 
+  const [totalNumber, setTotalNumber] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [searchText, setSearchText] = useState("");
+  const [filter, setFilter] = useState({session_id: session._id});
+  const [sort, setSort] = useState({});
+
   useEffect(() => {
     const fetchDPs = async () => {
       try {
-        const response = await authHttpClient.post("/dp/filter", {
-          session_id: session._id,
+        const response = await authHttpClient.post("/dp/getPage", {
+          pageSize,
+          pageNumber,
+          searchText,
+          filter,
+          sort,
         });
+        console.log(response);
+        setTotalNumber(response.data.total_number);
         setDps(response.data.data);
         setIsLoading(false);
       } catch (error) {
@@ -52,7 +65,7 @@ export default function Session({ session, index, editAction }) {
       }
     };
     fetchDPs();
-  }, []);
+  }, [searchText,pageNumber]);
 
   const [show, setShow] = useState(false);
   return isLoading ? (
@@ -97,7 +110,7 @@ export default function Session({ session, index, editAction }) {
       {show && (
         <>
           <div className="p-4 bg-white flex justify-between">
-            <Search />
+                <Search searchText={searchText} setSearchText={setSearchText}/>
             <Filter />
           </div>
 
@@ -145,7 +158,13 @@ export default function Session({ session, index, editAction }) {
               ))}
             </tbody>
           </table>
-          <Pagination />
+              <Pagination
+                totalNumber={totalNumber}
+                pageNumber={pageNumber}
+                setPageNumber={setPageNumber}
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+              />
         </>
       )}
     </div>

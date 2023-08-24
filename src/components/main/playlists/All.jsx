@@ -21,17 +21,29 @@ function All() {
   const [isLoading, setIsLoading] = useState(true);
   const authHttpClient = useAuthHttpClient();
   
+  const [searchText, setSearchText] = useState("");
+  const [totalNumber, setTotalNumber] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [sort, setSort] = useState({});
+
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         const response = await authHttpClient.post(
-          "/playlist/filterQuestion",
-          { user_id: user._id }
+          `/playlist/getQuestionsWithDetail`,
+          {
+            user_id: user.id,
+            searchText: searchText,
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            sort: sort,
+          }
         );
+        console.log(response);
+        setTotalNumber(response.data.total_number);
         setQuestions(
-          response.data.data
-            .map((playlist) => playlist.question_id)
-            .filter((item, pos, self) => self.indexOf(item) === pos) //remove duplicates
+          response.data.data.map(({_id}) => _id)
         );
         setIsLoading(false);
       } catch (error) {
@@ -39,7 +51,7 @@ function All() {
       }
     };
     fetchQuestions();
-  }, []);
+  }, [pageSize, pageNumber, searchText, sort]);
   return (
     <div>
       {isLoading ? (
@@ -51,7 +63,7 @@ function All() {
         </div>
       ) : (<div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
         <div className="p-4 bg-white flex justify-between">
-          <Search />
+                <Search searchText={searchText} setSearchText={setSearchText}/>
           <Filter />
         </div>
         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
@@ -103,7 +115,13 @@ function All() {
               ))}
             </tbody>
           </table>
-          <Pagination />
+              <Pagination
+                totalNumber={totalNumber}
+                pageNumber={pageNumber}
+                setPageNumber={setPageNumber}
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+              />
         </div>
       </div>)}
     </div>

@@ -25,18 +25,29 @@ function Playlist({ playlist }) {
   const [isLoading, setIsLoading] = useState(true);
   const authHttpClient = useAuthHttpClient();
 
+  // const [searchText, setSearchText] = useState("");
+  const [totalNumber, setTotalNumber] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [sort, setSort] = useState({});
+
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         const response = await authHttpClient.post(
-          "/playlist/filterQuestion",
-          { user_id: user._id,
-           playlist_id: playlist._id}
+          `/playlist/getQuestionsWithDetail`,
+          {
+            user_id: user.id,
+            playlist_id: playlist._id,
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            sort: sort,
+          }
         );
+        console.log(response);
+        setTotalNumber(response.data.total_number);
         setQuestions(
-          response.data.data
-            .map((playlist) => playlist.question_id)
-            .filter((item, pos, self) => self.indexOf(item) === pos) //remove duplicates
+          response.data.data.map(({_id}) => _id)
         );
         setIsLoading(false);
       } catch (error) {
@@ -44,7 +55,7 @@ function Playlist({ playlist }) {
       }
     };
     fetchQuestions();
-  }, []);
+  }, [pageSize, pageNumber]);
   return (
     <>
       {isLoading ? (
@@ -79,10 +90,10 @@ function Playlist({ playlist }) {
         </div>
         {show && (
           <>
-            <div className="p-4 bg-white flex justify-between">
-              <Search />
+            {/* <div className="p-4 bg-white flex justify-between">
+                <Search searchText={searchText} setSearchText={setSearchText}/>
               <Filter />
-            </div>
+            </div> */}
             <table className="min-w-full divide-y divide-gray-300">
             <thead className="divide-y divide-gray-200 bg-white">
               <tr>
@@ -131,7 +142,13 @@ function Playlist({ playlist }) {
               ))}
             </tbody>
           </table>
-          <Pagination />
+              <Pagination
+                totalNumber={totalNumber}
+                pageNumber={pageNumber}
+                setPageNumber={setPageNumber}
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+              />
           </>
         )}
       </div>)}

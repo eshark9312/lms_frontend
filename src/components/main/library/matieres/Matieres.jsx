@@ -18,10 +18,14 @@ function Matieres() {
   const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(false);
   const [selectedMatiere, setSelectedMatiere] = useState(null);
 
+  const [searchText, setSearchText] = useState("");
+
   useEffect(() => {
     const fetchMatieres = async () => {
       try {
-        const response = await authHttpClient.get("/matiere");
+        const response = await authHttpClient.post(`/matiere/getPage`, {
+          searchText,
+        });
         setMatieres(response.data.data);
         setIsLoading(false);
       } catch (error) {
@@ -29,7 +33,7 @@ function Matieres() {
       }
     };
     fetchMatieres();
-  }, []);
+  }, [searchText]);
 
   const AddNewMatiereModal = () => {
     const [isUploading, setIsUploading] = useState(false);
@@ -329,7 +333,7 @@ function Matieres() {
           {user.role === "user" && (
             <>
               <div className="mb-4 flex flex-row-reverse">
-                <Search />
+              <Search searchText={searchText} setSearchText={setSearchText}/>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                 {matieres.map((matiere, index) => (
@@ -351,7 +355,7 @@ function Matieres() {
                   <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
                   Add New Matiere
                 </button>
-                <Search />
+              <Search searchText={searchText} setSearchText={setSearchText}/>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                 {matieres.map((matiere, index) => (

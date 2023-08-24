@@ -33,8 +33,8 @@ export default function TakeTestModal() {
     setIsUploading(true);
     try {
       const response = await authHttpClient.post("/question/filterRandom", {
-        matiere_id: selectedMatiere?._id,
-        item_id: selectedItem?._id,
+        matiere_id: selectedMatiere,
+        item_id: selectedItem,
         n_questions: n_questions,
       });
       setIsUploading(false);

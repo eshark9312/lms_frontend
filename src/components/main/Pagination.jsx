@@ -103,7 +103,7 @@ export default function Pagination({
           <p className="text-sm text-gray-700">
             Showing{" "}
             <span className="font-medium">
-              {(pageNumber - 1) * pageSize + 1}
+              {lastPageNumber>0 ? (pageNumber - 1) * pageSize + 1 : 0}
             </span>{" "}
             to{" "}
             <span className="font-medium">

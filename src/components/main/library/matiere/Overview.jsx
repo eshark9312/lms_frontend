@@ -23,13 +23,25 @@ function Overview({ matiere }) {
   const [isLoading, setIsLoading] = useState(true);
   const authHttpClient = useAuthHttpClient();
 
+  const [totalNumber, setTotalNumber] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [searchText, setSearchText] = useState("");
+  const [filter, setFilter] = useState({});
+  const [sort, setSort] = useState({});
+
   useEffect(() => {
     if (!matiere) return;
     const fetchItems = async () => {
       try {
-        const response = await authHttpClient.post(`/item/filter/`, {
-          matiere_id: matiere._id,
+        const response = await authHttpClient.post(`/item/getPage`, {
+          pageSize,
+          pageNumber,
+          searchText,
+          filter: { ...filter, matiere_id: matiere._id },
+          sort,
         });
+        setTotalNumber(response.data.total_number);
         setItems(response.data.data);
         setIsLoading(false);
       } catch (error) {
@@ -37,7 +49,7 @@ function Overview({ matiere }) {
       }
     };
     fetchItems();
-  }, [matiere]);
+  }, [pageSize, pageNumber, searchText, filter, sort, matiere]);
 
   if (isLoading)
     return (
@@ -61,7 +73,7 @@ function Overview({ matiere }) {
             Liste des items
           </div>
           <div className="p-4 bg-white flex justify-between">
-            <Search />
+                <Search searchText={searchText} setSearchText={setSearchText}/>
             <Filter />
           </div>
           <table className="min-w-full divide-y divide-gray-300">
@@ -128,7 +140,13 @@ function Overview({ matiere }) {
               ))}
             </tbody>
           </table>
-          <Pagination />
+              <Pagination
+                totalNumber={totalNumber}
+                pageNumber={pageNumber}
+                setPageNumber={setPageNumber}
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+              />
         </div>
       </div>
       <div className="mt-8 grid md:grid-cols-2 gap-8 bg-gray-50">

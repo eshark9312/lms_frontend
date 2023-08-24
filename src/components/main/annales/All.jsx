@@ -19,10 +19,25 @@ function All() {
   const [dps, setDps] = useState([]);
   const [selectedDp, setSelectedDp] = useState(null);
 
+  const [totalNumber, setTotalNumber] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [searchText, setSearchText] = useState("");
+  const [filter, setFilter] = useState({});
+  const [sort, setSort] = useState({});
+
   useEffect(() => {
     const fetchDPs = async () => {
       try {
-        const response = await authHttpClient.get("/dp");
+        const response = await authHttpClient.post("/dp/getPage", {
+          pageSize,
+          pageNumber,
+          searchText,
+          filter,
+          sort,
+        });
+        console.log(response);
+        setTotalNumber(response.data.total_number);
         setDps(response.data.data);
         setIsLoading(false);
       } catch (error) {
@@ -30,7 +45,7 @@ function All() {
       }
     };
     fetchDPs();
-  }, []);
+  }, [searchText,pageNumber]);
 
   return (
     <div>
@@ -44,7 +59,7 @@ function All() {
       ) : (
         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
           <div className="p-4 bg-white flex justify-between">
-            <Search />
+                <Search searchText={searchText} setSearchText={setSearchText}/>
             <Filter />
           </div>
 
@@ -92,7 +107,13 @@ function All() {
               ))}
             </tbody>
           </table>
-          <Pagination />
+              <Pagination
+                totalNumber={totalNumber}
+                pageNumber={pageNumber}
+                setPageNumber={setPageNumber}
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+              />
         </div>
       )}
     </div>
