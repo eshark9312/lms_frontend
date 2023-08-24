@@ -494,19 +494,13 @@ export default function TakeTestModal() {
                           for="minmax-range"
                           class="mt-4 block mb-2 text-sm font-medium text-gray-90"
                         >
-                          Number of questions: {n_questions}/
-                          {selectedItem?.n_questions ??
-                            selectedMatiere?.n_questions}
+                          Number of questions: {n_questions}/{selectedItem?.n_questions ??selectedMatiere?.n_questions}
                         </label>
                         <input
                           id="minmax-range"
                           min="1"
-                          max={Math.min(
-                            selectedItem?.n_questions ??
-                              selectedMatiere?.n_questions ??
-                              25,
-                            25
-                          )}
+                          max={selectedItem?.n_questions ??
+                              selectedMatiere?.n_questions}
                           type="range"
                           value={n_questions}
                           onChange={(e) => setN_questions(e.target.value)}

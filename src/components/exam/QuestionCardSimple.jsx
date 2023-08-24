@@ -27,7 +27,7 @@ function QuestionCardSimple({
   }, [question, _answer]);
 
   const handleClick = () => {
-    next(answer);
+    if(answer)next(answer);
   };
 
   return (

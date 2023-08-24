@@ -66,8 +66,8 @@ function ExamSidebar({
                     }
                   }}
                   className={classNames(
-                    "w-12 h-12 flex justify-center items-center bg-gray-200 click-action hover:cursor-pointer",
-                    question.userAnswer && "bg-[#203772] text-white font-bold",
+                    "w-12 h-12 flex justify-center items-center click-action hover:cursor-pointer",
+                    question.userAnswer ? "bg-[#203772] text-white font-bold" : "bg-gray-200",
                     dp_index === currentDp &&
                       qi_index === currentQuestion &&
                       "border-2 border-[#203772]"
