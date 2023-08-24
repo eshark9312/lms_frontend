@@ -94,7 +94,7 @@ export default function Items() {
                 Liste des items
               </div>
               <div className="p-4 bg-white flex justify-between">
-                <Search />
+                <Search searchText={searchText} setSearchText={setSearchText}/>
                 <Filter />
               </div>
               <table className="min-w-full divide-y divide-gray-300">

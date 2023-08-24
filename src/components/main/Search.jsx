@@ -1,7 +1,7 @@
 import React from "react";
 import SearchIcon from "../icons/SearchIcon";
 
-function Search() {
+function Search({searchText, setSearchText}) {
   return (
     <form
       className="relative flex w-[450px] h-fit justify-center items-center"
@@ -23,6 +23,8 @@ function Search() {
         placeholder="Search"
         type="search"
         name="search"
+        value={searchText}
+        onChange={(e)=>{setSearchText(e.target.value)}}
       />
     </form>
   );
