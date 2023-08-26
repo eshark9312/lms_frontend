@@ -36,7 +36,7 @@ function Choice({
             {content}
           </div>
         </div>
-        {desc && isRight === false && (
+        {isRight === false && (
           <div>
             <MessageAlertIcon strokeWidth={3} />
           </div>

@@ -43,7 +43,7 @@ function QuestionCardSimple({
           {question.__t === "ShortAnswer" &&
             "Question à réponse ouverte et courte"}
         </div>
-        <div className="px-6 py-2 text-md">{question.content}</div>
+        <div className="px-6 py-2 text-md">{question.question}</div>
         <div className="px-6 py-2 text-md">
           {question.__t === "MultiChoice" &&
             question.answers.map((item, index) => (

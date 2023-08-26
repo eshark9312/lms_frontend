@@ -88,7 +88,7 @@ const DPItem = ({ dp }) => {
         {dp.dp_number}
       </td>
       <td className=" px-3 py-4 text-sm text-gray-500">
-        {lastAssess && format(new Date(lastAssess.last_access), "MMM dd, yyyy")}
+        {lastAssess && format(new Date(lastAssess.last_assess), "MMM dd, yyyy")}
       </td>
       <td className=" px-3 py-4 text-sm text-gray-500">
         <div className="flex flex-wrap">

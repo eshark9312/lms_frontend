@@ -28,7 +28,7 @@ function classNames(...classes) {
 export default function Items() {
   const authHttpClient = useAuthHttpClient();
   const { user } = useAuth();
-  const { setOpenTakeTestModal } = useQuiz();
+  const { setOpenTakeTestModal, setSelectedMatiere, setSelectedItem } = useQuiz();
 
   const [matieres, setMatieres] = useState([]);
   const [items, setItems] = useState([]);
@@ -36,7 +36,7 @@ export default function Items() {
   const [openNewItemModal, setOpenNewItemModal] = useState(false);
   const [openEditItemModal, setOpenEditItemModal] = useState(false);
   const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItem, selectItemForEdit] = useState(null);
 
   const [totalNumber, setTotalNumber] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -153,6 +153,8 @@ export default function Items() {
                         <Link
                           // to="/quiz"
                           onClick={() => {
+                            setSelectedItem(item._id);
+                            setSelectedMatiere(item.matiere_id);
                             setOpenTakeTestModal(true);
                           }}
                           className="text-primary-600 hover:text-primary-900"
@@ -206,11 +208,11 @@ export default function Items() {
                 <EditableItem
                   item={item}
                   editAction={() => {
-                    setSelectedItem(item);
+                    selectItemForEdit(item);
                     setOpenEditItemModal(true);
                   }}
                   deleteAction={() => {
-                    setSelectedItem(item);
+                    selectItemForEdit(item);
                     setOpenDeleteConfirmModal(true);
                   }}
                 />

@@ -111,7 +111,7 @@ function QuestionCard({ question: _question, setQuestions, index, next }) {
   const [showStatisticNoti, openStatisticNoti] = useState(false);
   const [showReportSlide, openReportSlide] = useState(false);
   const [showRefNoti, openRefNoti] = useState(false);
-
+console.log(question)
   return (
     <>
       <div className="bg-white h-screen py-16 px-4 md:px-16 flex justify-center items-center">
@@ -161,7 +161,12 @@ function QuestionCard({ question: _question, setQuestions, index, next }) {
               ))}
             {question.type === "ShortAnswer" && (
               <div className="px-16 mb-3">
-                <input
+                {question.result ?(
+                  <div className={`border-2 rounded-lg px-8 py-2 ${question.result.score===20?"bg-green-bg border-green-dark":"bg-red-bg border-red-dark"}`}>
+                    <div className="font-bold">{question.result.yourAnswer}</div>
+                    <div>{question.choices.join(", ")}</div>
+                  </div>
+                ): <input
                   className="w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
                   type="text"
                   value={question.result ? question.result.yourAnswer : answer}
@@ -172,7 +177,7 @@ function QuestionCard({ question: _question, setQuestions, index, next }) {
                           setAnswer(e.target.value);
                         }
                   }
-                />
+                />}
               </div>
             )}
             {question.result && (

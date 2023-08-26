@@ -38,7 +38,7 @@ const parseQuestion = (question) => {
           successRate: 32,
         },
         content: question.question,
-        choices: question.answers.map(({ choice }) => choice),
+        choices: question.answers.map((choice) => choice),
       };
       break;
     case "TrueOrFalse":

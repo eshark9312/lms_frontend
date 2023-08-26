@@ -37,7 +37,7 @@ const QuestionItem = ({ question_id }) => {
           question_id,
         });
         setLastScore(response.data.data?.user_score);
-        setLastAssessed(response.data.data?.last_access);
+        setLastAssessed(response.data.data?.last_assess);
       } catch (error) {
         console.log(error);
       }

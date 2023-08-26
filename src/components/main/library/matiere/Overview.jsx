@@ -18,7 +18,7 @@ import { useAuth } from "../../../../providers/authProvider";
 import { useQuiz } from "../../../../hooks/useQuiz";
 
 function Overview({ matiere }) {
-  const { setOpenTakeTestModal } = useQuiz();
+  const { setSelectedMatiere, setSelectedItem, setOpenTakeTestModal } = useQuiz();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const authHttpClient = useAuthHttpClient();
@@ -129,6 +129,8 @@ function Overview({ matiere }) {
                     <Link
                       // to="/quiz"
                       onClick={() => {
+                        setSelectedItem(item._id);
+                        setSelectedMatiere(matiere._id);
                         setOpenTakeTestModal(true);
                       }}
                       className="text-indigo-600 hover:text-indigo-900"
@@ -181,7 +183,7 @@ const StatisticsChart = ({ matiere }) => {
       }
     };
     getSuccessRate();
-  }, []);
+  }, [user, matiere]);
 
   return (
     <>

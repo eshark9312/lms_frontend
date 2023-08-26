@@ -62,6 +62,7 @@ export default function TakeTestModal() {
     const fetchMatieres = async () => {
       try {
         const response = await authHttpClient.get(`/matiere/`);
+        console.log(response);
         setMatieres(response.data.data);
       } catch (error) {
         console.log(error);

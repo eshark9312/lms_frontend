@@ -74,7 +74,7 @@ function QuestionResultCard({
           {question.__t === "ShortAnswer" &&
             "Question à réponse ouverte et courte"}
         </div>
-            <div className="px-12 pt-2 pb-6">{question.content}</div>
+            <div className="px-12 pt-2 pb-6">{question.question}</div>
             {question.__t === "MultiChoice" &&
               question.answers.map(({choice, answer, desc}, idx) => (
                 <Choice
@@ -90,6 +90,12 @@ function QuestionResultCard({
                 />
               ))}
             {question.__t === "ShortAnswer" && (
+              question.user_score ?
+                <div className={`border-2 rounded-lg mx-16 px-8 py-2 ${question.user_score===20?"bg-green-bg border-green-dark":"bg-red-bg border-red-dark"}`}>
+                  <div className="font-bold">{question.userAnswer}</div>
+                  <div>{question.answers.join(", ")}</div>
+                </div>
+              :
               <div className="px-16 mb-3">
                 <input
                   className="w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
