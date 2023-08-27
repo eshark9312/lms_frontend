@@ -246,10 +246,11 @@ export default function DPs() {
           });
     useEffect(() => {
       const fetchItems = async () => {
+        const filter = selectedMatiere ? {
+          matiere_id: selectedMatiere._id,
+        } : {};
         try {
-          const response = await authHttpClient.post(`/item/filter/`, {
-            matiere_id: selectedMatiere._id,
-          });
+          const response = await authHttpClient.post(`/item/filter/`, filter);
           setItems(response.data.data);
         } catch (error) {
           console.log(error);

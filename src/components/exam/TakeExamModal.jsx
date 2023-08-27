@@ -80,10 +80,13 @@ export default function TakeExamModal() {
         });
   useEffect(() => {
     const fetchItems = async () => {
+      const filter = selectedMatiere
+        ? {
+            matiere_id: selectedMatiere._id,
+          }
+        : {};
       try {
-        const response = await authHttpClient.post(`/item/filter/`, {
-          matiere_id: selectedMatiere._id,
-        });
+        const response = await authHttpClient.post(`/item/filter/`, filter);
         setItems(response.data.data);
       } catch (error) {
         console.log(error);
@@ -112,7 +115,7 @@ export default function TakeExamModal() {
     };
     fetchTags();
   }, []);
-  
+
   return (
     <Transition.Root show={openTakeTestModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={setOpenTakeTestModal}>
@@ -176,7 +179,10 @@ export default function TakeExamModal() {
                               onChange={(event) =>
                                 setMatiereQuery(event.target.value)
                               }
-                              displayValue={(matiere_id) => matieres.find(({_id})=>matiere_id===_id)?.name}
+                              displayValue={(matiere_id) =>
+                                matieres.find(({ _id }) => matiere_id === _id)
+                                  ?.name
+                              }
                             />
                             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                               <ChevronUpDownIcon
@@ -256,7 +262,9 @@ export default function TakeExamModal() {
                               onChange={(event) =>
                                 setItemQuery(event.target.value)
                               }
-                              displayValue={(item_id) => items.find(({_id})=>item_id===_id)?.name}
+                              displayValue={(item_id) =>
+                                items.find(({ _id }) => item_id === _id)?.name
+                              }
                             />
                             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                               <ChevronUpDownIcon
