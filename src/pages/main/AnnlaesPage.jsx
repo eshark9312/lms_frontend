@@ -13,6 +13,7 @@ import Sessions from "../../components/main/annales/Sessions";
 import { useExam } from "../../providers/examProvider";
 import useAuthHttpClient from "../../hooks/useAuthHttpClient";
 import { useNavigate } from "react-router-dom";
+import { Spinner } from "../../components/icons/Spinner";
 
 function AnnalesPage() {
   useEffect(() => {
@@ -83,7 +84,11 @@ function AnnalesPage() {
                 : "text-gray-300 border-gray-300 "
             } py-1.5 border-2 rounded-full flex gap-2 font-extrabold items-center px-4 click-action hover:cursor-pointer`}
           >
-            <AcademicCapIcon className="w-6 h-6" />
+            {isLoading ? (
+              <Spinner small />
+            ) : (
+              <AcademicCapIcon className="w-6 h-6" />
+            )}
             <p>{`Create a Exam`}</p>
           </div>
         </div>

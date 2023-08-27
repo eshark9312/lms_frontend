@@ -9,13 +9,21 @@ import Label from "../common/Label";
 import Check from "../common/Check";
 import useAuthHttpClient from "../../hooks/useAuthHttpClient";
 import { useAuth } from "../../providers/authProvider";
+import { useQuiz } from "../../hooks/useQuiz";
 const QuestionItem = ({ question_id }) => {
+  const { selectedQuestions, setSelectedQuestions } = useQuiz()
   const [question, setQuestion] = useState();
   const { user } = useAuth();
   const [lastAssessed, setLastAssessed] = useState();
   const [lastScore, setLastScore] = useState();
   const [playlists, setPlaylist] = useState();
   const authHttpClient = useAuthHttpClient();
+  
+  const checkHandle = (checked) => {
+    const tempQuestions = [...selectedQuestions.filter(_id=>question_id !== _id)]
+    if(checked) tempQuestions.push(question_id);
+    setSelectedQuestions(tempQuestions);
+  };
 
   useEffect(() => {
     const getQuestion = async () => {
@@ -65,8 +73,18 @@ const QuestionItem = ({ question_id }) => {
 
   return (
     <tr key={question_id} className="even:bg-gray-50">
-      <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 flex questions-center gap-2">
-        <Check />#{question?.question_number}
+      <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 flex questions-center gap-2 items-center">
+      <input
+          id="remember-me"
+          name="remember-me"
+          type="checkbox"
+          className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
+          checked={!!selectedQuestions.find(_id=>question_id === _id)}
+          onChange={(e) => {
+            checkHandle(e.target.checked);
+          }}
+        />
+        #{question?.question_number}
       </td>
       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
         {lastAssessed && format(new Date(lastAssessed), "MMM dd, yyyy")}

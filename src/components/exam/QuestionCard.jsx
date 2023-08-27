@@ -153,7 +153,6 @@ console.log(question)
                         }
                   }
                   isRight={
-                    question.result?.choices[idx].yourAnswer ===
                     question.result?.choices[idx].correctAnswer
                   }
                   desc={question.result?.choices[idx].desc}

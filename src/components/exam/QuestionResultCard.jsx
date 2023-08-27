@@ -83,14 +83,12 @@ function QuestionResultCard({
                   content={choice}
                   answered={!!question.userAnswer}
                   checked={question.userAnswer && question.userAnswer[idx] }
-                  isRight={question.userAnswer && answer ===
-                    question.userAnswer[idx]
-                  }
+                  isRight={answer}
                   desc={desc}
                 />
               ))}
             {question.__t === "ShortAnswer" && (
-              question.user_score ?
+              question.user_score!==undefined ?
                 <div className={`border-2 rounded-lg mx-16 px-8 py-2 ${question.user_score===20?"bg-green-bg border-green-dark":"bg-red-bg border-red-dark"}`}>
                   <div className="font-bold">{question.userAnswer}</div>
                   <div>{question.answers.join(", ")}</div>

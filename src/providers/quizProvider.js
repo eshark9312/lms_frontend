@@ -65,6 +65,7 @@ const parseQuestion = (question) => {
   return parsedQuestion;
 };
 export const QuizContextProvider = (props) => {
+  const [selectedQuestions, setSelectedQuestions] = useState([])   //only ids , it is for exam/test with saved questions
   const [questions, setQuestions] = useState([]);
   const [openTakeTestModal, setOpenTakeTestModal] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState()
@@ -76,6 +77,8 @@ export const QuizContextProvider = (props) => {
   const value = {
     questions,
     setQuestions,
+    selectedQuestions,
+    setSelectedQuestions,
     loadQuestions,
     openTakeTestModal,
     setOpenTakeTestModal,

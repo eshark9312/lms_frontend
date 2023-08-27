@@ -16,7 +16,9 @@ function Choice({
   const { borderColor, bgColor } = answered
     ? isRight
       ? { borderColor: "border-green-dark", bgColor: "bg-green-bg" }
-      : { borderColor: "border-red-dark", bgColor: "bg-red-bg" }
+      : checked
+      ? { borderColor: "border-red-dark", bgColor: "bg-red-bg" }
+      : { borderColor: "border-gray-300", bgColor: "bg-white" }
     : { borderColor: "border-gray-300", bgColor: "bg-white" };
 
   const [dropdown, setDropdown] = useState(false);
@@ -36,7 +38,7 @@ function Choice({
             {content}
           </div>
         </div>
-        {isRight === false && (
+        {answered && checked !== isRight && (
           <div>
             <MessageAlertIcon strokeWidth={3} />
           </div>
