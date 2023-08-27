@@ -93,7 +93,6 @@ function QuickAccess({ clickAction, item, setQuickAccessItems }) {
           <XMarkIcon className="w-4 h-4" />
         </div>
         <div className="px-2 text-center  flex-auto truncate  max-w-full">
-          {" "}
           {item && `${item.item_number}. ${item.name}`}
         </div>
         {item && <ProgressBar item={item} />}

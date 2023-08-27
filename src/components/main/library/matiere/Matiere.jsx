@@ -71,11 +71,18 @@ const Matiere = () => {
         <Breadcrumb pages={pages} />
       </div>
       <div className="flex justify-between">
-        <div className="text-3xl font-bold">{matiere?.name}</div>
+        <div className="text-3xl font-bold flex-1 flex items-center gap-2">
+          <img
+            src={matiere?.image}
+            alt={matiere?.name}
+            className="-my-2 h-12 w-12 flex-shrink-0 rounded-lg"
+          />
+          <p className="flex-1 truncate">{matiere?.name}</p>
+        </div>
         <div className="flex gap-4">
           <div
             onClick={() => createTest()}
-            className="border-2 border-primary-600 rounded-full text-primary-600 flex gap-2 font-extrabold items-center px-4 click-action hover:cursor-pointer"
+            className="border-2 border-primary-600 rounded-full text-primary-600 flex gap-2 font-extrabold items-center px-4 click-action hover:cursor-pointer click-action py-1.5"
           >
             <AcademicCapIcon className="w-6 h-6" />
             <p>Create a test</p>

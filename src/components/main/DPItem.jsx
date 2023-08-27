@@ -74,12 +74,12 @@ const DPItem = ({ dp }) => {
 
   return (
     <tr className="even:bg-gray-50">
-      <td className="font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 flex items-center gap-2">
+      <td className="font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
         <input
           id="remember-me"
           name="remember-me"
           type="checkbox"
-          className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
+          className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600 mr-2"
           checked={!!selectedDps.find(_id=>dp._id === _id)}
           onChange={(e) => {
             checkHandle(e.target.checked);

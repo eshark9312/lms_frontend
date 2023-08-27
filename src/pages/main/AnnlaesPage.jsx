@@ -89,7 +89,7 @@ function AnnalesPage() {
             ) : (
               <AcademicCapIcon className="w-6 h-6" />
             )}
-            <p>{`Create a Exam`}</p>
+            <p>{`Create an exam`}</p>
           </div>
         </div>
       </div>

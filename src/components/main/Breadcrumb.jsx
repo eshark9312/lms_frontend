@@ -24,7 +24,7 @@ export default function Breadcrumb({ pages }) {
                 to={page.href}
                 className={`${
                   page.current ? "text-primary-600" : "text-gray-500"
-                } ml-4 font-bold  hover:font-extrabold hover:text-primary-600`}
+                } ml-4 font-bold  hover:font-extrabold hover:text-primary-600 max-w-sm truncate `}
                 aria-current={page.current ? "page" : undefined}
               >
                 {page.name}

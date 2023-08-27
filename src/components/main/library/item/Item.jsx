@@ -18,15 +18,17 @@ import { useQuiz } from "../../../../hooks/useQuiz";
 
 const Item = () => {
   const authHttpClient = useAuthHttpClient();
-  const {setOpenTakeTestModal, setSelectedMatiere, setSelectedItem} = useQuiz()
+  const [parentMatiere, setParentMatiere] = useState();
+  const { setOpenTakeTestModal, setSelectedMatiere, setSelectedItem } =
+    useQuiz();
   const [item, setItem] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
-  const createTest=()=>{
-    setSelectedItem(item._id)
-    setSelectedMatiere(item.matiere_id)
-    setOpenTakeTestModal(true)
-  }
+  const createTest = () => {
+    setSelectedItem(item._id);
+    setSelectedMatiere(item.matiere_id);
+    setOpenTakeTestModal(true);
+  };
   const [tabs, setTabs] = useState([
     { name: "Overview", icon: ViewColumnsIcon, current: true },
     { name: "Saved questions", icon: PaperClipIcon, current: false },
@@ -47,6 +49,7 @@ const Item = () => {
 
   useEffect(() => {
     const fetchItem = async () => {
+      setIsLoading(true);
       try {
         const response = await authHttpClient.get(`/item/${id}`);
         setItem(response.data.data);
@@ -59,11 +62,32 @@ const Item = () => {
   }, []);
 
   useEffect(() => {
+    const fetchMatiere = async () => {
+      setIsLoading(true);
+      try {
+        const response = await authHttpClient.get(
+          `/matiere/${item.matiere_id}`
+        );
+        setParentMatiere(response.data.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (item) fetchMatiere();
+  }, [item]);
+
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   const pages = [
     { name: "Library", href: "/library/", current: false },
+    {
+      name: parentMatiere ? parentMatiere.name : "",
+      href: parentMatiere ? `/library/matiere/${parentMatiere._id}` : "#",
+      current: false,
+    },
     {
       name: item ? item.item_number + ". " + item.name : "",
       href: "#",
@@ -77,11 +101,14 @@ const Item = () => {
         <Breadcrumb pages={pages} />
       </div>
       <div className="flex justify-between">
-        <div className="text-3xl font-bold">{item?.name}</div>
+        <div className="text-3xl font-bold flex-1 truncate pr-8 ">{`${item?.item_number}. ${item?.name}`}</div>
         <div className="flex gap-4">
-          <div onClick={()=>createTest()} className="border-2 border-primary-600 rounded-full text-primary-600 flex gap-2 font-extrabold items-center px-4 click-action hover:cursor-pointer">
-              <AcademicCapIcon className="w-6 h-6" />
-              <p>Create a test</p>
+          <div
+            onClick={() => createTest()}
+            className="border-2 border-primary-600 rounded-full text-primary-600 flex gap-2 font-extrabold items-center px-4 click-action hover:cursor-pointer click-action py-1.5"
+          >
+            <AcademicCapIcon className="w-6 h-6" />
+            <p>Create a test</p>
           </div>
         </div>
       </div>
