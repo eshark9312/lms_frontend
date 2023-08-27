@@ -99,7 +99,7 @@ function Sidebar() {
               isActive
                 ? "bg-gray-50 text-primary-600"
                 : "text-gray-700 ",
-              "flex-1 px-2 text-sm flex gap-x-3 p-2 leading-6 font-semibold click-action justify-between items-center"
+              "flex-1 truncate px-2 text-sm flex gap-x-3 p-2 leading-6 font-semibold click-action justify-between items-center"
             )
           }
         >

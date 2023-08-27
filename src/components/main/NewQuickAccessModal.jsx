@@ -50,20 +50,22 @@ export default function NewQuickAccessModal({
     itemQuery === ""
       ? items
       : items.filter((item) => {
-          return item.name.toLowerCase().includes(itemQuery.toLowerCase());
+        console.log(item)
+          return item.name.toLowerCase().includes(itemQuery.toLowerCase()) || String(item.item_number).includes(itemQuery.toLowerCase());
         });
   useEffect(() => {
     const fetchItems = async () => {
+      const filter = selectedMatiere ? {
+        matiere_id: selectedMatiere._id,
+      } : {};
       try {
-        const response = await authHttpClient.post(`/item/filter/`, {
-          matiere_id: selectedMatiere._id,
-        });
+        const response = await authHttpClient.post(`/item/filter/`, filter);
         setItems(response.data.data);
       } catch (error) {
         console.log(error);
       }
     };
-    if (selectedMatiere) fetchItems();
+    fetchItems();
   }, [selectedMatiere]);
 
   useEffect(() => {
@@ -232,7 +234,7 @@ export default function NewQuickAccessModal({
                                 selected && "font-semibold"
                               )}
                             >
-                              {item.name}
+                              {`${item.item_number}. ${item.name}`}
                             </span>
                           </div>
 
