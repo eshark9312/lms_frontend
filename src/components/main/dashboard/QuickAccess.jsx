@@ -47,8 +47,14 @@ function QuickAccess({ clickAction, item, setQuickAccessItems }) {
         >
           <XMarkIcon className="w-4 h-4" />
         </div>
-        <div className="px-2 flex-1 text-center truncate max-w-full">
-          {matiere?.name}
+        <div className="px-2 flex-1 text-center truncate max-w-full items-center flex gap-2">
+          
+        <img
+            src={matiere?.image}
+            alt={matiere?.name}
+            className="h-8 w-8 flex-shrink-0 rounded-full"
+          />
+          <p className="flex-1 truncate">{matiere?.name}</p>
         </div>
         {matiere && <ProgressCircle r={30} matiere={matiere} />}
       </div>

@@ -66,6 +66,7 @@ function Sidebar() {
 
   const SidebarQuickAccessItem = ({ id, itemType, matiere_or_item_id }) => {
     const [item, setItem] = useState();
+    const [itemImage, setItemImage] = useState();
     const endpoint = itemType === "Matiere" ? "matiere" : "item";
     useEffect(() => {
       const fetchItem = async () => {
@@ -74,6 +75,16 @@ function Sidebar() {
             `/${endpoint}/${matiere_or_item_id}`
           );
           setItem(response.data.data);
+          if (response.data.data.image)
+            setItemImage(response.data.data.image); // item
+          else {
+            console.log(itemType);
+            const matiere_id = response.data.data.matiere_id;
+            const parentMatiere = await authHttpClient.get(
+              `/matiere/${matiere_id}`
+            );
+            setItemImage(parentMatiere.data.data.image);
+          }
           setIsLoading(false);
         } catch (error) {
           console.log(error);
@@ -96,13 +107,16 @@ function Sidebar() {
           to={`/library/${endpoint}/${matiere_or_item_id}`}
           className={({ isActive }) =>
             classNames(
-              isActive
-                ? "bg-gray-50 text-primary-600"
-                : "text-gray-700 ",
+              isActive ? "bg-gray-50 text-primary-600" : "text-gray-700 ",
               "flex-1 truncate px-2 text-sm flex gap-x-3 p-2 leading-6 font-semibold click-action justify-between items-center"
             )
           }
         >
+          <img
+            src={itemImage}
+            alt={item?.name}
+            className="h-6 w-6 flex-shrink-0 rounded-full"
+          />
           <div className="flex-1 max-w-full truncate ">
             {item &&
               (itemType === "Matiere"
