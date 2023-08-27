@@ -12,7 +12,7 @@ function classNames(...classes) {
 export default function NewQuickAccessModal({
   open,
   setOpen,
-  isSidebar=false,
+  isSidebar = false,
   setQuickAccessItems,
 }) {
   const { user } = useAuth();
@@ -50,14 +50,19 @@ export default function NewQuickAccessModal({
     itemQuery === ""
       ? items
       : items.filter((item) => {
-        console.log(item)
-          return item.name.toLowerCase().includes(itemQuery.toLowerCase()) || String(item.item_number).includes(itemQuery.toLowerCase());
+          console.log(item);
+          return (
+            item.name.toLowerCase().includes(itemQuery.toLowerCase()) ||
+            String(item.item_number).includes(itemQuery.toLowerCase())
+          );
         });
   useEffect(() => {
     const fetchItems = async () => {
-      const filter = selectedMatiere ? {
-        matiere_id: selectedMatiere._id,
-      } : {};
+      const filter = selectedMatiere
+        ? {
+            matiere_id: selectedMatiere._id,
+          }
+        : {};
       try {
         const response = await authHttpClient.post(`/item/filter/`, filter);
         setItems(response.data.data);
@@ -69,26 +74,27 @@ export default function NewQuickAccessModal({
   }, [selectedMatiere]);
 
   useEffect(() => {
-    if(!open){ 
-        setSelectedItem(null);
-        setSelectedMatiere(null);
+    if (!open) {
+      setSelectedItem(null);
+      setSelectedMatiere(null);
     }
-  },[open]);
+  }, [open]);
 
   const [isUploading, setIsUploading] = useState(false);
 
   const handleSubmit = async (e) => {
     setIsUploading(true);
-    const endpoint = isSidebar ? "/quickaccess/sidebar" : "/quickaccess"
+    const endpoint = isSidebar ? "/quickaccess/sidebar" : "/quickaccess";
     try {
       const response = await authHttpClient.post(endpoint, {
         user_id: user._id,
         MatiereOrItem: itemType,
-        matiere_or_item_id: (itemType === "Matiere" ? selectedMatiere._id : selectedItem._id),
+        matiere_or_item_id:
+          itemType === "Matiere" ? selectedMatiere._id : selectedItem._id,
       });
       setIsUploading(false);
-      setQuickAccessItems((_)=>[..._,response.data.data])
-      setOpen(false)
+      setQuickAccessItems((_) => [..._, response.data.data]);
+      setOpen(false);
     } catch (error) {
       setIsUploading(false);
       console.log(error);
@@ -126,7 +132,10 @@ export default function NewQuickAccessModal({
         <Combobox
           as="div"
           value={selectedMatiere}
-          onChange={setSelectedMatiere}
+          onChange={(matiere) => {
+            setSelectedItem(null);
+            setSelectedMatiere(matiere);
+          }}
         >
           <Combobox.Label className="mt-2 text-left block text-sm font-medium leading-6 text-gray-900">
             Select Matiere
@@ -195,7 +204,16 @@ export default function NewQuickAccessModal({
         </Combobox>
         {/*   select item    */}
         {itemType === "Item" && (
-          <Combobox as="div" value={selectedItem} onChange={setSelectedItem}>
+          <Combobox
+            as="div"
+            value={selectedItem}
+            onChange={(item) => {
+              setSelectedMatiere(
+                matieres.find(({ _id }) => _id === item.matiere_id)
+              );
+              setSelectedItem(item);
+            }}
+          >
             <Combobox.Label className="mt-2 text-left block text-sm font-medium leading-6 text-gray-900">
               Select Item
             </Combobox.Label>
@@ -203,7 +221,9 @@ export default function NewQuickAccessModal({
               <Combobox.Input
                 className="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
                 onChange={(event) => setItemQuery(event.target.value)}
-                displayValue={(item) => item?.name}
+                displayValue={(item) =>
+                  item && `${item.item_number}. ${item.name}`
+                }
               />
               <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                 <ChevronUpDownIcon

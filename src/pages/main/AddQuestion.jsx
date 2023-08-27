@@ -40,13 +40,18 @@ function AddNewQuestionPage() {
     itemQuery === ""
       ? items
       : items.filter((item) => {
-          return item.name.toLowerCase().includes(itemQuery.toLowerCase());
+          return (
+            item.name.toLowerCase().includes(itemQuery.toLowerCase()) ||
+            String(item.item_number).includes(itemQuery.toLowerCase())
+          );
         });
   useEffect(() => {
     const fetchItems = async () => {
-      const filter = selectedMatiere ? {
-        matiere_id: selectedMatiere._id,
-      } : {};
+      const filter = selectedMatiere
+        ? {
+            matiere_id: selectedMatiere._id,
+          }
+        : {};
       try {
         const response = await authHttpClient.post(`/item/filter/`, filter);
         setItems(response.data.data);
@@ -54,7 +59,7 @@ function AddNewQuestionPage() {
         console.log(error);
       }
     };
-    if (selectedMatiere) fetchItems();
+    fetchItems();
   }, [selectedMatiere]);
 
   const [tags, setTags] = useState([]);
@@ -106,6 +111,7 @@ function AddNewQuestionPage() {
     setNewQuestion({
       // question_number: "",
       question: "",
+      question_number: "",
       answers: Array(5).fill({
         choice: "",
         desc: "",
@@ -153,7 +159,6 @@ function AddNewQuestionPage() {
         item_id: selectedItem?._id,
         tags: selectedTags.map((tag) => tag._id),
         cards: selectedCards.map((card) => card._id),
-        question_number: 0,
       };
     });
   }, [selectedMatiere, selectedItem, selectedTags, selectedCards]);
@@ -214,9 +219,7 @@ function AddNewQuestionPage() {
         type: questionTypes.find((_) => _.selected).modelType,
       });
       setIsUploading(false);
-      const { type, n } = questionTypes.find(
-        ({ selected }) => selected
-      );
+      const { type, n } = questionTypes.find(({ selected }) => selected);
       setN_choices(n);
       setNewQuestion((question) => ({
         ...question,
@@ -243,6 +246,8 @@ function AddNewQuestionPage() {
       setErr((err) => ({ ...err, matiere_id: "required" }));
     if (!newQuestion.item_id)
       setErr((err) => ({ ...err, item_id: "required" }));
+    if (newQuestion.question_number === "")
+      setErr((err) => ({ ...err, question_number: "required" }));
     if (newQuestion.question === "")
       setErr((err) => ({ ...err, question: "required" }));
     if (newQuestion.comment === "")
@@ -290,7 +295,10 @@ function AddNewQuestionPage() {
           <Combobox
             as="div"
             value={selectedMatiere}
-            onChange={setSelectedMatiere}
+            onChange={(matiere) => {
+              setSelectedItem(null);
+              setSelectedMatiere(matiere);
+            }}
           >
             <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
               Select Matiere
@@ -366,7 +374,16 @@ function AddNewQuestionPage() {
             </div>
           </Combobox>
           {/*   select item    */}
-          <Combobox as="div" value={selectedItem} onChange={setSelectedItem}>
+          <Combobox
+            as="div"
+            value={selectedItem}
+            onChange={(item) => {
+              setSelectedMatiere(
+                matieres.find(({ _id }) => _id === item.matiere_id)
+              );
+              setSelectedItem(item);
+            }}
+          >
             <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
               Select Item
             </Combobox.Label>
@@ -379,7 +396,9 @@ function AddNewQuestionPage() {
                 onChange={(event) => {
                   setItemQuery(event.target.value);
                 }}
-                displayValue={(item) => item?.name}
+                displayValue={(item) =>
+                  item && `${item.item_number}. ${item.name}`
+                }
               />
               <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                 <ChevronUpDownIcon
@@ -410,7 +429,7 @@ function AddNewQuestionPage() {
                                 selected && "font-semibold"
                               )}
                             >
-                              {item.name}
+                              {`${item.item_number}. ${item.name}`}
                             </span>
                           </div>
 
@@ -572,6 +591,28 @@ function AddNewQuestionPage() {
             </div>
           </div>
         </div>
+        <div className="mt-4 w-1/5">
+          <input
+            className={classNames(
+              "w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6",
+              err.question_number && "ring-red-600"
+            )}
+            type="number"
+            placeholder="Question Number"
+            value={newQuestion.question_number}
+            onChange={(e) => {
+              if (err.question_number) {
+                const errTemp = { ...err };
+                errTemp.question_number = null;
+                setErr(errTemp);
+              }
+              setNewQuestion({
+                ...newQuestion,
+                question_number: e.target.value,
+              });
+            }}
+          />
+        </div>
         <div className="my-2 flex gap-2">
           <textarea
             type="text"
@@ -693,11 +734,11 @@ function AddNewQuestionPage() {
                     type="text"
                     value={answer}
                     onChange={(e) => {
-                        if (err.answers) {
-                          const errTemp = { ...err };
-                          errTemp.answers[index] = null;
-                          setErr(errTemp);
-                        }
+                      if (err.answers) {
+                        const errTemp = { ...err };
+                        errTemp.answers[index] = null;
+                        setErr(errTemp);
+                      }
                       setNewQuestion({
                         ...newQuestion,
                         answers: newQuestion.answers.map((_, _i) => {

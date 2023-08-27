@@ -71,7 +71,10 @@ function AddNewDPPage() {
     itemQuery === ""
       ? items
       : items.filter((item) => {
-          return item.name.toLowerCase().includes(itemQuery.toLowerCase());
+          return (
+            item.name.toLowerCase().includes(itemQuery.toLowerCase()) ||
+            String(item.item_number).includes(itemQuery.toLowerCase())
+          );
         });
   useEffect(() => {
     const fetchItems = async () => {
@@ -154,6 +157,7 @@ function AddNewDPPage() {
       items: [],
       tags: [],
       desc: "",
+      dp_number: null,
       questions: Array(5).fill({
         validated: false,
         type: "Basic question",
@@ -178,8 +182,8 @@ function AddNewDPPage() {
     setNewDP((newDP) => ({
       ...newDP,
       session_id: selectedSession?._id,
-      matieres:  selectedMatieres.map((matiere) => matiere._id),
-      items:  selectedItems.map((item) => item._id),
+      matieres: selectedMatieres.map((matiere) => matiere._id),
+      items: selectedItems.map((item) => item._id),
       tags: selectedTags.map((tag) => tag._id),
     }));
   }, [selectedMatieres, selectedItems, selectedTags, selectedSession]);
@@ -282,8 +286,9 @@ function AddNewDPPage() {
     if (!newDP.session_id)
       setErr((err) => ({ ...err, session_id: "required" }));
     if (newDP.desc === "") setErr((err) => ({ ...err, desc: "required" }));
-    if (newDP.session_id && newDP.desc)
-      return true;
+    if (!newDP.dp_number)
+      setErr((err) => ({ ...err, dp_number: "required" }));
+    if (newDP.session_id && newDP.desc) return true;
     else return false;
   };
   const validate = () => {
@@ -539,7 +544,7 @@ function AddNewDPPage() {
                                 selected && "font-semibold"
                               )}
                             >
-                              {item.name}
+                              {`${item.item_number}. ${item.name}`}
                             </span>
                           </div>
 
@@ -676,6 +681,28 @@ function AddNewDPPage() {
         <label className="mt-4 text-left block text font-bold leading-6 text-gray-900">
           Description
         </label>
+        <div className="mt-2 w-1/5">
+          <input
+            className={classNames(
+              "w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6",
+              err.dp_number && "ring-red-600"
+            )}
+            type="number"
+            placeholder="DP Number"
+            value={newDP.dp_number}
+            onChange={(e) => {
+              if (err.dp_number) {
+                const errTemp = { ...err };
+                errTemp.dp_number = null;
+                setErr(errTemp);
+              }
+              setNewDP({
+                ...newDP,
+                dp_number: e.target.value,
+              });
+            }}
+          />
+        </div>
         <textarea
           type="text"
           className={classNames(

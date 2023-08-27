@@ -76,7 +76,7 @@ export default function TakeExamModal() {
     itemQuery === ""
       ? items
       : items.filter((item) => {
-          return item.name.toLowerCase().includes(itemQuery.toLowerCase());
+        return item.name.toLowerCase().includes(itemQuery.toLowerCase()) || String(item.item_number).includes(itemQuery.toLowerCase());
         });
   useEffect(() => {
     const fetchItems = async () => {
@@ -92,7 +92,7 @@ export default function TakeExamModal() {
         console.log(error);
       }
     };
-    if (selectedMatiere) fetchItems();
+    fetchItems();
   }, [selectedMatiere]);
 
   const [tags, setTags] = useState([]);
@@ -168,7 +168,9 @@ export default function TakeExamModal() {
                         <Combobox
                           as="div"
                           value={selectedMatiere}
-                          onChange={setSelectedMatiere}
+                          onChange={matiere=>{
+                            setSelectedItem(null);
+                            setSelectedMatiere(matiere);}}
                         >
                           <Combobox.Label className="mt-2 text-left block text-sm font-medium leading-6 text-gray-900">
                             Matiere
@@ -251,7 +253,14 @@ export default function TakeExamModal() {
                         <Combobox
                           as="div"
                           value={selectedItem}
-                          onChange={setSelectedItem}
+                          onChange={(item_id) => {
+                            setSelectedMatiere(
+                              matieres.find(
+                                ({ _id }) => _id === items.find(item=>item._id ===item_id).matiere_id
+                              )._id
+                            );
+                            setSelectedItem(item_id);
+                          }}
                         >
                           <Combobox.Label className="mt-2 text-left block text-sm font-medium leading-6 text-gray-900">
                             Item
@@ -262,8 +271,13 @@ export default function TakeExamModal() {
                               onChange={(event) =>
                                 setItemQuery(event.target.value)
                               }
-                              displayValue={(item_id) =>
-                                items.find(({ _id }) => item_id === _id)?.name
+                              displayValue={(item_id) =>item_id &&
+                                `${
+                                  items.find(({ _id }) => item_id === _id)
+                                    ?.item_number
+                                }. ${
+                                  items.find(({ _id }) => item_id === _id)?.name
+                                }`
                               }
                             />
                             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
@@ -297,7 +311,7 @@ export default function TakeExamModal() {
                                               selected && "font-semibold"
                                             )}
                                           >
-                                            {item.name}
+                                            {`${item.item_number}. ${item.name}`}
                                           </span>
                                         </div>
 
