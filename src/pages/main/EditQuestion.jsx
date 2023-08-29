@@ -115,10 +115,16 @@ function EditQuestionPage() {
       try {
         const response = await authHttpClient.get(`/question/${id}`);
         console.log(response);
+        const type =
+          response.data.data.__t === "MultiChoice"
+            ? response.data.data.answers.length > 9
+              ? "Long question"
+              : "Basic question"
+            : "QROC";
         setQuestionTypes(
           questionTypes.map((questionType) => ({
             ...questionType,
-            selected: questionType.modelType === response.data.data.__t,
+            selected: questionType.type === type,
           }))
         );
         setNewQuestion(response.data.data);
@@ -228,6 +234,7 @@ function EditQuestionPage() {
         type: questionTypes.find((_) => _.selected).modelType,
       });
       setIsUploading(false);
+      alert("successfully uploaded!");
     } catch (error) {
       setIsUploading(false);
       console.log(error);

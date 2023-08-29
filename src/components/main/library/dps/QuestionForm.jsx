@@ -240,7 +240,7 @@ export default function QuestionForm({
                 {filteredCards.map((card) => (
                   <Combobox.Option
                     key={card._id}
-                    value={card}
+                    value={card._id}
                     className={({ active }) =>
                       classNames(
                         "relative cursor-default select-none py-2 pl-3 pr-9",
@@ -289,7 +289,7 @@ export default function QuestionForm({
                     setSelectedQuestion(tempQuestion);
                   }}
                 >
-                  {_.name}
+                  {cards.find(card=>card._id===_)?.name}
                 </div>
               ))}
             </div>

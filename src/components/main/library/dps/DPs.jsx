@@ -57,6 +57,12 @@ export default function DPs() {
     var win = window.open("/addDP/", "_blank");
     win.focus();
   };
+
+  const editDP = (id)=>{
+    var win = window.open(`/editDP/${id}`, '_blank');
+    win.focus();
+  }
+
   return (
     <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
       {user.role === "admin" && (
@@ -169,7 +175,8 @@ export default function DPs() {
                     </td>
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <Link
-                        // to="/quiz"
+                        onClick={()=>{editDP(dp._id)}}
+                        // to={`/editDP/${dp._id}`}
                         className="text-primary-600 hover:text-primary-900"
                       >
                         <PencilSquareIcon className="w-5 h-5 stroke-2" />

@@ -5,6 +5,7 @@ import { Spinner } from "../../components/icons/Spinner";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox } from "@headlessui/react";
 import QuestionForm from "../../components/main/library/dps/QuestionForm";
+import { useParams } from "react-router-dom";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -18,6 +19,7 @@ const questionTypes = [
 
 function EditDPPage() {
   const authHttpClient = useAuthHttpClient();
+  const { id } = useParams();
   const [sessions, setSessions] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
   const [sessionQuery, setSessionQuery] = useState("");
@@ -152,28 +154,6 @@ function EditDPPage() {
   }, [n_questions, idx]);
 
   useEffect(() => {
-    setNewDP(() => ({
-      matieres: [],
-      items: [],
-      tags: [],
-      desc: "",
-      dp_number: null,
-      questions: Array(5).fill({
-        validated: false,
-        type: "Basic question",
-        question: "",
-        answers: Array(5).fill({
-          choice: "",
-          desc: "",
-          answer: false,
-        }),
-        comment: "",
-        cards: [],
-      }),
-    }));
-  }, []);
-
-  useEffect(() => {
     if (selectedSession)
       setErr((err) => ({
         ...err,
@@ -181,10 +161,10 @@ function EditDPPage() {
       }));
     setNewDP((newDP) => ({
       ...newDP,
-      session_id: selectedSession?._id,
-      matieres: selectedMatieres.map((matiere) => matiere._id),
-      items: selectedItems.map((item) => item._id),
-      tags: selectedTags.map((tag) => tag._id),
+      session_id: selectedSession,
+      matieres: selectedMatieres,
+      items: selectedItems,
+      tags: selectedTags,
     }));
   }, [selectedMatieres, selectedItems, selectedTags, selectedSession]);
 
@@ -214,6 +194,37 @@ function EditDPPage() {
     setN_questions(n_questions - 1);
   };
 
+  useEffect(() => {
+    const fetchDP = async () => {
+      try {
+        const response = await authHttpClient.get(`/dp/${id}`);
+        console.log(response.data.data);
+        const tempDP = {
+          ...response.data.data,
+          questions: response.data.data.questions.map((question) => ({
+            ...question,
+            type:
+              question.__t === "MultiChoice"
+                ? question.answers.length > 9
+                  ? "Long question"
+                  : "Basic question"
+                : "QROC",
+          })),
+        };
+        setNewDP(tempDP);
+        setN_questions(tempDP.questions.length);
+        setSelectedSession(tempDP.session_id);
+        setSelectedMatieres(tempDP.matieres);
+        setSelectedItems(tempDP.items);
+        setSelectedTags(tempDP.tags);
+        setSelectedQuestion(tempDP.questions[0]);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchDP();
+  }, [id]);
+
   const handleSubmit = async () => {
     if (
       isUploading ||
@@ -227,40 +238,9 @@ function EditDPPage() {
       type: questionTypes.find(({ type }) => type === question.type).modelType,
     }));
     try {
-      await authHttpClient.post("/dp/", temp_DP);
+      await authHttpClient.put(`/dp/${temp_DP._id}`, temp_DP);
       setIsUploading(false);
-      setN_questions(5);
-      setNewDP({
-        ...newDP,
-        desc: "",
-        questions: Array(5).fill({
-          validated: false,
-          type: "Basic question",
-          question: "",
-          answers: Array(5).fill({
-            choice: "",
-            desc: "",
-            answer: false,
-          }),
-          comment: "",
-          cards: [],
-        }),
-      });
-      setIdx(0);
-      setErr({});
-      setSelectedQuestion({
-        validated: false,
-        type: "Basic question",
-        question: "",
-        answers: Array(5).fill({
-          choice: "",
-          desc: "",
-          answer: false,
-        }),
-        comment: "",
-        cards: [],
-      });
-      window.scrollTo(0, 0);
+      alert("Updated successfully");
     } catch (error) {
       setIsUploading(false);
       console.log(error);
@@ -286,8 +266,7 @@ function EditDPPage() {
     if (!newDP.session_id)
       setErr((err) => ({ ...err, session_id: "required" }));
     if (newDP.desc === "") setErr((err) => ({ ...err, desc: "required" }));
-    if (!newDP.dp_number)
-      setErr((err) => ({ ...err, dp_number: "required" }));
+    if (!newDP.dp_number) setErr((err) => ({ ...err, dp_number: "required" }));
     if (newDP.session_id && newDP.desc) return true;
     else return false;
   };
@@ -336,7 +315,7 @@ function EditDPPage() {
   return (
     <div className="flex w-full justify-center">
       <div className="p-10 rounded-lg bg-white sm:w-[900px]">
-        <div className="text-xl flex justify-center font-bold">Create DP</div>
+        <div className="text-xl flex justify-center font-bold">Edit DP</div>
         <div className="grid grid-cols-1 sm:grid-cols-2 my-2 gap-2">
           {/*   select session   */}
           <Combobox
@@ -354,7 +333,9 @@ function EditDPPage() {
                   err.session_id && "ring-red-600"
                 )}
                 onChange={(event) => setSessionQuery(event.target.value)}
-                displayValue={(session) => session?.name}
+                displayValue={(session) =>
+                  sessions.find(({ _id }) => _id === session)?.name
+                }
               />
               <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                 <ChevronUpDownIcon className="h-5 w-5 text-gray-400" />
@@ -365,7 +346,7 @@ function EditDPPage() {
                   {filteredSessions.map((session) => (
                     <Combobox.Option
                       key={session._id}
-                      value={session}
+                      value={session._id}
                       className={({ active }) =>
                         classNames(
                           "relative cursor-default select-none py-2 pl-3 pr-9",
@@ -437,7 +418,7 @@ function EditDPPage() {
                   {filteredMatieres.map((matiere) => (
                     <Combobox.Option
                       key={matiere._id}
-                      value={matiere}
+                      value={matiere._id}
                       className={({ active }) =>
                         classNames(
                           "relative cursor-default select-none py-2 pl-3 pr-9",
@@ -480,18 +461,16 @@ function EditDPPage() {
             </div>
             <div className="mt-1.5 flex-1 rounded-lg border-dashed border-2 border-gray-200 p-2">
               <div className="flex gap-2 flex-wrap ">
-                {selectedMatieres.map((matiere) => (
+                {selectedMatieres.map((matiere, i) => (
                   <div
                     className="px-2  hover:text-red-900 hover:border-red-900 hover:cursor-pointer min-w-fit border border-gray-400 rounded-md text-[12px]"
-                    onClick={() =>
-                      setSelectedMatieres(
-                        selectedMatieres.filter(
-                          (selectedTag) => selectedTag._id !== matiere._id
-                        )
-                      )
-                    }
+                    onClick={() => {
+                      const tempMatieres = [...selectedMatieres];
+                      tempMatieres.splice(i, 1);
+                      setSelectedMatieres(tempMatieres);
+                    }}
                   >
-                    {matiere.name}
+                    {matieres.find(({ _id }) => _id === matiere)?.name}
                   </div>
                 ))}
               </div>
@@ -527,7 +506,7 @@ function EditDPPage() {
                   {filteredItems.map((item) => (
                     <Combobox.Option
                       key={item._id}
-                      value={item}
+                      value={item._id}
                       className={({ active }) =>
                         classNames(
                           "relative cursor-default select-none py-2 pl-3 pr-9",
@@ -570,18 +549,16 @@ function EditDPPage() {
             </div>
             <div className="mt-1.5 flex-1 rounded-lg border-dashed border-2 border-gray-200 p-2">
               <div className="flex gap-2 flex-wrap ">
-                {selectedItems.map((item) => (
+                {selectedItems.map((item, i) => (
                   <div
                     className="px-2  hover:text-red-900 hover:border-red-900 hover:cursor-pointer min-w-fit border border-gray-400 rounded-md text-[12px]"
-                    onClick={() =>
-                      setSelectedItems(
-                        selectedItems.filter(
-                          (selectedItem) => selectedItem._id !== item._id
-                        )
-                      )
-                    }
+                    onClick={() => {
+                      const tempItems = [...selectedItems];
+                      tempItems.splice(i, 1);
+                      setSelectedItems(tempItems);
+                    }}
                   >
-                    {item.name}
+                    {items.find(({ _id }) => _id === item)?.name}
                   </div>
                 ))}
               </div>
@@ -617,7 +594,7 @@ function EditDPPage() {
                   {filteredTags.map((tag) => (
                     <Combobox.Option
                       key={tag._id}
-                      value={tag}
+                      value={tag._id}
                       className={({ active }) =>
                         classNames(
                           "relative cursor-default select-none py-2 pl-3 pr-9",
@@ -660,18 +637,16 @@ function EditDPPage() {
             </div>
             <div className="mt-1.5 flex-1 rounded-lg border-dashed border-2 border-gray-200 p-2">
               <div className="flex gap-2 flex-wrap ">
-                {selectedTags.map((tag) => (
+                {selectedTags.map((tag, i) => (
                   <div
                     className="px-2  hover:text-red-900 hover:border-red-900 hover:cursor-pointer min-w-fit border border-gray-400 rounded-md text-[12px]"
-                    onClick={() =>
-                      setSelectedTags(
-                        selectedTags.filter(
-                          (selectedTag) => selectedTag._id !== tag._id
-                        )
-                      )
-                    }
+                    onClick={() => {
+                      const tempTags = [...selectedTags];
+                      tempTags.splice(i, 1);
+                      setSelectedTags(tempTags);
+                    }}
                   >
-                    {tag.name}
+                    {tags.find(({ _id }) => _id === tag)?.name}
                   </div>
                 ))}
               </div>
@@ -788,7 +763,7 @@ function EditDPPage() {
             className="click-action inline-flex justify-between border border-gray-300 items-center gap-x-1.5 rounded-md bg-primary-600 text-white px-2.5 py-1.5 text-sm font-semibol focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
           >
             {isUploading && <Spinner small />}
-            {idx === n_questions - 1 ? "Upload DP" : "Next Question"}
+            {idx === n_questions - 1 ? "UpDate DP" : "Next Question"}
           </button>
         </div>
       </div>
