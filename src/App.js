@@ -31,6 +31,7 @@ import ExamPage from "./pages/exam/Exam";
 import TestPage from "./pages/exam/Test";
 import { ExamContextProvider } from "./providers/examProvider";
 import ExamResultPage from "./pages/exam/ExamResult";
+import EditQuestionPage from "./pages/main/EditQuestion";
 
 const ProtectedRoute = () => {
   const { user } = useAuth();
@@ -126,6 +127,10 @@ function App() {
                       path="/addQuestion/"
                       element={<AddNewQuestionPage />}
                     />
+                    <Route
+                    path="/editQuestion/:id?"
+                    element={<EditQuestionPage />}
+                  />
                     <Route path="/addDP/" element={<AddNewDPPage />} />
                     <Route path="/colors/" element={<Colors />} />
                   </Route>

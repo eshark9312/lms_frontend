@@ -60,7 +60,7 @@ export default function MonthView({
                   dateTime={day.date}
                   className={
                     day.isToday
-                      ? "flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white"
+                      ? "flex h-6 w-6 items-center justify-center rounded-full bg-primary-600 font-semibold text-white"
                       : undefined
                   }
                 >
@@ -73,12 +73,12 @@ export default function MonthView({
                       .map((event, idx) => (
                         <li key={idx}>
                           <a href={event.href} className="group flex">
-                            <p className="flex-auto truncate font-medium text-gray-900 group-hover:text-indigo-600">
+                            <p className="flex-auto truncate font-medium text-gray-900 group-hover:text-primary-600">
                               {event.title}
                             </p>
                             <time
                               dateTime={event.datetime}
-                              className="ml-3 hidden flex-none text-gray-500 group-hover:text-indigo-600 xl:block"
+                              className="ml-3 hidden flex-none text-gray-500 group-hover:text-primary-600 xl:block"
                             >
                               {event.from}
                             </time>
@@ -107,7 +107,7 @@ export default function MonthView({
                   day.isCurrentMonth ? "bg-white" : "bg-gray-50",
                   (day.isSelected || day.isToday) && "font-semibold",
                   day.isSelected && "text-white",
-                  !day.isSelected && day.isToday && "text-indigo-600",
+                  !day.isSelected && day.isToday && "text-primary-600",
                   !day.isSelected &&
                     day.isCurrentMonth &&
                     !day.isToday &&
@@ -124,7 +124,7 @@ export default function MonthView({
                   className={classNames(
                     day.isSelected &&
                       "flex h-6 w-6 items-center justify-center rounded-full",
-                    day.isSelected && day.isToday && "bg-indigo-600",
+                    day.isSelected && day.isToday && "bg-primary-600",
                     day.isSelected && !day.isToday && "bg-gray-900",
                     "ml-auto"
                   )}

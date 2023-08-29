@@ -49,11 +49,11 @@ export default function DayView({
               className="flex flex-col items-center pb-1.5 pt-3"
             >
               <span>{format(date, "EEEEE")}</span>
-              {/* Default: "text-gray-900", Selected: "bg-gray-900 text-white", Today (Not Selected): "text-indigo-600", Today (Selected): "bg-indigo-600 text-white" */}
+              {/* Default: "text-gray-900", Selected: "bg-gray-900 text-white", Today (Not Selected): "text-primary-600", Today (Selected): "bg-primary-600 text-white" */}
               <span
                 className={classNames(
                   "mt-3 flex h-8 w-8 items-center justify-center rounded-full text-base font-semibold text-gray-900",
-                  isSameDay(date, today) && "text-indigo-600",
+                  isSameDay(date, today) && "text-primary-600",
                   isSameDay(date, selectedDay) &&
                     "rounded-full bg-gray-900 text-white"
                 )}
@@ -316,7 +316,7 @@ export default function DayView({
                   !day.isCurrentMonth &&
                   !day.isToday &&
                   "text-gray-400",
-                day.isToday && !day.isSelected && "text-indigo-600",
+                day.isToday && !day.isSelected && "text-primary-600",
                 dayIdx === 0 && "rounded-tl-lg",
                 dayIdx === 6 && "rounded-tr-lg",
                 dayIdx === days.length - 7 && "rounded-bl-lg",
@@ -327,7 +327,7 @@ export default function DayView({
                 dateTime={day.date}
                 className={classNames(
                   "mx-auto flex h-7 w-7 items-center justify-center rounded-full",
-                  day.isSelected && day.isToday && "bg-indigo-600",
+                  day.isSelected && day.isToday && "bg-primary-600",
                   day.isSelected && !day.isToday && "bg-gray-900"
                 )}
               >

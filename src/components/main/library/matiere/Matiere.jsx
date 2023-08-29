@@ -59,7 +59,7 @@ const Matiere = () => {
       }
     };
     fetchMatiere();
-  }, []);
+  }, [id]);
 
   const pages = [
     { name: "Library", href: "/library/", current: false },

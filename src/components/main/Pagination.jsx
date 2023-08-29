@@ -77,7 +77,6 @@ export default function Pagination({
   const nextPage = () => {
     pageNumber < lastPageNumber && setPageNumber(pageNumber + 1);
   };
-  console.log(paginationItems);
   return (
     <div className="flex items-center justify-between border-gray-200 bg-white px-4 py-3 sm:px-6">
       <div className="flex flex-1 justify-between sm:hidden">
@@ -101,14 +100,14 @@ export default function Pagination({
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-gray-700">
-            Showing{" "}
+            Showing
             <span className="font-medium">
               {lastPageNumber>0 ? (pageNumber - 1) * pageSize + 1 : 0}
-            </span>{" "}
-            to{" "}
+            </span>
+            to
             <span className="font-medium">
               {Math.min(pageNumber * pageSize, totalNumber)}
-            </span>{" "}
+            </span>
             of <span className="font-medium">{totalNumber}</span> results
           </p>
         </div>

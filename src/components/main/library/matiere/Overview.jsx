@@ -133,7 +133,7 @@ function Overview({ matiere }) {
                         setSelectedMatiere(matiere._id);
                         setOpenTakeTestModal(true);
                       }}
-                      className="text-indigo-600 hover:text-indigo-900"
+                      className="text-primary-600 hover:text-primary-900"
                     >
                       <PencilSquareIcon className="w-5 h-5 stroke-2" />
                     </Link>
