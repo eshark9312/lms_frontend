@@ -7,11 +7,13 @@ import useAuthHttpClient from "../../hooks/useAuthHttpClient";
 import { Spinner } from "../icons/Spinner";
 import { useQuiz } from "../../hooks/useQuiz";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../providers/authProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 export default function TakeTestModal() {
+  const { user } = useAuth();
   const {
     openTakeTestModal,
     setOpenTakeTestModal,
@@ -24,18 +26,24 @@ export default function TakeTestModal() {
   const navigator = useNavigate();
   const authHttpClient = useAuthHttpClient();
   const [isUploading, setIsUploading] = useState(false);
-  const [rank, setRank] = useState("Rang A"); // Rang B, All
+  const [counting, setCounting] = useState(false);
+  const [rank, setRank] = useState("A"); // Rang: A, B, All
   const [history, setHistory] = useState("Tried"); // Never tried, Both
-  const [n_questions, setN_questions] = useState(5);
+  const [n_questions, setN_questions] = useState(1);
+  const [total_questions, setTotalQuestions] = useState(1);
   const [modeExam, setEnabled] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async () => {
     setIsUploading(true);
     try {
       const response = await authHttpClient.post("/question/filterRandom", {
+        user_id: user._id,
         matiere_id: selectedMatiere,
         item_id: selectedItem,
         n_questions: n_questions,
+        tags: selectedTags.map((tag) => tag._id),
+        history,
+        rang: rank,
       });
       setIsUploading(false);
       console.log(response.data.data);
@@ -120,6 +128,31 @@ export default function TakeTestModal() {
     fetchTags();
   }, []);
 
+  useEffect(() => {
+    const countQuestions = async () => {
+      setCounting(true);
+      const response = await authHttpClient.post("/question/count", {
+        user_id: user._id,
+        matiere_id: selectedMatiere,
+        item_id: selectedItem,
+        tags: selectedTags.map((tag) => tag._id),
+        history,
+        rang: rank,
+      });
+      setTotalQuestions(response.data.data);
+      if(response.data.data===0) setN_questions(0)
+      setCounting(false);
+    };
+    countQuestions();
+  }, [
+    rank,
+    history,
+    selectedTags,
+    selectedMatiere,
+    selectedItem,
+    user,
+    authHttpClient,
+  ]);
   return (
     <Transition.Root show={openTakeTestModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={setOpenTakeTestModal}>
@@ -172,9 +205,10 @@ export default function TakeTestModal() {
                         <Combobox
                           as="div"
                           value={selectedMatiere}
-                          onChange={matiere=>{
+                          onChange={(matiere) => {
                             setSelectedItem(null);
-                            setSelectedMatiere(matiere);}}
+                            setSelectedMatiere(matiere);
+                          }}
                         >
                           <Combobox.Label className="mt-2 text-left block text-sm font-medium leading-6 text-gray-900">
                             Matiere
@@ -260,7 +294,10 @@ export default function TakeTestModal() {
                           onChange={(item_id) => {
                             setSelectedMatiere(
                               matieres.find(
-                                ({ _id }) => _id === items.find(item=>item._id ===item_id).matiere_id
+                                ({ _id }) =>
+                                  _id ===
+                                  items.find((item) => item._id === item_id)
+                                    .matiere_id
                               )._id
                             );
                             setSelectedItem(item_id);
@@ -275,7 +312,8 @@ export default function TakeTestModal() {
                               onChange={(event) =>
                                 setItemQuery(event.target.value)
                               }
-                              displayValue={(item_id) =>item_id &&
+                              displayValue={(item_id) =>
+                                item_id &&
                                 `${
                                   items.find(({ _id }) => item_id === _id)
                                     ?.item_number
@@ -347,19 +385,19 @@ export default function TakeTestModal() {
                         </div>
                         <div className=" flex max-w-fit border-2 border-primary-600 divide-x-2 divide-primary-600 rounded-lg">
                           <div
-                            onClick={() => setRank("Rang A")}
+                            onClick={() => setRank("A")}
                             className={classNames(
                               "hover:cursor-pointer rounded-l text-left block text-sm leading-6 text-gray-900 py-1 px-3",
-                              rank === "Rang A" && "bg-primary-600 text-white"
+                              rank === "A" && "bg-primary-600 text-white"
                             )}
                           >
                             Rang A
                           </div>
                           <div
-                            onClick={() => setRank("Rang B")}
+                            onClick={() => setRank("B")}
                             className={classNames(
                               "hover:cursor-pointer text-left block text-sm leading-6 text-gray-900 py-1 px-3",
-                              rank === "Rang B" && "bg-primary-600 text-white"
+                              rank === "B" && "bg-primary-600 text-white"
                             )}
                           >
                             Rang B
@@ -390,14 +428,12 @@ export default function TakeTestModal() {
                               Tried
                             </label>
                           </div>
-                          <div
-                            onChange={() => setHistory("Never tried")}
-                            className="flex items-center"
-                          >
+                          <div className="flex items-center">
                             <input
                               name="history"
                               type="radio"
                               checked={history === "Never tried"}
+                              onChange={() => setHistory("Never tried")}
                               className="h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-600"
                             />
                             <label className="ml-3 block text-sm font-medium leading-6 text-gray-900">
@@ -518,19 +554,14 @@ export default function TakeTestModal() {
                         </Combobox>
                         <label
                           for="minmax-range"
-                          class="mt-4 block mb-2 text-sm font-medium text-gray-90"
+                          className="mt-4 block mb-2 text-sm font-medium text-gray-90"
                         >
-                          Number of questions: {n_questions}/
-                          {selectedItem?.n_questions ??
-                            selectedMatiere?.n_questions}
+                          Number of questions: {n_questions}/{total_questions}
                         </label>
                         <input
                           id="minmax-range"
-                          min="1"
-                          max={
-                            selectedItem?.n_questions ??
-                            selectedMatiere?.n_questions
-                          }
+                          min={Math.min(1, total_questions)}
+                          max={total_questions}
                           type="range"
                           value={n_questions}
                           onChange={(e) => setN_questions(e.target.value)}

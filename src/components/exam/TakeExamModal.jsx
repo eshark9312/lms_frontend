@@ -514,7 +514,7 @@ export default function TakeExamModal() {
                         </Combobox>
                         <label
                           for="minmax-range"
-                          class="mt-4 block mb-2 text-sm font-medium text-gray-90"
+                          className="mt-4 block mb-2 text-sm font-medium text-gray-90"
                         >
                           Number of questions: {n_questions}/
                           {selectedItem?.n_questions ??
