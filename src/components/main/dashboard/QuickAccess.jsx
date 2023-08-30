@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
 import ProgressCircle from "../../common/ProgressCircle";
-import { ProgressBar } from "../../common/ProgressBar";
+import { ItemProgressBar } from "../../common/ItemProgressBar";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 
@@ -95,7 +95,7 @@ function QuickAccess({ clickAction, item, setQuickAccessItems }) {
         <div className="px-2 text-center  flex-auto truncate  max-w-full">
           {item && `${item.item_number}. ${item.name}`}
         </div>
-        {item && <ProgressBar item={item} />}
+        {item && <ItemProgressBar item={item} />}
       </div>
     );
   };

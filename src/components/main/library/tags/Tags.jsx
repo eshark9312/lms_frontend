@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-import { ProgressBar } from "../../../common/ProgressBar";
 import Pagination from "../../Pagination";
 import Search from "../../Search";
 import Filter from "../../Filter";

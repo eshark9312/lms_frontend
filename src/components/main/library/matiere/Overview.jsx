@@ -16,9 +16,12 @@ import { Spinner } from "../../../icons/Spinner";
 import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
 import { useAuth } from "../../../../providers/authProvider";
 import { useQuiz } from "../../../../hooks/useQuiz";
+import { ItemStatus } from "../../ItemStatus";
 
 function Overview({ matiere }) {
-  const { setSelectedMatiere, setSelectedItem, setOpenTakeTestModal } = useQuiz();
+  const { user } = useAuth();
+  const { setSelectedMatiere, setSelectedItem, setOpenTakeTestModal } =
+    useQuiz();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const authHttpClient = useAuthHttpClient();
@@ -28,13 +31,14 @@ function Overview({ matiere }) {
   const [pageNumber, setPageNumber] = useState(1);
   const [searchText, setSearchText] = useState("");
   const [filter, setFilter] = useState({});
-  const [sort, setSort] = useState({});
+  const [sort, setSort] = useState();
 
   useEffect(() => {
     if (!matiere) return;
     const fetchItems = async () => {
       try {
         const response = await authHttpClient.post(`/item/getPage`, {
+          user_id: user._id,
           pageSize,
           pageNumber,
           searchText,
@@ -73,7 +77,7 @@ function Overview({ matiere }) {
             Liste des items
           </div>
           <div className="p-4 bg-white flex justify-between">
-                <Search searchText={searchText} setSearchText={setSearchText}/>
+            <Search searchText={searchText} setSearchText={setSearchText} />
             <Filter />
           </div>
           <table className="min-w-full divide-y divide-gray-300">
@@ -109,7 +113,7 @@ function Overview({ matiere }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
-              {items.map((item) => (
+              {items.map((item, index) => (
                 <tr key={item._id}>
                   <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 hover:text-primary-600 hover:cursor-pointer click-action">
                     <Link to={`/library/item/${item._id}`}>
@@ -117,13 +121,25 @@ function Overview({ matiere }) {
                     </Link>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {item.status}
+                    <ItemStatus
+                      status={item.status}
+                      status_id={item.status_id}
+                      setItems={setItems}
+                      item_id={item._id}
+                      itemIndex={index}
+                    />
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     {item.n_questions} questions
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    <ProgressBar item={item} />
+                    <ProgressBar
+                      progress={
+                        item.n_questions && item.progress
+                          ? Math.round((item.progress / item.n_questions) * 100)
+                          : 0
+                      }
+                    />
                   </td>
                   <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                     <Link
@@ -142,13 +158,13 @@ function Overview({ matiere }) {
               ))}
             </tbody>
           </table>
-              <Pagination
-                totalNumber={totalNumber}
-                pageNumber={pageNumber}
-                setPageNumber={setPageNumber}
-                pageSize={pageSize}
-                setPageSize={setPageSize}
-              />
+          <Pagination
+            totalNumber={totalNumber}
+            pageNumber={pageNumber}
+            setPageNumber={setPageNumber}
+            pageSize={pageSize}
+            setPageSize={setPageSize}
+          />
         </div>
       </div>
       <div className="mt-8 grid md:grid-cols-2 gap-8 bg-gray-50">

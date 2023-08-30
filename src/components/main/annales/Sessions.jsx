@@ -1,9 +1,3 @@
-import { Link } from "react-router-dom";
-import { ProgressBar } from "../../common/ProgressBar";
-import Pagination from "../Pagination";
-import Search from "../Search";
-import Filter from "../Filter";
-import {  PlusIcon} from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
 import { useAuth } from "../../../providers/authProvider";

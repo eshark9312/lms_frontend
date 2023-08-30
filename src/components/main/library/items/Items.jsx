@@ -21,6 +21,7 @@ import { Spinner } from "../../../icons/Spinner";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox, Switch } from "@headlessui/react";
 import { useQuiz } from "../../../../hooks/useQuiz";
+import { ItemStatus } from "../../ItemStatus";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -28,7 +29,8 @@ function classNames(...classes) {
 export default function Items() {
   const authHttpClient = useAuthHttpClient();
   const { user } = useAuth();
-  const { setOpenTakeTestModal, setSelectedMatiere, setSelectedItem } = useQuiz();
+  const { setOpenTakeTestModal, setSelectedMatiere, setSelectedItem } =
+    useQuiz();
 
   const [matieres, setMatieres] = useState([]);
   const [items, setItems] = useState([]);
@@ -49,6 +51,7 @@ export default function Items() {
     const fetchItems = async () => {
       try {
         const response = await authHttpClient.post(`/item/getPage`, {
+          user_id: user._id,
           pageSize,
           pageNumber,
           searchText,
@@ -89,12 +92,12 @@ export default function Items() {
               <Spinner />
             </div>
           ) : (
-            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
+            <div className="shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
               <div className="p-6 bg-white text-xl font-extrabold">
                 Liste des items
               </div>
               <div className="p-4 bg-white flex justify-between">
-                <Search searchText={searchText} setSearchText={setSearchText}/>
+                <Search searchText={searchText} setSearchText={setSearchText} />
                 <Filter />
               </div>
               <table className="min-w-full divide-y divide-gray-300">
@@ -133,7 +136,7 @@ export default function Items() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {items.map((item) => (
+                  {items.map((item, index) => (
                     <tr key={item._id}>
                       <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 hover:text-primary-600 hover:cursor-pointer click-action">
                         <Link to={`/library/item/${item._id}`}>
@@ -141,13 +144,27 @@ export default function Items() {
                         </Link>
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {item.status}
+                        <ItemStatus
+                          status={item.status}
+                          status_id={item.status_id}
+                          setItems={setItems}
+                          item_id={item._id}
+                          itemIndex={index}
+                        />
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {item.n_questions} questions
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <ProgressBar item={item} />
+                        <ProgressBar
+                          progress={
+                            item.n_questions && item.progress
+                              ? Math.round(
+                                  (item.progress / item.n_questions) * 100
+                                )
+                              : 0
+                          }
+                        />
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                         <Link
