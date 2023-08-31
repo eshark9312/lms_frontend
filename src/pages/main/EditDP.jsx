@@ -228,10 +228,13 @@ function EditDPPage() {
   const handleSubmit = async () => {
     if (
       isUploading ||
-      newDP.questions.filter(({ validated }) => !validated).length > 0
+      newDP.questions.filter(
+        ({ validated }, i) => !validated && !validateQuestion(i)
+      ).length > 0
     )
       return;
     setIsUploading(true);
+    console.log(newDP);
     const temp_DP = { ...newDP };
     temp_DP.questions = temp_DP.questions.map((question) => ({
       ...question,
@@ -248,7 +251,7 @@ function EditDPPage() {
   };
 
   const handleClick = () => {
-    if (!validate()) return;
+    if (!validateQuestion(idx)) return;
     if (idx === n_questions - 1) {
       if (!validateHeader()) {
         window.scrollTo(0, 0);
@@ -270,31 +273,31 @@ function EditDPPage() {
     if (newDP.session_id && newDP.desc) return true;
     else return false;
   };
-  const validate = () => {
-    if (selectedQuestion.question === "")
+  const validateQuestion = (index) => {
+    if (newDP.questions[index].question === "")
       setErr((err) => ({ ...err, question: "required" }));
-    if (selectedQuestion.comment === "")
+    if (newDP.questions[index].comment === "")
       setErr((err) => ({ ...err, comment: "required" }));
-    const { type } = selectedQuestion;
+    const { type } = newDP.questions[index];
     const answers =
       type === "Basic question" || type === "Long question"
-        ? selectedQuestion.answers.map(({ choice }) =>
+        ? newDP.questions[index].answers.map(({ choice }) =>
             choice === "" ? "required" : null
           )
-        : selectedQuestion.answers.map((answer) =>
+        : newDP.questions[index].answers.map((answer) =>
             answer === "" ? "required" : null
           );
     if (answers.filter((_) => _).length > 0)
       setErr((err) => ({ ...err, answers: answers }));
     if (
-      selectedQuestion.question &&
-      selectedQuestion.comment &&
+      newDP.questions[index].question &&
+      newDP.questions[index].comment &&
       answers.filter((_) => _).length === 0
     ) {
-      newDP.questions[idx].validated = true;
+      newDP.questions[index].validated = true;
       return true;
     } else {
-      newDP.questions[idx].validated = false;
+      newDP.questions[index].validated = false;
       return false;
     }
   };
@@ -726,7 +729,7 @@ function EditDPPage() {
                   _.validated && "ring-primary-600"
                 )}
                 onClick={() => {
-                  if (validate()) {
+                  if (validateQuestion(idx)) {
                     setIdx(i);
                     setSelectedQuestion(newDP.questions[i]);
                   }

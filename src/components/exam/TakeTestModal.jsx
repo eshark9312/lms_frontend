@@ -76,8 +76,8 @@ export default function TakeTestModal() {
         console.log(error);
       }
     };
-    fetchMatieres();
-  }, []);
+    openTakeTestModal && fetchMatieres();
+  }, [openTakeTestModal]);
 
   const [items, setItems] = useState([]);
   const [itemQuery, setItemQuery] = useState("");
@@ -104,8 +104,8 @@ export default function TakeTestModal() {
         console.log(error);
       }
     };
-    fetchItems();
-  }, [selectedMatiere]);
+    openTakeTestModal && fetchItems();
+  }, [selectedMatiere, openTakeTestModal]);
 
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -125,8 +125,8 @@ export default function TakeTestModal() {
         console.log(error);
       }
     };
-    fetchTags();
-  }, []);
+    openTakeTestModal && fetchTags();
+  }, [openTakeTestModal]);
 
   useEffect(() => {
     const countQuestions = async () => {
@@ -143,7 +143,7 @@ export default function TakeTestModal() {
       if(response.data.data===0) setN_questions(0)
       setCounting(false);
     };
-    countQuestions();
+    openTakeTestModal && countQuestions();
   }, [
     rank,
     history,
@@ -152,6 +152,7 @@ export default function TakeTestModal() {
     selectedItem,
     user,
     authHttpClient,
+    openTakeTestModal
   ]);
   return (
     <Transition.Root show={openTakeTestModal} as={Fragment}>

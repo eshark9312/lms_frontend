@@ -51,18 +51,20 @@ export default function Pagination({
   }, [lastPageNumber, pageNumber]);
 
   const PaginationItem = ({ number }) => {
-    return <div
-      onClick={() => {
-        setPageNumber(number);
-      }}
-      className={`hover:cursor-pointer inline-flex items-center px-4 py-2 text-sm font-semibold ${
-        pageNumber === number
-          ? "z-10 bg-primary-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
-          : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
-      }`}
-    >
-      {number}
-    </div>;
+    return (
+      <div
+        onClick={() => {
+          setPageNumber(number);
+        }}
+        className={`hover:cursor-pointer inline-flex items-center px-4 py-2 text-sm font-semibold ${
+          pageNumber === number
+            ? "z-10 bg-primary-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+            : "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0"
+        }`}
+      >
+        {number}
+      </div>
+    );
   };
 
   const Ellipsis = () => (
@@ -100,15 +102,7 @@ export default function Pagination({
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-gray-700">
-            Showing
-            <span className="font-medium">
-              {lastPageNumber>0 ? (pageNumber - 1) * pageSize + 1 : 0}
-            </span>
-            to
-            <span className="font-medium">
-              {Math.min(pageNumber * pageSize, totalNumber)}
-            </span>
-            of <span className="font-medium">{totalNumber}</span> results
+            {`Showing ${lastPageNumber > 0 ? (pageNumber - 1) * pageSize + 1 : 0} to ${Math.min(pageNumber * pageSize, totalNumber)} of ${totalNumber} results`}
           </p>
         </div>
         <div>
@@ -126,7 +120,11 @@ export default function Pagination({
               <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
             </div>
             {paginationItems.map((item, index) =>
-              item === 0 ? <Ellipsis /> : <PaginationItem key={index} number={item} />
+              item === 0 ? (
+                <Ellipsis />
+              ) : (
+                <PaginationItem key={index} number={item} />
+              )
             )}
             <div
               onClick={() => {

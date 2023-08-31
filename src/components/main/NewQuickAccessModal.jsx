@@ -40,8 +40,8 @@ export default function NewQuickAccessModal({
         console.log(error);
       }
     };
-    fetchMatieres();
-  }, []);
+    open && fetchMatieres();
+  }, [open]);
 
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -70,8 +70,8 @@ export default function NewQuickAccessModal({
         console.log(error);
       }
     };
-    fetchItems();
-  }, [selectedMatiere]);
+    open && fetchItems();
+  }, [selectedMatiere, open]);
 
   useEffect(() => {
     if (!open) {
