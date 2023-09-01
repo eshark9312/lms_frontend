@@ -250,8 +250,8 @@ function AddNewQuestionPage() {
       setErr((err) => ({ ...err, question_number: "required" }));
     if (newQuestion.question === "")
       setErr((err) => ({ ...err, question: "required" }));
-    if (newQuestion.comment === "")
-      setErr((err) => ({ ...err, comment: "required" }));
+    // if (newQuestion.comment === "")
+    //   setErr((err) => ({ ...err, comment: "required" }));
     const { type } = questionTypes.find(({ selected }) => selected);
     const answers =
       type === "Basic question" || type === "Long question"

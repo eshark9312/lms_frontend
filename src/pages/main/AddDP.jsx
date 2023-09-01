@@ -294,8 +294,8 @@ function AddNewDPPage() {
   const validate = () => {
     if (selectedQuestion.question === "")
       setErr((err) => ({ ...err, question: "required" }));
-    if (selectedQuestion.comment === "")
-      setErr((err) => ({ ...err, comment: "required" }));
+    // if (selectedQuestion.comment === "")
+    //   setErr((err) => ({ ...err, comment: "required" }));
     const { type } = selectedQuestion;
     const answers =
       type === "Basic question" || type === "Long question"

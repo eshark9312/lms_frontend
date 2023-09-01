@@ -1,8 +1,6 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../providers/authProvider";
-import { useState } from "react";
-
-import { httpClient } from "../../config/axiosConfig";
 import { Spinner } from "../icons/Spinner";
 
 export default function Signin() {
