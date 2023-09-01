@@ -1,38 +1,38 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../providers/authProvider";
 import { useState } from "react";
-
-import { httpClient } from "../../config/axiosConfig";
+import { Spinner } from "../icons/Spinner";
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const { signup } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [err, seterr] = useState({});
-  const navigate = useNavigate();
-  const { signup } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     if (e) {
       e.preventDefault();
-      // alert(password);
-      // alert(password2);
       if (password !== password2) {
         seterr({ password2: "Passwords do not match" });
         return;
       } else {
         try {
+          setIsLoading(true);
           const err = await signup({ email, password });
-          if (err) console.log(err);
           if (err) {
             seterr(err);
             // if (err === "") {
             //   // sendVerficationmail(email);
             // }
           } else {
+            setIsLoading(false);
             navigate("/auth/signin");
           }
         } catch (error) {
+          setIsLoading(false);
           console.error(error);
         }
       }
@@ -154,7 +154,7 @@ export default function Signup() {
                   onClick={(e) => handleSubmit(e)}
                   className="flex w-full justify-center rounded-md bg-primary-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
                 >
-                  Sign up
+                  {isLoading ? <Spinner small center /> : "Sign up"}
                 </button>
               </div>
             </form>

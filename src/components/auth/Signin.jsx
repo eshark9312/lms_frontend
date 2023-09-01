@@ -3,13 +3,14 @@ import { useAuth } from "../../providers/authProvider";
 import { useState } from "react";
 
 import { httpClient } from "../../config/axiosConfig";
+import { Spinner } from "../icons/Spinner";
 
 export default function Signin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
-  // const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [err, seterr] = useState({});
   // const sendVerficationmail = async (email) => {
   //   try {
@@ -24,17 +25,19 @@ export default function Signin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setIsLoading(true);
       const err = await login({ email: email, password: password });
-      if(err) console.log(err);
       if (err) {
         seterr(err);
         // if (err === "") {
         //   // sendVerficationmail(email);
         // }
       } else {
+        setIsLoading(false);
         navigate("/");
       }
     } catch (error) {
+      setIsLoading(false);
       console.error(error);
     }
   };
@@ -144,7 +147,7 @@ export default function Signin() {
                   onClick={(e) => handleSubmit(e)}
                   className="flex w-full justify-center rounded-md bg-primary-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
                 >
-                  Sign in
+                  {isLoading ? <Spinner small center /> : "Sign in"}
                 </button>
               </div>
             </form>
