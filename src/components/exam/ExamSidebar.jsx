@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ExitIcon from "../icons/ExitIcon";
 import { useNavigate } from "react-router-dom";
 import { Switch } from "@headlessui/react";
@@ -9,6 +9,9 @@ function classNames(...classes) {
 }
 function ExamSidebar({
   dps,
+  questions,
+  dpOrQuestion,
+  setDpOrQuestion,
   currentDp,
   setCurrentDp,
   currentQuestion,
@@ -16,10 +19,27 @@ function ExamSidebar({
   setEnd,
   sidebarLeft,
   setSidebar,
-  totalTime,
-  timeLeft,
 }) {
   const navigator = useNavigate();
+  const [totalTime, setTotalTime] = useState(1000);
+  const [timeLeft, setTimeLeft] = useState(0);
+  useEffect(() => {
+    const timeLimit =
+      (dps.reduce((total, { questions }) => (total += questions.length), 0)+ questions.length) *
+      60 *
+      1000;
+    setTotalTime(timeLimit);
+    const endTime = Date.now() + timeLimit;
+    let timer;
+    setTimeout(() => {
+      clearInterval(timer);
+      setEnd(true);
+    }, timeLimit);
+    timer = setInterval(() => {
+      setTimeLeft(Math.max(0, endTime - Date.now()));
+    }, 100);
+  }, []);
+
   return (
     <div className="flex flex-col h-full border-2 border-[#203772]">
       <div className="bg-white text-center font-extrabold p-8 pb-4">
@@ -28,9 +48,15 @@ function ExamSidebar({
             style={{
               width: `${100 - Math.round((timeLeft * 100) / totalTime)}%`,
             }}
-            className={classNames("absolute h-full rounded-full bg-[#D4E7FB]", timeLeft<10000 && "bg-red-100")}
+            className={classNames(
+              "absolute h-full rounded-full bg-[#D4E7FB]",
+              timeLeft < 10000 && "bg-red-100"
+            )}
           ></div>
-          <div className="absolute w-full text-center">{`Durée ${format(timeLeft, "mm:ss")}`}</div>
+          <div className="absolute w-full text-center">{`Durée ${format(
+            timeLeft,
+            "mm:ss"
+          )}`}</div>
         </div>
         <div className="mt-2">
           <Switch
@@ -60,15 +86,19 @@ function ExamSidebar({
                 <div
                   key={question._id}
                   onClick={() => {
-                    if (question.userAnswer) {
+                    if (question.userAnswer || qi_index === 0) {
+                      setDpOrQuestion("dp");
                       setCurrentDp(dp_index);
                       setCurrentQuestion(qi_index);
                     }
                   }}
                   className={classNames(
                     "w-12 h-12 flex justify-center items-center click-action hover:cursor-pointer",
-                    question.userAnswer ? "bg-[#203772] text-white font-bold" : "bg-gray-200",
-                    dp_index === currentDp &&
+                    question.userAnswer
+                      ? "bg-[#203772] text-white font-bold"
+                      : "bg-gray-200",
+                    dpOrQuestion === "dp" &&
+                      dp_index === currentDp &&
                       qi_index === currentQuestion &&
                       "border-2 border-[#203772]"
                   )}
@@ -79,6 +109,35 @@ function ExamSidebar({
             </div>
           </div>
         ))}
+        {questions.length > 0 && (
+          <div className="w-full">
+            <div className="w-full bg-[#203772] text-white font-bold py-4 text-center">
+              QI
+            </div>
+            <div className="px-8 py-4 grid grid-cols-4 gap-4">
+              {questions.map((question, qi_index) => (
+                <div
+                  key={question._id}
+                  onClick={() => {
+                    setDpOrQuestion("question");
+                    setCurrentQuestion(qi_index);
+                  }}
+                  className={classNames(
+                    "w-12 h-12 flex justify-center items-center click-action hover:cursor-pointer",
+                    question.userAnswer
+                      ? "bg-[#203772] text-white font-bold"
+                      : "bg-gray-200",
+                    dpOrQuestion === "questions" &&
+                      qi_index === currentQuestion &&
+                      "border-2 border-[#203772]"
+                  )}
+                >
+                  {qi_index + 1}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       <div className="bg-[#203772] text-center text-white p-8 flex">
         <div

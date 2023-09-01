@@ -276,8 +276,8 @@ function EditDPPage() {
   const validateQuestion = (index) => {
     if (newDP.questions[index].question === "")
       setErr((err) => ({ ...err, question: "required" }));
-    if (newDP.questions[index].comment === "")
-      setErr((err) => ({ ...err, comment: "required" }));
+    // if (newDP.questions[index].comment === "")
+    //   setErr((err) => ({ ...err, comment: "required" }));
     const { type } = newDP.questions[index];
     const answers =
       type === "Basic question" || type === "Long question"

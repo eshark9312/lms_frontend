@@ -4,41 +4,48 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-function QuestionCardSimple({
-  desc,
-  question,
-  answer: _answer,
+function DpCardSimple({
+  dps,
+  setDps,
   currentDp,
   currentQuestion,
-  isLastQuestion,
-  next,
+  setCurrentQuestion,
+  setCurrentDp,
 }) {
-  const [answer, setAnswer] = useState();
-
-  useEffect(() => {
-    if (!_answer) {
-      question.__t === "MultiChoice" &&
-        setAnswer(Array(question.answers.length).fill(false));
-      question.__t === "ShortAnswer" && setAnswer("");
-      question.__t === "TrueOrFalse" && setAnswer(false);
-    }else {
-      setAnswer(_answer);
-    }
-  }, [question, _answer]);
-
-  const handleClick = () => {
-    if(answer)next(answer);
+  const setAnswer = (answer) => {
+    const tempDps = JSON.parse(JSON.stringify(dps));
+    tempDps[currentDp].questions[currentQuestion].userAnswer = answer;
+    setDps(tempDps);
   };
-
-  return (
-    <div className="bg-white py-16 px-4 md:px-16 justify-center items-center flex flex-col">
-      <div className="lg:w-5/6 h-full">
-        <div className="bg-[#203772] px-12 text-white font-bold py-4 text-xl">
-          QI
-        </div>
-        {desc && currentQuestion===0 && <div className="px-6 py-2 text-md">{desc}</div>}
+  const next = (answer) => {
+    setAnswer(answer);
+    if (currentQuestion < dps[currentDp].questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else if (currentDp < dps.length - 1) {
+      setCurrentDp(currentDp + 1);
+      setCurrentQuestion(0);
+    }
+  };
+  const Question = ({ qi_index, question, answer: _answer }) => {
+    const handleClick = () => {
+      if (answer) next(answer);
+    };
+    const [answer, setAnswer] = useState();
+    useEffect(() => {
+      console.log("Question");
+      if (!_answer) {
+        question.__t === "MultiChoice" &&
+          setAnswer(Array(question.answers.length).fill(false));
+        question.__t === "ShortAnswer" && setAnswer("");
+        question.__t === "TrueOrFalse" && setAnswer(false);
+      } else {
+        setAnswer(_answer);
+      }
+    }, [question, _answer]);
+    return (
+      <>
         <div className="mt-2 px-6 py-2 text-lg font-bold">
-          Question {currentQuestion + 1} -{" "}
+          Question {qi_index + 1} -{" "}
           {question.__t === "MultiChoice" && "Question à réponses multiples"}
           {question.__t === "ShortAnswer" &&
             "Question à réponse ouverte et courte"}
@@ -57,13 +64,12 @@ function QuestionCardSimple({
                   )}
                 >
                   <input
+                    id={"answer" + index}
                     onChange={() => {
                       if (!_answer) {
-                        setAnswer((prev) => {
-                          return prev.map((_, i) => {
-                            return i === index ? !prev[i] : prev[i];
-                          });
-                        });
+                        const tempAnswer = JSON.parse(JSON.stringify(answer));
+                        tempAnswer[index] = !tempAnswer[index];
+                        setAnswer(tempAnswer);
                       }
                     }}
                     checked={answer?.[index]}
@@ -107,9 +113,31 @@ function QuestionCardSimple({
             Valider la réponse
           </button>
         </div>}
+      </>
+    );
+  };
+  return (
+    <div className="bg-white py-16 px-4 md:px-16 justify-center items-center flex flex-col">
+      <div className="lg:w-5/6 h-full">
+        <div className="bg-[#203772] px-12 text-white font-bold py-4 text-xl">
+          {`DP ${currentDp + 1}`}
+        </div>
+        <div className="px-6 py-2 text-md">{dps[currentDp]?.desc}</div>
+        {dps[currentDp].questions.map(
+          (question, qi_index) =>
+            (qi_index === 0 ||
+              !!dps[currentDp].questions[qi_index - 1].userAnswer) && (
+              <Question
+                qi_index={qi_index}
+                question={question}
+                answer={question.userAnswer}
+                next={next}
+              />
+            )
+        )}
       </div>
     </div>
   );
 }
 
-export default QuestionCardSimple;
+export default DpCardSimple;

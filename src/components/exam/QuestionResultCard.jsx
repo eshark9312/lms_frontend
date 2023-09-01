@@ -18,6 +18,7 @@ import { useCard } from "../../providers/cardProvider";
 import { useQuiz } from "../../hooks/useQuiz";
 
 function QuestionResultCard({
+  dpOrQuestion,
   desc,
   question,
   currentDp,
@@ -59,7 +60,7 @@ function QuestionResultCard({
             className={`border-2 ${borderColor} ${bgColor} ${textColor} rounded-t-xl px-12 py-3 flex justify-between`}
           >
             <Label colorInherit>
-              {`DP${currentDp+1} - Question ${currentQuestion + 1}`}
+              {dpOrQuestion==="dp" ? `DP${currentDp+1} - Question ${currentQuestion + 1}` :`QI - Question ${currentQuestion + 1}`}
               <span className="rounded bg-blue-light text-white ml-2 my-1 px-1 text-xs text-center">
                 {question.difficulty ? "A" : "B"}
               </span>

@@ -4,10 +4,11 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox } from "@headlessui/react";
 import useAuthHttpClient from "../../hooks/useAuthHttpClient";
-import { Spinner } from "../icons/Spinner";
+import { Spinner, TinySpinner } from "../icons/Spinner";
 import { useQuiz } from "../../hooks/useQuiz";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../providers/authProvider";
+import { useExam } from "../../providers/examProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -23,6 +24,7 @@ export default function TakeTestModal() {
     setSelectedItem,
     setSelectedMatiere,
   } = useQuiz();
+  const { setQuestions } = useExam();
   const navigator = useNavigate();
   const authHttpClient = useAuthHttpClient();
   const [isUploading, setIsUploading] = useState(false);
@@ -46,10 +48,15 @@ export default function TakeTestModal() {
         rang: rank,
       });
       setIsUploading(false);
-      console.log(response.data.data);
-      loadQuestions(response.data.data);
       setOpenTakeTestModal(false);
-      navigator("/quiz");
+      if (modeExam) {
+        alert("exam mode");
+        setQuestions(response.data.data);
+        navigator("/exam");
+      } else {
+        loadQuestions(response.data.data);
+        navigator("/quiz");
+      }
     } catch (error) {
       setIsUploading(false);
       console.log(error);
@@ -140,7 +147,7 @@ export default function TakeTestModal() {
         rang: rank,
       });
       setTotalQuestions(response.data.data);
-      if(response.data.data===0) setN_questions(0)
+      if (response.data.data === 0) setN_questions(0);
       setCounting(false);
     };
     openTakeTestModal && countQuestions();
@@ -151,9 +158,9 @@ export default function TakeTestModal() {
     selectedMatiere,
     selectedItem,
     user,
-    authHttpClient,
-    openTakeTestModal
+    openTakeTestModal,
   ]);
+
   return (
     <Transition.Root show={openTakeTestModal} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={setOpenTakeTestModal}>
@@ -555,9 +562,14 @@ export default function TakeTestModal() {
                         </Combobox>
                         <label
                           for="minmax-range"
-                          className="mt-4 block mb-2 text-sm font-medium text-gray-90"
+                          className="mt-4 mb-2 text-sm font-medium text-gray-90 inline-flex items-center"
                         >
-                          Number of questions: {n_questions}/{total_questions}
+                          Number of questions:{" "}
+                          {counting ? (
+                            <TinySpinner />
+                          ) : (
+                            `${n_questions}/${total_questions}`
+                          )}
                         </label>
                         <input
                           id="minmax-range"
