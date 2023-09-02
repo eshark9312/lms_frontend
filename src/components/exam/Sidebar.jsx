@@ -18,7 +18,7 @@ function Sidebar({ currentQuestion, setQuestion, questions, closeSideBar }) {
             num={index + 1}
             active={index === currentQuestion}
             onClick={() => {
-              if (index === 0 || questions[index - 1].result)
+              // if (index === 0 || questions[index - 1].result)
                 setQuestion(index);
               // if (closeSideBar) closeSideBar();
             }}
