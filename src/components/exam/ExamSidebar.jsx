@@ -86,7 +86,7 @@ function ExamSidebar({
                 <div
                   key={question._id}
                   onClick={() => {
-                    if (question.userAnswer || qi_index === 0) {
+                    if (question.userAnswer || qi_index === 0 || dp.questions[qi_index-1].userAnswer ) {
                       setDpOrQuestion("dp");
                       setCurrentDp(dp_index);
                       setCurrentQuestion(qi_index);

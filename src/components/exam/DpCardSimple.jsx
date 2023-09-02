@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -12,6 +12,15 @@ function DpCardSimple({
   setCurrentQuestion,
   setCurrentDp,
 }) {
+  const dpRef = useRef(null)
+  useEffect(() => {
+    if (currentQuestion === 0) {
+      dpRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [currentQuestion]);
   const setAnswer = (answer) => {
     const tempDps = JSON.parse(JSON.stringify(dps));
     tempDps[currentDp].questions[currentQuestion].userAnswer = answer;
@@ -26,7 +35,15 @@ function DpCardSimple({
       setCurrentQuestion(0);
     }
   };
-  const Question = ({ qi_index, question, answer: _answer }) => {
+  const Question = ({ qi_index, question, answer: _answer, scrollHere }) => {
+    const questionRef = useRef(null);
+    useEffect(() => {
+      if (scrollHere)
+        questionRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+    }, [scrollHere]);
     const handleClick = () => {
       if (answer) next(answer);
     };
@@ -44,7 +61,7 @@ function DpCardSimple({
     }, [question, _answer]);
     return (
       <>
-        <div className="mt-2 px-6 py-2 text-lg font-bold">
+        <div ref={questionRef} className={`mt-2 px-6 py-2 text-lg font-bold`}>
           Question {qi_index + 1} -{" "}
           {question.__t === "MultiChoice" && "Question à réponses multiples"}
           {question.__t === "ShortAnswer" &&
@@ -105,19 +122,21 @@ function DpCardSimple({
           )}
         </div>
 
-        {!_answer && <div className="px-6 py-6 flex flex-wrap justify-between flex-row-reverse">
-          <button
-            onClick={() => handleClick()}
-            className="click-action px-8 py-2 text-lg bg-[#E2959A] text-white border-transparent border-2"
-          >
-            Valider la réponse
-          </button>
-        </div>}
+        {!_answer && (
+          <div className="px-6 py-6 flex flex-wrap justify-between flex-row-reverse">
+            <button
+              onClick={() => handleClick()}
+              className="click-action px-8 py-2 text-lg bg-[#E2959A] text-white border-transparent border-2"
+            >
+              Valider la réponse
+            </button>
+          </div>
+        )}
       </>
     );
   };
   return (
-    <div className="bg-white py-16 px-4 md:px-16 justify-center items-center flex flex-col">
+    <div ref={dpRef} className="bg-white py-16 px-4 md:px-16 justify-center items-center flex flex-col">
       <div className="lg:w-5/6 h-full">
         <div className="bg-[#203772] px-12 text-white font-bold py-4 text-xl">
           {`DP ${currentDp + 1}`}
@@ -132,6 +151,7 @@ function DpCardSimple({
                 question={question}
                 answer={question.userAnswer}
                 next={next}
+                scrollHere={qi_index && qi_index === currentQuestion}
               />
             )
         )}
