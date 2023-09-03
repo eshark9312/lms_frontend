@@ -44,8 +44,8 @@ function App() {
     <div className="App">
       <QuizContextProvider>
         <BrowserRouter>
-            <AuthProvider>
-          <ExamContextProvider>
+          <AuthProvider>
+            <ExamContextProvider>
               <CardProvider>
                 <Routes>
                   <Route element={<ProtectedRoute />}>
@@ -129,14 +129,11 @@ function App() {
                       element={<AddNewQuestionPage />}
                     />
                     <Route
-                    path="/editQuestion/:id?"
-                    element={<EditQuestionPage />}
-                  />
+                      path="/editQuestion/:id?"
+                      element={<EditQuestionPage />}
+                    />
                     <Route path="/addDP/" element={<AddNewDPPage />} />
-                    <Route
-                    path="/editDP/:id?"
-                    element={<EditDPPage />}
-                  />
+                    <Route path="/editDP/:id?" element={<EditDPPage />} />
                     <Route path="/colors/" element={<Colors />} />
                   </Route>
                   <Route path="/auth/signin" element={<Signin />} />
@@ -146,8 +143,8 @@ function App() {
                 <TakeTestModal />
                 <CardSlider />
               </CardProvider>
-          </ExamContextProvider>
-            </AuthProvider>
+            </ExamContextProvider>
+          </AuthProvider>
         </BrowserRouter>
       </QuizContextProvider>
     </div>

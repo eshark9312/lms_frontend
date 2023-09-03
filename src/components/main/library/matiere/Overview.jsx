@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 
 import {
   EllipsisVerticalIcon,
   PencilSquareIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  ChevronUpDownIcon,
 } from "@heroicons/react/24/outline";
 
 import PieChart from "../../PieChart";
@@ -17,6 +19,7 @@ import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
 import { useAuth } from "../../../../providers/authProvider";
 import { useQuiz } from "../../../../hooks/useQuiz";
 import { ItemStatus } from "../../ItemStatus";
+import { Popover, Transition } from "@headlessui/react";
 
 function Overview({ matiere }) {
   const { user } = useAuth();
@@ -31,9 +34,10 @@ function Overview({ matiere }) {
   const [pageNumber, setPageNumber] = useState(1);
   const [searchText, setSearchText] = useState("");
   const [filter, setFilter] = useState({});
-  const [sort, setSort] = useState();
+  const [sort, setSort] = useState({});
 
   useEffect(() => {
+    console.log(filter);
     if (!matiere) return;
     const fetchItems = async () => {
       try {
@@ -55,6 +59,27 @@ function Overview({ matiere }) {
     fetchItems();
   }, [pageSize, pageNumber, searchText, filter, sort, matiere]);
 
+  const filterByStatus = (status) => {
+    setFilter({ status: status });
+  };
+
+  const sortByNQuestion = () => {
+    let tempSort = { ...sort };
+    delete tempSort.n_questions;
+    if (!sort?.n_questions) tempSort = { n_questions: 1, ...tempSort };
+    else if (sort.n_questions === 1)
+      tempSort = { n_questions: -1, ...tempSort };
+    setSort(tempSort);
+  };
+
+  const sortByProgress = () => {
+    let tempSort = { ...sort };
+    delete tempSort.progress;
+    if (!sort?.progress) tempSort = { progress: 1, ...tempSort };
+    else if (sort.progress === 1) tempSort = { progress: -1, ...tempSort };
+    setSort(tempSort);
+  };
+
   if (isLoading)
     return (
       <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50 h-[70vh] flex items-center justify-center">
@@ -73,13 +98,12 @@ function Overview({ matiere }) {
     <>
       <div className="inline-block min-w-full py-2 align-middle">
         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
-          <div className="p-6 bg-white text-xl font-extrabold">
+          <div className="px-6 py-4 bg-white text-xl font-extrabold flex justify-between items-center">
             Liste des items
-          </div>
-          <div className="p-4 bg-white flex justify-between">
             <Search searchText={searchText} setSearchText={setSearchText} />
-            <Filter />
           </div>
+          {/* <div className="p-4 bg-white flex justify-between">
+          </div> */}
           <table className="min-w-full divide-y divide-gray-300">
             <thead className="divide-y divide-gray-200 bg-white">
               <tr>
@@ -93,19 +117,51 @@ function Overview({ matiere }) {
                   scope="col"
                   className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                 >
-                  Status
+                  <ItemStatusFilter
+                    setStatus={filterByStatus}
+                    status={filter.status}
+                  />
                 </th>
                 <th
                   scope="col"
                   className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                 >
-                  Number of questions
+                  <div
+                    onClick={() => {
+                      sortByNQuestion();
+                    }}
+                    className="hover:cursor-pointer hover:text-primary-600 flex items-center max-w-fit"
+                  >
+                    Number of questions
+                    {!sort.n_questions && (
+                      <ChevronUpDownIcon className="w-4 h-4 stroke-2" />
+                    )}
+                    {sort.n_questions && sort.n_questions === 1 && (
+                      <ChevronDownIcon className="w-4 h-4 stroke-2" />
+                    )}
+                    {sort.n_questions && sort.n_questions === -1 && (
+                      <ChevronUpIcon className="w-4 h-4 stroke-2" />
+                    )}
+                  </div>
                 </th>
-                <th
-                  scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                >
-                  Progress rate
+                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                  <div
+                    onClick={() => {
+                      sortByProgress();
+                    }}
+                    className="hover:cursor-pointer hover:text-primary-600 flex items-center max-w-fit"
+                  >
+                    Progress rate
+                    {!sort.progress && (
+                      <ChevronUpDownIcon className="w-4 h-4 stroke-2" />
+                    )}
+                    {sort.progress && sort.progress === 1 && (
+                      <ChevronDownIcon className="w-4 h-4 stroke-2" />
+                    )}
+                    {sort.progress && sort.progress === -1 && (
+                      <ChevronUpIcon className="w-4 h-4 stroke-2" />
+                    )}
+                  </div>
                 </th>
                 <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                   <span className="sr-only">Edit</span>
@@ -174,6 +230,67 @@ function Overview({ matiere }) {
     </>
   );
 }
+
+export const ItemStatusFilter = ({ status, setStatus }) => {
+  const options = [
+    {
+      value: "done",
+      label: "Fait",
+    },
+    {
+      value: "todo",
+      label: "À faire",
+    },
+    {
+      value: "in progress",
+      label: "En cours",
+    },
+    {
+      value: null,
+      label: "Pas de statut",
+    },
+    {
+      value: undefined,
+      label: "All",
+    },
+  ];
+  return (
+    <Popover as="div" className="relative w-full inline-block text-left">
+      <Popover.Button className="hover:text-primary-600">Status</Popover.Button>
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
+      >
+        <Popover.Panel className="absolute right-0 z-10 mt-2 origin-top-right rounded-md bg-white p-2 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <div className="space-y-1">
+            {options.map((option, optionIdx) => (
+              <div
+                key={option.label}
+                className={`flex items-center rounded-md py-1 hover:bg-gray-100 hover:cursor-pointer ${
+                  option.value === status && "text-primary-600 bg-gray-100"
+                }`}
+                onClick={() => {
+                  setStatus(option.value);
+                }}
+              >
+                <span
+                  className={`ml-3 whitespace-nowrap pr-6 text-sm font-extrabold`}
+                >
+                  {option.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Popover.Panel>
+      </Transition>
+    </Popover>
+  );
+};
 const StatisticsChart = ({ matiere }) => {
   const [successRate, setSuccessRate] = useState(null);
   const [progressRate, setProgressRate] = useState(0);
@@ -183,15 +300,10 @@ const StatisticsChart = ({ matiere }) => {
   useEffect(() => {
     const getSuccessRate = async () => {
       try {
-        console.log({
-          user_id: user._id,
-          matiere_id: matiere._id,
-        });
         const response = await authHttpClient.post(`/progress/matiere/filter`, {
           user_id: user._id,
           matiere_id: matiere._id,
         });
-        console.log(response.data.data);
         setSuccessRate(response.data.data[0]?.success_rate);
         setProgressRate(response.data.data[0]?.progress_rate);
       } catch (error) {

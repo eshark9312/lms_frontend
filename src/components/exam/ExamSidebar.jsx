@@ -3,11 +3,13 @@ import ExitIcon from "../icons/ExitIcon";
 import { useNavigate } from "react-router-dom";
 import { Switch } from "@headlessui/react";
 import { format } from "date-fns";
+import { Spinner } from "../icons/Spinner";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 function ExamSidebar({
+  isSubmitting,
   dps,
   questions,
   dpOrQuestion,
@@ -25,7 +27,8 @@ function ExamSidebar({
   const [timeLeft, setTimeLeft] = useState(0);
   useEffect(() => {
     const timeLimit =
-      (dps.reduce((total, { questions }) => (total += questions.length), 0)+ questions.length) *
+      (dps.reduce((total, { questions }) => (total += questions.length), 0) +
+        questions.length) *
       60 *
       1000;
     setTotalTime(timeLimit);
@@ -86,7 +89,11 @@ function ExamSidebar({
                 <div
                   key={question._id}
                   onClick={() => {
-                    if (question.userAnswer || qi_index === 0 || dp.questions[qi_index-1].userAnswer ) {
+                    if (
+                      question.userAnswer ||
+                      qi_index === 0 ||
+                      dp.questions[qi_index - 1].userAnswer
+                    ) {
                       setDpOrQuestion("dp");
                       setCurrentDp(dp_index);
                       setCurrentQuestion(qi_index);
@@ -140,17 +147,16 @@ function ExamSidebar({
         )}
       </div>
       <div className="bg-[#203772] text-center text-white p-8 flex">
-        <div
-          onClick={() => {
-            setEnd(true);
-          }}
-          className="hover:cursor-pointer click-action flex-1"
-        >
-          TERMINER
-        </div>
-        <button onClick={() => navigator(-1)}>
-          <ExitIcon />
-        </button>
+        {!isSubmitting && (
+          <div
+            onClick={() => {
+              setEnd(true);
+            }}
+            className="hover:cursor-pointer click-action flex-1 flex items-center justify-center"
+          >
+            {isSubmitting ? <Spinner small center /> : "TERMINER"}
+          </div>
+        )}
       </div>
     </div>
   );

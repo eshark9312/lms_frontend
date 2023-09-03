@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import ConfirmModal from "../common/ConfirmModal";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -12,7 +13,7 @@ function DpCardSimple({
   setCurrentQuestion,
   setCurrentDp,
 }) {
-  const dpRef = useRef(null)
+  const dpRef = useRef(null);
   useEffect(() => {
     if (currentQuestion === 0) {
       dpRef.current.scrollIntoView({
@@ -44,9 +45,6 @@ function DpCardSimple({
           block: "start",
         });
     }, [scrollHere]);
-    const handleClick = () => {
-      if (answer) next(answer);
-    };
     const [answer, setAnswer] = useState();
     useEffect(() => {
       console.log("Question");
@@ -59,6 +57,15 @@ function DpCardSimple({
         setAnswer(_answer);
       }
     }, [question, _answer]);
+
+    const [openConfirmModal, setOpenConfirmModal] = useState(false);
+    const handleClick = () => {
+      if (answer) setOpenConfirmModal(true);
+    };
+    const onConfirm = () => {
+      next(answer);
+    };
+
     return (
       <>
         <div ref={questionRef} className={`mt-2 px-6 py-2 text-lg font-bold`}>
@@ -132,11 +139,19 @@ function DpCardSimple({
             </button>
           </div>
         )}
+        <ConfirmModal
+          open={openConfirmModal}
+          setOpen={setOpenConfirmModal}
+          onConfirm={onConfirm}
+        />
       </>
     );
   };
   return (
-    <div ref={dpRef} className="bg-white py-16 px-4 md:px-16 justify-center items-center flex flex-col">
+    <div
+      ref={dpRef}
+      className="bg-white py-16 px-4 md:px-16 justify-center items-center flex flex-col"
+    >
       <div className="lg:w-5/6 h-full">
         <div className="bg-[#203772] px-12 text-white font-bold py-4 text-xl">
           {`DP ${currentDp + 1}`}

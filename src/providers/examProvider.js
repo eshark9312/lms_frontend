@@ -13,8 +13,10 @@ export const ExamContextProvider = (props) => {
   const [questions, setQuestions] = useState([]);
   const [result, setResult] = useState({ dps: [], questions: [] });
   const [openTakeExamModal, setOpenTakeExamModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitAnswers = async () => {
+    setIsSubmitting(true);
     const resultDps = [];
     const resultQis = [];
     for (let i = 0; i < dps.length; i++) {
@@ -47,9 +49,11 @@ export const ExamContextProvider = (props) => {
     setDps([]);
     setQuestions([]);
     setResult({ dps: resultDps, questions: resultQis });
+    setIsSubmitting(false);
     navigator("/result/");
   };
   const value = {
+    isSubmitting,
     questions,
     setQuestions,
     selectedQuestions,

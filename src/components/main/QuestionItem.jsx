@@ -44,6 +44,7 @@ const QuestionItem = ({ question_id }) => {
           user_id: user._id,
           question_id,
         });
+        console.log(response);
         setLastScore(response.data.data?.user_score);
         setLastAssessed(response.data.data?.last_assess);
       } catch (error) {

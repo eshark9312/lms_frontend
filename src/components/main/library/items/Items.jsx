@@ -22,6 +22,7 @@ import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox, Switch } from "@headlessui/react";
 import { useQuiz } from "../../../../hooks/useQuiz";
 import { ItemStatus } from "../../ItemStatus";
+import { ItemStatusFilter } from "../matiere/Overview";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -80,6 +81,28 @@ export default function Items() {
     };
     if (user.role === "admin") fetchMatieres();
   }, [user]);
+
+  const filterByStatus = (status) => {
+    setFilter({ status: status });
+  };
+
+  const sortByNQuestion = () => {
+    let tempSort = { ...sort };
+    delete tempSort.n_questions;
+    if (!sort?.n_questions) tempSort = { n_questions: 1, ...tempSort };
+    else if (sort.n_questions === 1)
+      tempSort = { n_questions: -1, ...tempSort };
+    setSort(tempSort);
+  };
+
+  const sortByProgress = () => {
+    let tempSort = { ...sort };
+    delete tempSort.progress;
+    if (!sort?.progress) tempSort = { progress: 1, ...tempSort };
+    else if (sort.progress === 1) tempSort = { progress: -1, ...tempSort };
+    setSort(tempSort);
+  };
+
   return (
     <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
       {user.role === "user" && (
@@ -92,13 +115,10 @@ export default function Items() {
               <Spinner />
             </div>
           ) : (
-            <div className="shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
-              <div className="p-6 bg-white text-xl font-extrabold">
+            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
+              <div className="px-6 py-4 bg-white text-xl font-extrabold flex justify-between items-center">
                 Liste des items
-              </div>
-              <div className="p-4 bg-white flex justify-between">
                 <Search searchText={searchText} setSearchText={setSearchText} />
-                <Filter />
               </div>
               <table className="min-w-full divide-y divide-gray-300">
                 <thead className="divide-y divide-gray-200 bg-white">
@@ -113,19 +133,51 @@ export default function Items() {
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Status
+                      <ItemStatusFilter
+                        setStatus={filterByStatus}
+                        status={filter.status}
+                      />
                     </th>
                     <th
                       scope="col"
                       className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Number of questions
+                      <div
+                        onClick={() => {
+                          sortByNQuestion();
+                        }}
+                        className="hover:cursor-pointer hover:text-primary-600 flex items-center max-w-fit"
+                      >
+                        Number of questions
+                        {!sort.n_questions && (
+                          <ChevronUpDownIcon className="w-4 h-4 stroke-2" />
+                        )}
+                        {sort.n_questions && sort.n_questions === 1 && (
+                          <ChevronDownIcon className="w-4 h-4 stroke-2" />
+                        )}
+                        {sort.n_questions && sort.n_questions === -1 && (
+                          <ChevronUpIcon className="w-4 h-4 stroke-2" />
+                        )}
+                      </div>
                     </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                    >
-                      Progress rate
+                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                      <div
+                        onClick={() => {
+                          sortByProgress();
+                        }}
+                        className="hover:cursor-pointer hover:text-primary-600 flex items-center max-w-fit"
+                      >
+                        Progress rate
+                        {!sort.progress && (
+                          <ChevronUpDownIcon className="w-4 h-4 stroke-2" />
+                        )}
+                        {sort.progress && sort.progress === 1 && (
+                          <ChevronDownIcon className="w-4 h-4 stroke-2" />
+                        )}
+                        {sort.progress && sort.progress === -1 && (
+                          <ChevronUpIcon className="w-4 h-4 stroke-2" />
+                        )}
+                      </div>
                     </th>
                     <th
                       scope="col"

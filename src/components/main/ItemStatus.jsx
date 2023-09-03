@@ -41,6 +41,7 @@ export const ItemStatus = ({
 
   const setStatus = (value) => {
     console.log(status, "->", value);
+
     const delectStatus = async () => {
       setIsModifying(true);
       await authHttpClient.delete(`/status/${status_id}`);
@@ -54,34 +55,42 @@ export const ItemStatus = ({
     };
     const updateStatus = async () => {
       setIsModifying(true);
-      let id;
-      if (status_id)
-        await authHttpClient.put(`/status/${status_id}`, {
-          user_id: user._id,
-          item_id,
-          status: value,
-        });
-      else {
-        const response = await authHttpClient.post("/status", {
-          user_id: user._id,
-          item_id,
-          status: value,
-        });
-        id = response.data.data._id;
-      }
+      await authHttpClient.put(`/status/${status_id}`, {
+        user_id: user._id,
+        item_id,
+        status: value,
+      });
       setItems((items) => {
         const tempItems = JSON.parse(JSON.stringify(items));
         tempItems[itemIndex].status = value;
-        tempItems[itemIndex].status_id = id;
+        tempItems[itemIndex].status_id = status_id;
         return tempItems;
       });
       setIsModifying(false);
     };
+    const createStatus = async () => {
+      setIsModifying(true);
+      const response = await authHttpClient.post("/status", {
+        user_id: user._id,
+        item_id,
+        status: value,
+      });
+      setItems((items) => {
+        const tempItems = JSON.parse(JSON.stringify(items));
+        tempItems[itemIndex].status = value;
+        tempItems[itemIndex].status_id = response.data.data._id;
+        return tempItems;
+      });
+      setIsModifying(false);
+    };
+
     if (value !== status) {
-      !value && delectStatus();
-      value && updateStatus();
+      if(!value) delectStatus();
+      else if(!status) createStatus();
+      else updateStatus();
     }
   };
+  
   return (
     <Popover as="div" className="relative w-full inline-block text-left">
       <div>

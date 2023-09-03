@@ -16,6 +16,7 @@ import QuestionItem from "../QuestionItem";
 import { Spinner } from "../../icons/Spinner";
 
 function All() {
+  console.log("all");
   const { user } = useAuth();
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

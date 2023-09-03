@@ -4,11 +4,12 @@ import QuestionCardSimple from "../../components/exam/QuestionCardSimple";
 import { useNavigate } from "react-router-dom";
 import { useExam } from "../../providers/examProvider";
 import DpCardSimple from "../../components/exam/DpCardSimple";
+import Modal from "../../components/common/Modal";
 
 export default function ExamPage() {
   console.log("examPage");
   const navigator = useNavigate();
-  const { questions, setQuestions, dps, setDps, submitAnswers } = useExam();
+  const { questions, setQuestions, dps, setDps, submitAnswers, isSubmitting } = useExam();
   const [dpOrQuestion, setDpOrQuestion] = useState("dp"); // "dp" or "question"
   const [currentDp, setCurrentDp] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -52,6 +53,7 @@ export default function ExamPage() {
           } lg:w-72 hidden bg-white lg:absolute lg:inset-y-0 lg:z-2 lg:flex lg:flex-col`}
         >
           <ExamSidebar
+            isSubmitting={isSubmitting}
             dps={dps}
             questions={questions}
             dpOrQuestion={dpOrQuestion}
@@ -93,3 +95,4 @@ export default function ExamPage() {
     </div>
   );
 }
+

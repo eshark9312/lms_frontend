@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ConfirmModal from "../common/ConfirmModal";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -8,9 +9,7 @@ function QuestionCardSimple({
   desc,
   question,
   answer: _answer,
-  currentDp,
   currentQuestion,
-  isLastQuestion,
   next,
 }) {
   const [answer, setAnswer] = useState();
@@ -26,9 +25,15 @@ function QuestionCardSimple({
     }
   }, [question, _answer]);
 
+
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const handleClick = () => {
-    if(answer)next(answer);
+    if (answer) setOpenConfirmModal(true);
   };
+  const onConfirm = () => {
+    next(answer);
+  };
+
 
   return (
     <div className="bg-white py-16 px-4 md:px-16 justify-center items-center flex flex-col">
@@ -108,6 +113,11 @@ function QuestionCardSimple({
           </button>
         </div>}
       </div>
+        <ConfirmModal
+          open={openConfirmModal}
+          setOpen={setOpenConfirmModal}
+          onConfirm={onConfirm}
+        />
     </div>
   );
 }

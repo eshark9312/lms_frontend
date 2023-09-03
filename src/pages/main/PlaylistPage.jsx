@@ -16,7 +16,6 @@ function PlaylistsPage() {
   ]);
 
   const setCurrentTab = (selectedTab) => {
-    console.log(selectedTab);
     setTabs(
       tabs.map((tab) => {
         if (selectedTab === tab.name) tab.current = true;
@@ -25,11 +24,7 @@ function PlaylistsPage() {
       })
     );
   };
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
+  
   const pages = [{ name: "Playlists", href: "/playlists/", current: true }];
 
   return (
