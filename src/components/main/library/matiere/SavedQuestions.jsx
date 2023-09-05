@@ -28,21 +28,15 @@ function SavedQuestions({ matiere_id }) {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await authHttpClient.post(
-          `/playlist/getQuestionsWithDetail`,
-          {
-            user_id: user.id,
-            matiere_id: matiere_id,
-            pageNumber: pageNumber,
-            pageSize: pageSize,
-            sort: sort,
-          }
-        );
-        console.log(response);
+        const response = await authHttpClient.post(`/playlist/getPage`, {
+          user_id: user._id,
+          matiere_id: matiere_id,
+          pageNumber: pageNumber,
+          pageSize: pageSize,
+          sort: { question_number: 1 },
+        });
         setTotalNumber(response.data.total_number);
-        setQuestions(
-          response.data.data.map(({_id}) => _id)
-        );
+        setQuestions(response.data.data);
         setIsLoading(false);
       } catch (error) {
         console.log(error);
@@ -105,7 +99,7 @@ function SavedQuestions({ matiere_id }) {
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {questions.map((question) => (
-                <QuestionItem question_id={question} key={question} />
+                <QuestionItem question={question} key={question.question_id} />
               ))}
             </tbody>
           </table>
