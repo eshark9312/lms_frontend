@@ -16,7 +16,7 @@ const QuestionItem = ({ question: _question }) => {
     total_score,
     last_assess,
   } = _question;
-  
+
   const { selectedQuestions, setSelectedQuestions } = useQuiz();
 
   const checkHandle = (checked) => {
@@ -48,9 +48,11 @@ const QuestionItem = ({ question: _question }) => {
       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 flex flex-wrap gap-1">
         {playlists && (
           <>
-            {playlists.map((playlist) => (
-              <Label color={playlist.color}>{playlist.name}</Label>
-            ))}
+            {playlists
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((playlist) => (
+                <Label color={playlist.color}>{playlist.name}</Label>
+              ))}
           </>
         )}
       </td>

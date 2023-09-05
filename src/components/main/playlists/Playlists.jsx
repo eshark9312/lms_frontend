@@ -16,6 +16,7 @@ function Playlists() {
         const response = await authHttpClient.post("/playlist/filter", {
           user_id: user._id,
         });
+        console.log(response.data.data);
         setPlaylists(response.data.data);
         setIsLoading(false);
       } catch (error) {
@@ -24,6 +25,7 @@ function Playlists() {
     };
     fetchPlaylists();
   }, [user]);
+
   return (
     <>
       {isLoading ? (
