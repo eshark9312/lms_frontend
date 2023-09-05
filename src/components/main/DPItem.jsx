@@ -1,7 +1,6 @@
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../providers/authProvider";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useAuthHttpClient from "../../hooks/useAuthHttpClient";
 import { format } from "date-fns";
 import { useExam } from "../../providers/examProvider";
@@ -9,10 +8,7 @@ import { Spinner } from "../icons/Spinner";
 
 const DPItem = ({ dp }) => {
   const navigator = useNavigate();
-  const { user } = useAuth();
   const authHttpClient = useAuthHttpClient();
-  const [lastAssess, setLastAssess] = useState();
-  // const [playlists, setPlaylist] = useState();
   const { setDps, selectedDps, setSelectedDps } = useExam();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -36,42 +32,6 @@ const DPItem = ({ dp }) => {
     setSelectedDps(tempDps);
   };
 
-  useEffect(() => {
-    const getHistory = async () => {
-      try {
-        const response = await authHttpClient.post(
-          `/answer/getLastAssessForDp`,
-          {
-            user_id: user._id,
-            dp_id: dp._id,
-          }
-        );
-        setLastAssess(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getHistory();
-  }, [user, dp]);
-
-  // useEffect(() => {
-  //   const getPlaylist = async () => {
-  //     try {
-  //       const response = await authHttpClient.post(
-  //         `/playlist/filterAndGetPlaylist`,
-  //         {
-  //           user_id: user._id,
-  //           question_id,
-  //         }
-  //       );
-  //       setPlaylist(response.data.data.map((playlist) => playlist.playlist_id));
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   getPlaylist();
-  // }, [user, question_id]);
-
   return (
     <tr className="even:bg-gray-50">
       <td className="font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6">
@@ -88,7 +48,7 @@ const DPItem = ({ dp }) => {
         {dp.dp_number}
       </td>
       <td className=" px-3 py-4 text-sm text-gray-500">
-        {lastAssess && format(new Date(lastAssess.last_assess), "MMM dd, yyyy")}
+        {dp.last_assess && format(new Date(dp.last_assess), "MMM dd, yyyy")}
       </td>
       <td className=" px-3 py-4 text-sm text-gray-500">
         <div className="flex flex-wrap">
@@ -115,7 +75,7 @@ const DPItem = ({ dp }) => {
         </div>
       </td>
       <td className=" px-3 py-1 text-sm text-gray-500 ">
-        {lastAssess && `${lastAssess.user_score}/${lastAssess.total_score}`}
+        {dp.user_score && `${dp.user_score}/${dp.total_score}`}
       </td>
       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
         <div

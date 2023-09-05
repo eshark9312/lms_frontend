@@ -3,9 +3,8 @@ import { Popover, Transition } from "@headlessui/react";
 import FilterIcon from "../icons/FilterIcon";
 
 const options=  [
-      { value: "status", label: "Status" },
-      { value: "questions", label: "Questions" },
-      { value: "progress", label: "Progress" },
+      { value: "matieres", label: "Matières" },
+      { value: "items", label: "Items" },
     ]
 export default function Filter() {
   return (

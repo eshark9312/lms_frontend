@@ -80,7 +80,7 @@ export default function Pagination({
     pageNumber < lastPageNumber && setPageNumber(pageNumber + 1);
   };
   return (
-    <div className="flex items-center justify-between border-gray-200 bg-white px-4 py-3 sm:px-6">
+    <div className="flex items-center justify-between border-gray-200 bg-white px-4 py-3 sm:px-6  sm:rounded-b-lg">
       <div className="flex flex-1 justify-between sm:hidden">
         <div
           onClick={() => {
