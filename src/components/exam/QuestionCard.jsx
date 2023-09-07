@@ -13,14 +13,12 @@ import InfoCircle from "../icons/InfoCircle";
 
 import ShareLinkModal from "./ShareLinkModal";
 import SlidePlaylist from "./SlidePlaylist";
-import NotiStat from "./NotiStat";
-import SlideConcept from "./SlideConcept";
-import NotiRef from "./NotiRef";
 import SlideReport from "./SlideReport";
 import useAuthHttpClient from "../../hooks/useAuthHttpClient";
 import { useAuth } from "../../providers/authProvider";
 import { useCard } from "../../providers/cardProvider";
 import { useQuiz } from "../../hooks/useQuiz";
+import { useNotification } from "../../providers/notificationProvider";
 
 function QuestionCard({ question: _question, setQuestions, index, next }) {
   const { setCurrentQuestion } = useQuiz();
@@ -108,10 +106,23 @@ function QuestionCard({ question: _question, setQuestions, index, next }) {
 
   const [showShareLinkModal, openShareLinkModal] = useState(false);
   const [showPlaylistSlide, openPlaylistSlide] = useState(false);
-  const [showStatisticNoti, openStatisticNoti] = useState(false);
   const [showReportSlide, openReportSlide] = useState(false);
-  const [showRefNoti, openRefNoti] = useState(false);
-console.log(question)
+
+  const { showNotification } = useNotification();
+  const showRef = () => {
+    showNotification(
+      `Source : Référentiel de Neurologie 2018, p.289
+      Tags : #VIèmepaire`
+    );
+  };
+  const showStatistics = () => {
+    showNotification(
+      `Last attempted : 6 days ago
+      Last score : 10/20
+      Success rate : 32% of users score 20/20`
+    );
+  };
+
   return (
     <>
       <div className="bg-white h-screen py-16 px-4 md:px-16 flex justify-center items-center">
@@ -152,31 +163,41 @@ console.log(question)
                           });
                         }
                   }
-                  isRight={
-                    question.result?.choices[idx].correctAnswer
-                  }
+                  isRight={question.result?.choices[idx].correctAnswer}
                   desc={question.result?.choices[idx].desc}
                 />
               ))}
             {question.type === "ShortAnswer" && (
               <div className="px-16 mb-3">
-                {question.result ?(
-                  <div className={`border-2 rounded-lg px-8 py-2 ${question.result.score===20?"bg-green-bg border-green-dark":"bg-red-bg border-red-dark"}`}>
-                    <div className="font-bold">{question.result.yourAnswer}</div>
+                {question.result ? (
+                  <div
+                    className={`border-2 rounded-lg px-8 py-2 ${
+                      question.result.score === 20
+                        ? "bg-green-bg border-green-dark"
+                        : "bg-red-bg border-red-dark"
+                    }`}
+                  >
+                    <div className="font-bold">
+                      {question.result.yourAnswer}
+                    </div>
                     <div>{question.choices.join(", ")}</div>
                   </div>
-                ): <input
-                  className="w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-                  type="text"
-                  value={question.result ? question.result.yourAnswer : answer}
-                  onChange={
-                    question.result
-                      ? () => {}
-                      : (e) => {
-                          setAnswer(e.target.value);
-                        }
-                  }
-                />}
+                ) : (
+                  <input
+                    className="w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                    type="text"
+                    value={
+                      question.result ? question.result.yourAnswer : answer
+                    }
+                    onChange={
+                      question.result
+                        ? () => {}
+                        : (e) => {
+                            setAnswer(e.target.value);
+                          }
+                    }
+                  />
+                )}
               </div>
             )}
             {question.result && (
@@ -233,7 +254,7 @@ console.log(question)
               </div>
               <div
                 onClick={() => {
-                  openStatisticNoti(true);
+                  showStatistics();
                 }}
                 className="hover:cursor-pointer hover:text-blue-500"
               >
@@ -249,7 +270,7 @@ console.log(question)
               </div>
               <div
                 onClick={() => {
-                  openRefNoti(true);
+                  showRef();
                 }}
                 className="hover:cursor-pointer hover:text-blue-500"
               >
@@ -274,8 +295,6 @@ console.log(question)
 
       <ShareLinkModal open={showShareLinkModal} setOpen={openShareLinkModal} />
       <SlidePlaylist open={showPlaylistSlide} setOpen={openPlaylistSlide} />
-      <NotiStat show={showStatisticNoti} setShow={openStatisticNoti} />
-      <NotiRef show={showRefNoti} setShow={openRefNoti} />
       <SlideReport open={showReportSlide} setOpen={openReportSlide} />
     </>
   );

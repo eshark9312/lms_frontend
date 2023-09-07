@@ -8,6 +8,7 @@ import useAuthHttpClient from "../../hooks/useAuthHttpClient";
 import { useAuth } from "../../providers/authProvider";
 import { Spinner, TinySpinner } from "../icons/Spinner";
 import { useQuiz } from "../../hooks/useQuiz";
+import { useNotification } from "../../providers/notificationProvider";
 
 const colors = [
   "primary",
@@ -27,6 +28,8 @@ function SlidePlaylist({ open, setOpen }) {
   const { currentQuestion } = useQuiz();
   const [playlists, setPlaylists] = useState([]);
   const [search, setSearch] = useState("");
+  const { showNotification } = useNotification();
+
   const filteredPlaylists =
     search === ""
       ? playlists
@@ -91,10 +94,15 @@ function SlidePlaylist({ open, setOpen }) {
       });
       setCreating(false);
       setToggled(false);
+      showCreatedSuccess(response.data.data.name);
     } catch (error) {
       setCreating(false);
       console.log(error);
     }
+  };
+
+  const showCreatedSuccess = (name) => {
+    showNotification(`Playlist "${name}" is created successfully!`);
   };
 
   const applyPlaylistChange = async () => {
@@ -118,22 +126,27 @@ function SlidePlaylist({ open, setOpen }) {
           question_id: currentQuestion,
           playlist_id: playlistsToBeAdded[i]._id,
         });
-        setSavedQuestions(_=>[..._, response.data.data]);
+        setSavedQuestions((_) => [..._, response.data.data]);
       }
       for (let i = 0; i < playlistsToBeRemoved.length; i++) {
         await authHttpClient.delete(
           `/playlist/question/${playlistsToBeRemoved[i]._id}`
         );
-        setSavedQuestions(_=>
+        setSavedQuestions((_) =>
           _.filter(({ _id }) => {
             return _id !== playlistsToBeRemoved[i]._id;
           })
         );
       }
       setApplying(false);
+      showApplyedSuccess();
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const showApplyedSuccess = () => {
+    showNotification(`Applied successfully!`);
   };
 
   return (
