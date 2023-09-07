@@ -1,8 +1,28 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import useAuthHttpClient from "../../hooks/useAuthHttpClient";
+import { useAuth } from "../../providers/authProvider";
+import { Spinner } from "../icons/Spinner";
 
 function SlideReport({ open, setOpen }) {
+  const authHttpClient = useAuthHttpClient();
+  const { user } = useAuth();
+  const [sending, setSending] = useState(false);
+
+  const send = () => {
+    const report = document.getElementById("report").innerText;
+    const sendReport = async () => {
+      setSending(true);
+      await authHttpClient.post("report", {
+        user_id: user._id,
+        report,
+      });
+      setSending(false);
+      setOpen(false);
+    };
+    report && sendReport();
+  };
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setOpen}>
@@ -53,6 +73,7 @@ function SlideReport({ open, setOpen }) {
                       <div className="text-sm">Description</div>
                       <div className="my-2 first:focus:border-primary-600">
                         <span
+                          id="report"
                           placeholder="Please specifiy why you contact us..."
                           className="empty:before:content-[attr(placeholder)] before:text-gray-400 p-2 block w-full min-h-[96px] border-2 rounded-md border-gray-400 focus-visible:outline-primary-600"
                           contentEditable
@@ -60,10 +81,10 @@ function SlideReport({ open, setOpen }) {
                       </div>
                       <div className="flex flex-row-reverse">
                         <button
-                          onClick={() => setOpen(false)}
-                          className="px-4 py-2 bg-primary-600 text-white rounded-lg"
+                          onClick={send}
+                          className="px-4 py-2 bg-primary-600 text-white rounded-lg w-20 flex justify-center items-center"
                         >
-                          send
+                          {sending ? <Spinner small center /> : "Send"}
                         </button>
                       </div>
                     </div>

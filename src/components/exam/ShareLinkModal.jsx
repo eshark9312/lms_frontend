@@ -2,8 +2,11 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import CopyIcon from "../icons/CopyIcon";
+import { useQuiz } from "../../hooks/useQuiz";
 
 function ShareLinkModal({ open, setOpen }) {
+  const { currentQuestion } = useQuiz();
+  const linkToShare = `${process.env.REACT_APP_URL}/quiz/${currentQuestion}`;
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setOpen}>
@@ -58,13 +61,18 @@ function ShareLinkModal({ open, setOpen }) {
                   </div>
                 </div>
                 <div className="px-2 mt-2">Share link</div>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 border-2 border-solid rounded-lg p-2">
-                    supex.com/q/id2030349
-                  </div>
-                  <div className="text-gray-400 hover:cursor-pointer px-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="flex-1 border-2 border-solid rounded-lg px-2 py-1 overflow-auto inline-flex whitespace-nowrap text-primary-700 [&::-webkit-scrollbar]:hidden">
+                    {linkToShare}
+                  </p>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(linkToShare);
+                    }}
+                    className="text-gray-400 hover:cursor-pointer px-2 hover:text-gray-700 active:text-primary-700"
+                  >
                     <CopyIcon className="text-gray-200" />
-                  </div>
+                  </button>
                 </div>
               </Dialog.Panel>
             </Transition.Child>
