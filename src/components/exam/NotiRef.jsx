@@ -1,8 +1,19 @@
-import { Fragment } from 'react'
-import { Transition } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/20/solid'
+import { Fragment, useEffect, useState } from "react";
+import { Transition } from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 
-function NotiRef({show, setShow}) {
+function NotiRef({ show, setShow }) {
+  const [timer, setTimer] = useState();
+  useEffect(() => {
+    console.log("show: ", show, "timer: ", timer);
+    if (show)
+      setTimer(
+        setTimeout(() => {
+          setShow(false);
+        }, 5000)
+      );
+    else clearTimeout(timer);
+  }, [show, setShow]);
   return (
     <div
       aria-live="assertive"
@@ -28,7 +39,7 @@ function NotiRef({show, setShow}) {
                     Source : Référentiel de Neurologie 2018, p.289
                   </p>
                   <p className="text-sm font-medium text-gray-900">
-                  Tags : #VIèmepaire
+                    Tags : #VIèmepaire
                   </p>
                 </div>
                 <div className="absolute top-0 right-0">
@@ -49,8 +60,7 @@ function NotiRef({show, setShow}) {
         </Transition>
       </div>
     </div>
-
-  )
+  );
 }
 
-export default NotiRef
+export default NotiRef;

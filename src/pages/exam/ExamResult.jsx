@@ -13,12 +13,15 @@ export default function ExamResultPage() {
   const [currentDp, setCurrentDp] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const next = () => {
-    if (currentQuestion < result[currentDp].questions.length - 1) {
+    if (dpOrQuestion === "dp") {
+      if (currentQuestion < result.dps[currentDp].questions.length - 1) {
+        setCurrentQuestion(currentQuestion + 1);
+      } else if (currentDp < result.dps.length - 1) {
+        setCurrentDp(currentDp + 1);
+        setCurrentQuestion(0);
+      }
+    } else if (currentQuestion < result.questions.length - 1)
       setCurrentQuestion(currentQuestion + 1);
-    } else if (currentDp < result.length - 1) {
-      setCurrentDp(currentDp + 1);
-      setCurrentQuestion(0);
-    }
   };
 
   useEffect(() => {

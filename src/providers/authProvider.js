@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
     authHttpClient
       .get("auth/refresh")
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         setUser(res.data.data.user);
       })
       .catch((e) => e);

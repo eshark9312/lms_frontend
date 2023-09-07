@@ -50,6 +50,7 @@ export default function Items() {
 
   useEffect(() => {
     const fetchItems = async () => {
+      setIsLoading(true);
       try {
         const response = await authHttpClient.post(`/item/getPage`, {
           user_id: user._id,
@@ -107,86 +108,76 @@ export default function Items() {
     <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
       {user.role === "user" && (
         <div className="inline-block min-w-full py-2 align-middle">
-          {isLoading ? (
-            <div
-              role="status"
-              className="h-[70vh] pb-20 flex justify-center items-center"
-            >
-              <Spinner />
+          <div className="shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
+            <div className="px-6 py-4 bg-white text-xl font-extrabold flex justify-between items-center sm:rounded-t-lg">
+              Liste des items
+              <Search searchText={searchText} setSearchText={setSearchText} />
             </div>
-          ) : (
-            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
-              <div className="px-6 py-4 bg-white text-xl font-extrabold flex justify-between items-center">
-                Liste des items
-                <Search searchText={searchText} setSearchText={setSearchText} />
-              </div>
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead className="divide-y divide-gray-200 bg-white">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="w-1/3 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+            <table className="min-w-full divide-y divide-gray-300">
+              <thead className="divide-y divide-gray-200 bg-white">
+                <tr>
+                  <th
+                    scope="col"
+                    className="w-1/3 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                  >
+                    Title
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    <ItemStatusFilter
+                      setStatus={filterByStatus}
+                      status={filter.status}
+                    />
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    <div
+                      onClick={() => {
+                        sortByNQuestion();
+                      }}
+                      className="hover:cursor-pointer hover:text-primary-600 flex items-center max-w-fit"
                     >
-                      Title
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      Number of questions
+                      {!sort.n_questions && (
+                        <ChevronUpDownIcon className="w-4 h-4 stroke-2" />
+                      )}
+                      {sort.n_questions && sort.n_questions === 1 && (
+                        <ChevronDownIcon className="w-4 h-4 stroke-2" />
+                      )}
+                      {sort.n_questions && sort.n_questions === -1 && (
+                        <ChevronUpIcon className="w-4 h-4 stroke-2" />
+                      )}
+                    </div>
+                  </th>
+                  <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <div
+                      onClick={() => {
+                        sortByProgress();
+                      }}
+                      className="hover:cursor-pointer hover:text-primary-600 flex items-center max-w-fit"
                     >
-                      <ItemStatusFilter
-                        setStatus={filterByStatus}
-                        status={filter.status}
-                      />
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                    >
-                      <div
-                        onClick={() => {
-                          sortByNQuestion();
-                        }}
-                        className="hover:cursor-pointer hover:text-primary-600 flex items-center max-w-fit"
-                      >
-                        Number of questions
-                        {!sort.n_questions && (
-                          <ChevronUpDownIcon className="w-4 h-4 stroke-2" />
-                        )}
-                        {sort.n_questions && sort.n_questions === 1 && (
-                          <ChevronDownIcon className="w-4 h-4 stroke-2" />
-                        )}
-                        {sort.n_questions && sort.n_questions === -1 && (
-                          <ChevronUpIcon className="w-4 h-4 stroke-2" />
-                        )}
-                      </div>
-                    </th>
-                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      <div
-                        onClick={() => {
-                          sortByProgress();
-                        }}
-                        className="hover:cursor-pointer hover:text-primary-600 flex items-center max-w-fit"
-                      >
-                        Progress rate
-                        {!sort.progress && (
-                          <ChevronUpDownIcon className="w-4 h-4 stroke-2" />
-                        )}
-                        {sort.progress && sort.progress === 1 && (
-                          <ChevronDownIcon className="w-4 h-4 stroke-2" />
-                        )}
-                        {sort.progress && sort.progress === -1 && (
-                          <ChevronUpIcon className="w-4 h-4 stroke-2" />
-                        )}
-                      </div>
-                    </th>
-                    <th
-                      scope="col"
-                      className="relative py-3.5 pl-3 pr-4 sm:pr-6"
-                    >
-                      <span className="sr-only">Edit</span>
-                    </th>
-                  </tr>
-                </thead>
+                      Progress rate
+                      {!sort.progress && (
+                        <ChevronUpDownIcon className="w-4 h-4 stroke-2" />
+                      )}
+                      {sort.progress && sort.progress === 1 && (
+                        <ChevronDownIcon className="w-4 h-4 stroke-2" />
+                      )}
+                      {sort.progress && sort.progress === -1 && (
+                        <ChevronUpIcon className="w-4 h-4 stroke-2" />
+                      )}
+                    </div>
+                  </th>
+                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                    <span className="sr-only">Edit</span>
+                  </th>
+                </tr>
+              </thead>
+              {!isLoading && (
                 <tbody className="divide-y divide-gray-200 bg-white">
                   {items.map((item, index) => (
                     <tr key={item._id}>
@@ -234,16 +225,24 @@ export default function Items() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
-              <Pagination
-                totalNumber={totalNumber}
-                pageNumber={pageNumber}
-                setPageNumber={setPageNumber}
-                pageSize={pageSize}
-                setPageSize={setPageSize}
-              />
-            </div>
-          )}
+              )}
+            </table>
+            {isLoading && (
+              <div
+                role="status"
+                className="h-[70vh] flex justify-center items-center bg-white"
+              >
+                <Spinner />
+              </div>
+            )}
+            <Pagination
+              totalNumber={totalNumber}
+              pageNumber={pageNumber}
+              setPageNumber={setPageNumber}
+              pageSize={pageSize}
+              setPageSize={setPageSize}
+            />
+          </div>
         </div>
       )}
       {user.role === "admin" && (

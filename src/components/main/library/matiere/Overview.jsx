@@ -40,6 +40,7 @@ function Overview({ matiere }) {
     console.log(filter);
     if (!matiere) return;
     const fetchItems = async () => {
+      setIsLoading(true);
       try {
         const response = await authHttpClient.post(`/item/getPage`, {
           user_id: user._id,
@@ -80,30 +81,17 @@ function Overview({ matiere }) {
     setSort(tempSort);
   };
 
-  if (isLoading)
-    return (
-      <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50 h-[70vh] flex items-center justify-center">
-        <Spinner />
-      </div>
-    );
-
-  return isLoading ? (
-    <div
-      role="status"
-      className="h-[70vh] pb-20 flex justify-center items-center"
-    >
-      <Spinner />
-    </div>
-  ) : (
+  return (
     <>
       <div className="inline-block min-w-full py-2 align-middle">
-        <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
+        <div className="overflow shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg  divide-y-2 divide-gray-200">
           <div className="px-6 py-4 bg-white text-xl font-extrabold flex justify-between items-center">
             Liste des items
             <Search searchText={searchText} setSearchText={setSearchText} />
           </div>
           {/* <div className="p-4 bg-white flex justify-between">
           </div> */}
+
           <table className="min-w-full divide-y divide-gray-300">
             <thead className="divide-y divide-gray-200 bg-white">
               <tr>
@@ -168,52 +156,61 @@ function Overview({ matiere }) {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {items.map((item, index) => (
-                <tr key={item._id}>
-                  <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 hover:text-primary-600 hover:cursor-pointer click-action">
-                    <Link to={`/library/item/${item._id}`}>
-                      {item.item_number}. {item.name}
-                    </Link>
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    <ItemStatus
-                      status={item.status}
-                      status_id={item.status_id}
-                      setItems={setItems}
-                      item_id={item._id}
-                      itemIndex={index}
-                    />
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {item.n_questions} questions
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    <ProgressBar
-                      progress={
-                        item.n_questions && item.progress
-                          ? Math.round((item.progress / item.n_questions) * 100)
-                          : 0
-                      }
-                    />
-                  </td>
-                  <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                    <Link
-                      // to="/quiz"
-                      onClick={() => {
-                        setSelectedItem(item._id);
-                        setSelectedMatiere(matiere._id);
-                        setOpenTakeTestModal(true);
-                      }}
-                      className="text-primary-600 hover:text-primary-900"
-                    >
-                      <PencilSquareIcon className="w-5 h-5 stroke-2" />
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+            {!isLoading && (
+              <tbody className="divide-y divide-gray-200 bg-white">
+                {items.map((item, index) => (
+                  <tr key={item._id}>
+                    <td className="whitespace-wrap font-extrabold py-4 pl-4 pr-3 text-sm text-gray-900 sm:pl-6 hover:text-primary-600 hover:cursor-pointer click-action">
+                      <Link to={`/library/item/${item._id}`}>
+                        {item.item_number}. {item.name}
+                      </Link>
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      <ItemStatus
+                        status={item.status}
+                        status_id={item.status_id}
+                        setItems={setItems}
+                        item_id={item._id}
+                        itemIndex={index}
+                      />
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {item.n_questions} questions
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      <ProgressBar
+                        progress={
+                          item.n_questions && item.progress
+                            ? Math.round(
+                                (item.progress / item.n_questions) * 100
+                              )
+                            : 0
+                        }
+                      />
+                    </td>
+                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                      <Link
+                        // to="/quiz"
+                        onClick={() => {
+                          setSelectedItem(item._id);
+                          setSelectedMatiere(matiere._id);
+                          setOpenTakeTestModal(true);
+                        }}
+                        className="text-primary-600 hover:text-primary-900"
+                      >
+                        <PencilSquareIcon className="w-5 h-5 stroke-2" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            )}
           </table>
+          {isLoading && (
+            <div className="h-[70vh] bg-white flex justify-center items-center">
+              <Spinner />
+            </div>
+          )}
           <Pagination
             totalNumber={totalNumber}
             pageNumber={pageNumber}

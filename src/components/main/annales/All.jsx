@@ -19,7 +19,6 @@ function All() {
   const [isLoading, setIsLoading] = useState(true);
   const authHttpClient = useAuthHttpClient();
   const [dps, setDps] = useState([]);
-  const [selectedDp, setSelectedDp] = useState(null);
 
   const [totalNumber, setTotalNumber] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -114,13 +113,13 @@ function All() {
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-[150px]"
                 >
                   <div
                     onClick={() => {
                       sortByLastAssess();
                     }}
-                    className="hover:cursor-pointer hover:text-primary-600 flex items-center max-w-fit"
+                    className="hover:cursor-pointer hover:text-primary-600 flex items-center"
                   >
                     Last assessed
                     {!sort.last_assess && (
@@ -136,7 +135,7 @@ function All() {
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-[200px]"
                 >
                   Matiere
                 </th>
@@ -148,7 +147,7 @@ function All() {
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-[150px]"
                 >
                 <div
                   onClick={() => {

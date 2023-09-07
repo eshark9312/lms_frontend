@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Switch } from "@headlessui/react";
 import { format } from "date-fns";
 import { Spinner } from "../icons/Spinner";
+import ConfirmModal from "../common/ConfirmModal";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -25,6 +26,11 @@ function ExamSidebar({
   const navigator = useNavigate();
   const [totalTime, setTotalTime] = useState(1000);
   const [timeLeft, setTimeLeft] = useState(0);
+  const [openModal, setOpenModal]= useState(false);
+  const clickHandle =()=>{
+    setOpenModal(true)
+  }
+
   useEffect(() => {
     const timeLimit =
       (dps.reduce((total, { questions }) => (total += questions.length), 0) +
@@ -150,7 +156,7 @@ function ExamSidebar({
         {!isSubmitting && (
           <div
             onClick={() => {
-              setEnd(true);
+              clickHandle();
             }}
             className="hover:cursor-pointer click-action flex-1 flex items-center justify-center"
           >
@@ -158,8 +164,10 @@ function ExamSidebar({
           </div>
         )}
       </div>
+      <ConfirmModal open={openModal} setOpen={setOpenModal} content={"Do you want to finish the exam?"} onConfirm={()=>{setEnd(true)}} />
     </div>
   );
 }
+
 
 export default ExamSidebar;

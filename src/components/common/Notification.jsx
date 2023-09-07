@@ -1,8 +1,23 @@
-import { Fragment } from 'react'
-import { Transition } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/20/solid'
+import { Fragment, useEffect, useState } from "react";
+import { Transition } from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/20/solid";
+import { useNotification } from "../../providers/notificationProvider";
 
-function Notification({show, setShow}) {
+function Notification() {
+  const { openNotification, setOpenNotification, notificationText } =
+    useNotification();
+
+  const [timer, setTimer] = useState();
+  useEffect(() => {
+    if (openNotification)
+      setTimer(
+        setTimeout(() => {
+          setOpenNotification(false);
+        }, 5000)
+      );
+    else clearTimeout(timer);
+  }, [openNotification, setOpenNotification, timer]);
+
   return (
     <div
       aria-live="assertive"
@@ -11,7 +26,7 @@ function Notification({show, setShow}) {
       <div className="flex w-full flex-col items-center space-y-4">
         {/* Notification panel, dynamically insert this into the live region when it needs to be displayed */}
         <Transition
-          show={show}
+          show={openNotification}
           as={Fragment}
           enter="transform ease-out duration-300 transition"
           enterFrom="translate-y-2 opacity-0"
@@ -25,13 +40,7 @@ function Notification({show, setShow}) {
               <div className="flex relative p-4">
                 <div className="flex flex-col w-0 flex-1 justify-between">
                   <p className="text-sm font-medium text-gray-900">
-                    Last attempted : 6 days ago
-                  </p>
-                  <p className="text-sm font-medium text-gray-900">
-                    Last score : 10/20
-                  </p>
-                  <p className="text-sm font-medium text-gray-900">
-                    Success rate : 32% of users score 20/20
+                    {notificationText}
                   </p>
                 </div>
                 <div className="absolute top-0 right-0">
@@ -39,7 +48,7 @@ function Notification({show, setShow}) {
                     type="button"
                     className="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                     onClick={() => {
-                      setShow(false);
+                      setOpenNotification(false);
                     }}
                   >
                     <span className="sr-only">Close</span>
@@ -52,8 +61,7 @@ function Notification({show, setShow}) {
         </Transition>
       </div>
     </div>
-
-  )
+  );
 }
 
-export default Notification
+export default Notification;

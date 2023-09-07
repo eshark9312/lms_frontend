@@ -59,8 +59,16 @@ function DpCardSimple({
     }, [question, _answer]);
 
     const [openConfirmModal, setOpenConfirmModal] = useState(false);
+    const [openConfirmNumberOfAnswerModal, setOpenConfirmNumberOfAnswerModal] = useState(false);
     const handleClick = () => {
-      if (answer) setOpenConfirmModal(true);
+      if (answer)
+        if (
+          question.answers.length > 7 &&                                    // it is long question
+          answer.filter((_) => _).length !==
+            question.answers.filter(({ answer }) => answer).length
+        )
+          setOpenConfirmNumberOfAnswerModal(true);
+        else setOpenConfirmModal(true);
     };
     const onConfirm = () => {
       next(answer);
@@ -144,6 +152,12 @@ function DpCardSimple({
           setOpen={setOpenConfirmModal}
           onConfirm={onConfirm}
         />
+        <ConfirmModal
+        open={openConfirmNumberOfAnswerModal}
+        setOpen={setOpenConfirmNumberOfAnswerModal}
+        content={`You must select ${question.answers.filter(({ answer }) => answer).length} answers!`}
+        withOutCancel
+      />
       </>
     );
   };

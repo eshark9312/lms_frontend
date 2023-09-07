@@ -12,6 +12,9 @@ const DPItem = ({ dp }) => {
   const { setDps, selectedDps, setSelectedDps } = useExam();
   const [isLoading, setIsLoading] = useState(false);
 
+  const [showAllMatieres, setShowAllMatieres] = useState(false);
+  const [showAllItems, setShowAllItems] = useState(false);
+
   const fetchDpAndLoad = async () => {
     const response = await authHttpClient.get(`/dp/withDetails/${dp._id}`);
     setIsLoading(false);
@@ -27,8 +30,8 @@ const DPItem = ({ dp }) => {
   };
 
   const checkHandle = (checked) => {
-    const tempDps = [...selectedDps.filter(_id=>dp._id !== _id)]
-    if(checked) tempDps.push(dp._id);
+    const tempDps = [...selectedDps.filter((_id) => dp._id !== _id)];
+    if (checked) tempDps.push(dp._id);
     setSelectedDps(tempDps);
   };
 
@@ -40,7 +43,7 @@ const DPItem = ({ dp }) => {
           name="remember-me"
           type="checkbox"
           className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600 mr-2"
-          checked={!!selectedDps.find(_id=>dp._id === _id)}
+          checked={!!selectedDps.find((_id) => dp._id === _id)}
           onChange={(e) => {
             checkHandle(e.target.checked);
           }}
@@ -52,26 +55,58 @@ const DPItem = ({ dp }) => {
       </td>
       <td className=" px-3 py-4 text-sm text-gray-500">
         <div className="flex flex-wrap">
-          {dp.matieres.map((matiere) => (
+          {dp.matieres.length > 1 && !showAllMatieres ? (
+            <>
             <div
-              key={matiere._id}
               className="px-2 m-1 max-w-fit border border-gray-400 rounded-md text-[12px]"
             >
-              {matiere.name}
+              {dp.matieres[0].name}
             </div>
-          ))}
+            <div
+              onClick={()=>{setShowAllMatieres(true)}}
+              className="px-2 m-1 max-w-fit text-[12px] hover:cursor-pointer hover:text-primary-600"
+            >
+              {`${dp.matieres.length-1} more`}
+            </div>
+            </>
+          ) : (
+            dp.matieres.map((matiere) => (
+              <div
+                key={matiere._id}
+                className="px-2 m-1 max-w-fit border border-gray-400 rounded-md text-[12px]"
+              >
+                {matiere.name}
+              </div>
+            ))
+          )}
         </div>
       </td>
       <td className=" px-3 py-4 text-sm text-gray-500">
         <div className="flex flex-wrap">
-          {dp.items.map((item) => (
+        {dp.items.length > 1 && !showAllItems ? (
+            <>
             <div
-              key={item._id}
-              className="px-2 m-1 max-w-fit border border-gray-400 rounded-md text-[12px]"
+                className="px-2 m-1 border border-gray-400 rounded-md text-[12px] truncate max-w-[400px]"
+              >
+                {`${dp.items[0].item_number}. ${dp.items[0].name}`}
+              </div>
+            <div
+              onClick={()=>{setShowAllItems(true)}}
+              className="px-2 m-1 max-w-fit text-[12px] hover:cursor-pointer hover:text-primary-600"
             >
-              {`${item.item_number}. ${item.name}`}
+              {`${dp.items.length-1} more`}
             </div>
-          ))}
+            </>
+          ) : (
+            dp.items.map((item) => (
+              <div
+                key={item._id}
+                className="px-2 m-1 border border-gray-400 rounded-md text-[12px] truncate max-w-[400px]"
+              >
+                {`${item.item_number}. ${item.name}`}
+              </div>
+            ))
+          )}
         </div>
       </td>
       <td className=" px-3 py-1 text-sm text-gray-500 ">

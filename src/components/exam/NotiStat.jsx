@@ -1,8 +1,19 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/20/solid'
 
 function NotiStat({show, setShow}) {
+  const [timer, setTimer] = useState();
+  useEffect(() => {
+    console.log("show: ", show, "timer: ", timer);
+    if (show)
+      setTimer(
+        setTimeout(() => {
+          setShow(false);
+        }, 5000)
+      );
+    else clearTimeout(timer);
+  }, [show, setShow]);
   return (
     <div
       aria-live="assertive"

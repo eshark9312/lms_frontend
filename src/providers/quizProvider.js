@@ -1,5 +1,4 @@
 import { createContext, useState } from "react";
-import useAuthHttpClient from "../hooks/useAuthHttpClient";
 
 const parseQuestion = (question) => {
   let parsedQuestion;
