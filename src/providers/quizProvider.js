@@ -1,3 +1,4 @@
+import { differenceInDays, format } from "date-fns";
 import { createContext, useState } from "react";
 
 const parseQuestion = (question) => {
@@ -14,9 +15,15 @@ const parseQuestion = (question) => {
         type: question.__t,
         tags: question.tags,
         statistics: {
-          lastAttempt: "6 days ago",
-          lastScore: 10,
-          successRate: 32,
+          lastAttempt: question.score
+            ? `${differenceInDays(Date.now(), new Date(question.score.last_assess))}days ago`
+            : "",
+          lastScore: question.score? `${question.score.user_score}/${question.score.total_score}` : "",
+          successRate: question.statistics.total
+            ? Math.round(
+                (question.statistics.success / question.statistics.total) * 100
+              )
+            : 0,
         },
         content: question.question,
         choices: question.answers.map(({ choice }) => choice),
@@ -31,11 +38,17 @@ const parseQuestion = (question) => {
         src: "Référentiel de Neurologie 2018, p.289",
         // type: question.type,
         type: question.__t,
-        tags: question.tags,
+        tags: question.tags.map(({ name }) => name),
         statistics: {
-          lastAttempt: "6 days ago",
-          lastScore: 10,
-          successRate: 32,
+          lastAttempt: question.score
+            ? `${differenceInDays(Date.now(), new Date(question.score.last_assess))}days ago`
+            : "",
+          lastScore: question.score? `${question.score.user_score}/${question.score.total_score}` : "",
+          successRate: question.statistics.total
+            ? Math.round(
+                (question.statistics.success / question.statistics.total) * 100
+              )
+            : 0,
         },
         content: question.question,
         choices: question.answers.map((choice) => choice),
@@ -52,9 +65,15 @@ const parseQuestion = (question) => {
         type: question.__t,
         tags: question.tags,
         statistics: {
-          lastAttempt: "6 days ago",
-          lastScore: 10,
-          successRate: 32,
+          lastAttempt: question.score
+            ? `${differenceInDays(Date.now(), new Date(question.score.last_assess))}days ago`
+            : "",
+          lastScore: question.score? `${question.score.user_score}/${question.score.total_score}` : "",
+          successRate: question.statistics.total
+            ? Math.round(
+                (question.statistics.success / question.statistics.total) * 100
+              )
+            : 0,
         },
         content: question.question,
       };
@@ -65,13 +84,14 @@ const parseQuestion = (question) => {
   return parsedQuestion;
 };
 export const QuizContextProvider = (props) => {
-  const [selectedQuestions, setSelectedQuestions] = useState([])   //only ids , it is for exam/test with saved questions
+  const [selectedQuestions, setSelectedQuestions] = useState([]); //only ids , it is for exam/test with saved questions
   const [questions, setQuestions] = useState([]);
   const [openTakeTestModal, setOpenTakeTestModal] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState()
+  const [currentQuestion, setCurrentQuestion] = useState();
   const [selectedMatiere, setSelectedMatiere] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const loadQuestions = (rawQuestions) => {
+    console.log(rawQuestions);
     setQuestions(rawQuestions.map(parseQuestion));
   };
   const value = {

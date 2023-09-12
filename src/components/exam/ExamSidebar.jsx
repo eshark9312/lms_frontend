@@ -153,7 +153,6 @@ function ExamSidebar({
         )}
       </div>
       <div className="bg-[#203772] text-center text-white p-8 flex">
-        {!isSubmitting && (
           <div
             onClick={() => {
               clickHandle();
@@ -162,7 +161,6 @@ function ExamSidebar({
           >
             {isSubmitting ? <Spinner small center /> : "TERMINER"}
           </div>
-        )}
       </div>
       <ConfirmModal open={openModal} setOpen={setOpenModal} content={"Do you want to finish the exam?"} onConfirm={()=>{setEnd(true)}} />
     </div>

@@ -21,6 +21,7 @@ import { useQuiz } from "../../hooks/useQuiz";
 import { useNotification } from "../../providers/notificationProvider";
 
 function QuestionCard({ question: _question, setQuestions, index, next }) {
+  console.log("question: ",_question)
   const { setCurrentQuestion } = useQuiz();
   const { user } = useAuth();
   const authHttpClient = useAuthHttpClient();
@@ -112,14 +113,14 @@ function QuestionCard({ question: _question, setQuestions, index, next }) {
   const showRef = () => {
     showNotification(
       `Source : Référentiel de Neurologie 2018, p.289
-      Tags : #VIèmepaire`
+      Tags : ${question.tags.join(', ')}`
     );
   };
   const showStatistics = () => {
     showNotification(
-      `Last attempted : 6 days ago
-      Last score : 10/20
-      Success rate : 32% of users score 20/20`
+      `Last attempted : ${question.statistics.lastAttempt}
+      Last score : ${question.statistics.lastScore}
+      Success rate : ${question.statistics.successRate}% of users score 20/20`
     );
   };
 

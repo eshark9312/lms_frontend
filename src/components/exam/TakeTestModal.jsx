@@ -30,7 +30,7 @@ export default function TakeTestModal() {
   const [isUploading, setIsUploading] = useState(false);
   const [counting, setCounting] = useState(false);
   const [rank, setRank] = useState("A"); // Rang: A, B, All
-  const [history, setHistory] = useState("Tried"); // Never tried, Both
+  const [history, setHistory] = useState("Tried"); // Tried, Never tried, Both
   const [n_questions, setN_questions] = useState(1);
   const [total_questions, setTotalQuestions] = useState(1);
   const [modeExam, setEnabled] = useState(false);
@@ -50,7 +50,6 @@ export default function TakeTestModal() {
       setIsUploading(false);
       setOpenTakeTestModal(false);
       if (modeExam) {
-        alert("exam mode");
         setQuestions(response.data.data);
         navigator("/exam");
       } else {

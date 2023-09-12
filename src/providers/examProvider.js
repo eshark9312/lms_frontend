@@ -16,41 +16,47 @@ export const ExamContextProvider = (props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitAnswers = async () => {
-    setIsSubmitting(true);
-    const resultDps = [];
-    const resultQis = [];
-    for (let i = 0; i < dps.length; i++) {
-      const answers = dps[i].questions.map(({ userAnswer }) => userAnswer);
-      console.log(answers);
-      const response = await authHttpClient.post("/answer/dp/", {
-        user_id: user._id,
-        dp_id: dps[i]._id,
-        answers,
-      });
-      resultDps.push(response.data.data);
+    try {
+      setIsSubmitting(true);
+      const resultDps = [];
+      const resultQis = [];
+      for (let i = 0; i < dps.length; i++) {
+        const answers = dps[i].questions.map(({ userAnswer }) => userAnswer);
+        console.log(answers);
+        const response = await authHttpClient.post("/answer/dp/", {
+          user_id: user._id,
+          dp_id: dps[i]._id,
+          answers,
+        });
+        resultDps.push(response.data.data);
+      }
+      for (let i = 0; i < questions.length; i++) {
+        const answer = questions[i].userAnswer;
+        const response = await authHttpClient.post("/answer", {
+          user_id: user._id,
+          question: {
+            question_id: questions[i]._id,
+          },
+          answer,
+        });
+        resultQis.push({
+          ...response.data.data.question,
+          user_score: response.data.data.score,
+          userAnswer: answer,
+          lastScore: response.data.data.lastScore,
+          lastAttempt: response.data.data.lastAttempt,
+          total_score: response.data.data.total_score
+        });
+      }
+      setDps([]);
+      setQuestions([]);
+      setResult({ dps: resultDps, questions: resultQis });
+      setIsSubmitting(false);
+      navigator("/result/");
+    } catch (e) {
+      console.log(e);
+      setIsSubmitting(false);
     }
-    for (let i = 0; i < questions.length; i++) {
-      const answer = questions[i].userAnswer;
-      const response = await authHttpClient.post("/answer", {
-        user_id: user._id,
-        question: {
-          question_id: questions[i]._id,
-          type: questions[i].__t,
-        },
-        answer,
-      });
-      resultQis.push({
-        ...response.data.data.question,
-        user_score: response.data.data.score,
-        userAnswer: answer,
-        total_score: 20,
-      });
-    }
-    setDps([]);
-    setQuestions([]);
-    setResult({ dps: resultDps, questions: resultQis });
-    setIsSubmitting(false);
-    navigator("/result/");
   };
   const value = {
     isSubmitting,
