@@ -22,10 +22,6 @@ import { Spinner } from "../../../icons/Spinner";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox, Switch } from "@headlessui/react";
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
-
 const colors = [
   "primary",
   "red",

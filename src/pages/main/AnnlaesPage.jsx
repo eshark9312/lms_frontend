@@ -39,20 +39,29 @@ function AnnalesPage() {
   const authHttpClient = useAuthHttpClient();
   const navigator = useNavigate();
   const pages = [{ name: "Annales", href: "/annales/", current: true }];
-  const { selectedDps, setDps } = useExam();
+  const { selectedDps, setDps, selectedQuestions, setQuestions } = useExam();
   const [isLoading, setIsLoading] = useState(false);
   const createExam = () => {
     setIsLoading(true);
     fetchDpAndLoad();
   };
   const fetchDpAndLoad = async () => {
-    setDps([]);
+    const tempDps = [];
+    const tempQuestions = [];
     for (let i = 0; i < selectedDps.length; i++) {
       const response = await authHttpClient.get(
         `/dp/withDetails/${selectedDps[i]}`
       );
-      setDps((dps) => [...dps, response.data.data]);
+      tempDps.push(response.data.data);
     }
+    for (let i = 0; i < selectedQuestions.length; i++) {
+      const response = await authHttpClient.get(
+        `/question/${selectedQuestions[i]}`
+      );
+      tempQuestions.push(response.data.data);
+    }
+    setDps(tempDps);
+    setQuestions(tempQuestions);
     setIsLoading(false);
     // var win = window.open("/exam/", '_blank');
     // win.focus();
@@ -67,19 +76,25 @@ function AnnalesPage() {
       <div className="flex justify-between">
         <div className="text-3xl font-bold">Annales</div>
         <div className="flex gap-4 items-center">
-          {selectedDps.length > 0 && (
-            <div>
-              {`${selectedDps.length} ${
-                selectedDps.length > 1 ? "DPs" : "DP"
-              } selected`}
-            </div>
-          )}
+          <div>
+            {selectedDps.length > 0 &&
+              `${selectedDps.length}${
+                selectedDps.length > 1 ? " DPs " : " DP "
+              }`}
+            {selectedDps.length > 0 && selectedQuestions.length > 0 && "and "}
+            {selectedQuestions.length > 0 &&
+              `${selectedQuestions.length}${
+                selectedQuestions.length > 1 ? " Questions " : " Question "
+              }`}
+            {(selectedDps.length > 0 || selectedQuestions > 0) && `selected`}
+          </div>
           <div
             onClick={() => {
-              selectedDps.length > 0 && createExam();
+              (selectedDps.length > 0 || selectedQuestions.length > 0) &&
+                createExam();
             }}
             className={`${
-              selectedDps.length > 0
+              selectedDps.length > 0 || selectedQuestions.length > 0
                 ? "text-primary-600 border-primary-600 "
                 : "text-gray-300 border-gray-300 "
             } py-1.5 border-2 rounded-full flex gap-2 font-extrabold items-center px-4 click-action hover:cursor-pointer`}

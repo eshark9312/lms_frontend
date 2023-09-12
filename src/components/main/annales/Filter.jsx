@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { Combobox, Popover, Transition } from "@headlessui/react";
+import { Combobox, Popover, Switch, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 
 import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
@@ -298,14 +298,13 @@ export default function Filter({ filter, setFilter }) {
               )}
             </div>
           </Combobox>
-
           <div className="mt-4 flex flex-row-reverse gap-2">
             <button
               onClick={() => {
                 clickHandle();
               }}
               type="button"
-              className="click-action inline-flex justify-between border-2 border-gray-300 items-center gap-x-1.5 rounded-md  px-2.5 py-1.5 text-sm hover:border-primary-600 hover:text-primary-600"
+              className="click-action inline-flex justify-between border-2 border-gray-300 items-center gap-x-1.5 rounded-md  px-2.5 py-1.5 text-sm hover:bg-primary-600 hover:text-gray-50 hover:border-primary-600 text-primary-600 font-bold"
             >
               Apply
             </button>

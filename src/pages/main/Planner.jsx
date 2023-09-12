@@ -293,7 +293,6 @@ const events = [
     desc: "",
   },
 ];
-
 function PlannerPage() {
   const [view, setView] = useState("Day view");
   const [today, setToday] = useState(startOfToday());

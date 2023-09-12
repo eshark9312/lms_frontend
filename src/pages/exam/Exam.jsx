@@ -4,7 +4,6 @@ import QuestionCardSimple from "../../components/exam/QuestionCardSimple";
 import { useNavigate } from "react-router-dom";
 import { useExam } from "../../providers/examProvider";
 import DpCardSimple from "../../components/exam/DpCardSimple";
-import Modal from "../../components/common/Modal";
 
 export default function ExamPage() {
   console.log("examPage");
@@ -18,7 +17,7 @@ export default function ExamPage() {
 
   useEffect(() => {
     end && submitAnswers();
-  }, [end, submitAnswers]);
+  }, [end]);
 
   const setAnswer = (answer) => {
     console.log(answer);

@@ -19,6 +19,9 @@ export default function ExamResultPage() {
       } else if (currentDp < result.dps.length - 1) {
         setCurrentDp(currentDp + 1);
         setCurrentQuestion(0);
+      } else {
+        setDpOrQuestion("question")
+        setCurrentQuestion(0)
       }
     } else if (currentQuestion < result.questions.length - 1)
       setCurrentQuestion(currentQuestion + 1);

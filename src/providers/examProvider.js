@@ -16,6 +16,7 @@ export const ExamContextProvider = (props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitAnswers = async () => {
+    console.log('submitAnswers')
     try {
       setIsSubmitting(true);
       const resultDps = [];
