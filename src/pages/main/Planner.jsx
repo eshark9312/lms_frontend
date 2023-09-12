@@ -20,280 +20,307 @@ import DayView from "../../components/main/planner/dayView";
 import WeekView from "../../components/main/planner/weekView";
 import MonthView from "../../components/main/planner/monthView";
 import AddEventModal from "../../components/main/planner/addEventModal";
+import { useAuth } from "../../providers/authProvider";
+import useAuthHttpClient from "../../hooks/useAuthHttpClient";
+import { useNotification } from "../../providers/notificationProvider";
 
-const events = [
-  {
-    type: "matiere",
-    id: 12,
-    title: "Cardiologie",
-    date: "2023-08-01",
-    from: "17:00",
-    to: "18:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 14,
-    title: "Pneumologie",
-    date: "2023-08-01",
-    from: "13:00",
-    to: "16:00",
-    desc: "",
-  },
-  {
-    type: "item",
-    id: 1,
-    title: "188. Endocardite infectieuse",
-    date: "2023-08-01",
-    from: "9:00",
-    to: "10:00",
-    desc: "here some description you added",
-  },
-  {
-    type: "item",
-    id: 2,
-    title: "152. Endocardite infectieuse",
-    date: "2023-08-01",
-    from: "10:00",
-    to: "11:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 12,
-    title: "Cardiologie",
-    date: "2023-08-02",
-    from: "14:00",
-    to: "15:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 14,
-    title: "Pneumologie",
-    date: "2023-08-02",
-    from: "9:00",
-    to: "12:00",
-    desc: "",
-  },
-  {
-    type: "item",
-    id: 1,
-    title: "188. Endocardite infectieuse",
-    date: "2023-08-02",
-    from: "12:00",
-    to: "13:00",
-    desc: "here some description you added",
-  },
-  {
-    type: "item",
-    id: 2,
-    title: "152. Endocardite infectieuse",
-    date: "2023-08-03",
-    from: "7:00",
-    to: "8:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 12,
-    title: "Cardiologie",
-    date: "2023-08-03",
-    from: "9:00",
-    to: "10:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 14,
-    title: "Pneumologie",
-    date: "2023-08-03",
-    from: "14:00",
-    to: "16:00",
-    desc: "",
-  },
-  {
-    type: "item",
-    id: 1,
-    title: "188. Endocardite infectieuse",
-    date: "2023-08-03",
-    from: "16:00",
-    to: "17:00",
-    desc: "here some description you added",
-  },
-  {
-    type: "item",
-    id: 2,
-    title: "152. Endocardite infectieuse",
-    date: "2023-08-05",
-    from: "10:00",
-    to: "11:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 12,
-    title: "Cardiologie",
-    date: "2023-08-05",
-    from: "19:00",
-    to: "21:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 14,
-    title: "Pneumologie",
-    date: "2023-08-05",
-    from: "6:00",
-    to: "8:00",
-    desc: "",
-  },
-  {
-    type: "item",
-    id: 1,
-    title: "188. Endocardite infectieuse",
-    date: "2023-08-05",
-    from: "13:00",
-    to: "14:00",
-    desc: "here some description you added",
-  },
-  {
-    type: "item",
-    id: 2,
-    title: "152. Endocardite infectieuse",
-    date: "2023-08-05",
-    from: "17:00",
-    to: "18:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 12,
-    title: "Cardiologie",
-    date: "2023-07-25",
-    from: "17:00",
-    to: "18:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 14,
-    title: "Pneumologie",
-    date: "2023-07-25",
-    from: "13:00",
-    to: "16:00",
-    desc: "",
-  },
-  {
-    type: "item",
-    id: 1,
-    title: "188. Endocardite infectieuse",
-    date: "2023-07-25",
-    from: "9:00",
-    to: "10:00",
-    desc: "here some description you added",
-  },
-  {
-    type: "item",
-    id: 2,
-    title: "152. Endocardite infectieuse",
-    date: "2023-07-25",
-    from: "10:00",
-    to: "11:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 12,
-    title: "Cardiologie",
-    date: "2023-07-26",
-    from: "14:00",
-    to: "15:00",
-    desc: "",
-  },
-  {
-    type: "item",
-    id: 2,
-    title: "152. Endocardite infectieuse",
-    date: "2023-07-27",
-    from: "7:00",
-    to: "8:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 12,
-    title: "Cardiologie",
-    date: "2023-07-27",
-    from: "9:00",
-    to: "10:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 14,
-    title: "Pneumologie",
-    date: "2023-07-27",
-    from: "14:00",
-    to: "16:00",
-    desc: "",
-  },
-  {
-    type: "item",
-    id: 1,
-    title: "188. Endocardite infectieuse",
-    date: "2023-07-27",
-    from: "16:00",
-    to: "17:00",
-    desc: "here some description you added",
-  },
-  {
-    type: "item",
-    id: 2,
-    title: "152. Endocardite infectieuse",
-    date: "2023-07-28",
-    from: "10:00",
-    to: "11:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 12,
-    title: "Cardiologie",
-    date: "2023-07-28",
-    from: "19:00",
-    to: "21:00",
-    desc: "",
-  },
-  {
-    type: "matiere",
-    id: 14,
-    title: "Pneumologie",
-    date: "2023-07-28",
-    from: "6:00",
-    to: "8:00",
-    desc: "",
-  },
-  {
-    type: "item",
-    id: 1,
-    title: "188. Endocardite infectieuse",
-    date: "2023-07-28",
-    from: "13:00",
-    to: "14:00",
-    desc: "here some description you added",
-  },
-  {
-    type: "item",
-    id: 2,
-    title: "152. Endocardite infectieuse",
-    date: "2023-07-28",
-    from: "17:00",
-    to: "18:00",
-    desc: "",
-  },
-];
+// const events = [
+//   {
+//     type: "matiere",
+//     id: 12,
+//     title: "Cardiologie",
+//     date: "2023-08-01",
+//     from: "17:00",
+//     to: "18:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 14,
+//     title: "Pneumologie",
+//     date: "2023-08-01",
+//     from: "13:00",
+//     to: "16:00",
+//     desc: "",
+//   },
+//   {
+//     type: "item",
+//     id: 1,
+//     title: "188. Endocardite infectieuse",
+//     date: "2023-08-01",
+//     from: "9:00",
+//     to: "10:00",
+//     desc: "here some description you added",
+//   },
+//   {
+//     type: "item",
+//     id: 2,
+//     title: "152. Endocardite infectieuse",
+//     date: "2023-08-01",
+//     from: "10:00",
+//     to: "11:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 12,
+//     title: "Cardiologie",
+//     date: "2023-08-02",
+//     from: "14:00",
+//     to: "15:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 14,
+//     title: "Pneumologie",
+//     date: "2023-08-02",
+//     from: "9:00",
+//     to: "12:00",
+//     desc: "",
+//   },
+//   {
+//     type: "item",
+//     id: 1,
+//     title: "188. Endocardite infectieuse",
+//     date: "2023-08-02",
+//     from: "12:00",
+//     to: "13:00",
+//     desc: "here some description you added",
+//   },
+//   {
+//     type: "item",
+//     id: 2,
+//     title: "152. Endocardite infectieuse",
+//     date: "2023-08-03",
+//     from: "7:00",
+//     to: "8:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 12,
+//     title: "Cardiologie",
+//     date: "2023-08-03",
+//     from: "9:00",
+//     to: "10:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 14,
+//     title: "Pneumologie",
+//     date: "2023-08-03",
+//     from: "14:00",
+//     to: "16:00",
+//     desc: "",
+//   },
+//   {
+//     type: "item",
+//     id: 1,
+//     title: "188. Endocardite infectieuse",
+//     date: "2023-08-03",
+//     from: "16:00",
+//     to: "17:00",
+//     desc: "here some description you added",
+//   },
+//   {
+//     type: "item",
+//     id: 2,
+//     title: "152. Endocardite infectieuse",
+//     date: "2023-08-05",
+//     from: "10:00",
+//     to: "11:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 12,
+//     title: "Cardiologie",
+//     date: "2023-08-05",
+//     from: "19:00",
+//     to: "21:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 14,
+//     title: "Pneumologie",
+//     date: "2023-08-05",
+//     from: "6:00",
+//     to: "8:00",
+//     desc: "",
+//   },
+//   {
+//     type: "item",
+//     id: 1,
+//     title: "188. Endocardite infectieuse",
+//     date: "2023-08-05",
+//     from: "13:00",
+//     to: "14:00",
+//     desc: "here some description you added",
+//   },
+//   {
+//     type: "item",
+//     id: 2,
+//     title: "152. Endocardite infectieuse",
+//     date: "2023-08-05",
+//     from: "17:00",
+//     to: "18:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 12,
+//     title: "Cardiologie",
+//     date: "2023-07-25",
+//     from: "17:00",
+//     to: "18:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 14,
+//     title: "Pneumologie",
+//     date: "2023-07-25",
+//     from: "13:00",
+//     to: "16:00",
+//     desc: "",
+//   },
+//   {
+//     type: "item",
+//     id: 1,
+//     title: "188. Endocardite infectieuse",
+//     date: "2023-07-25",
+//     from: "9:00",
+//     to: "10:00",
+//     desc: "here some description you added",
+//   },
+//   {
+//     type: "item",
+//     id: 2,
+//     title: "152. Endocardite infectieuse",
+//     date: "2023-07-25",
+//     from: "10:00",
+//     to: "11:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 12,
+//     title: "Cardiologie",
+//     date: "2023-07-26",
+//     from: "14:00",
+//     to: "15:00",
+//     desc: "",
+//   },
+//   {
+//     type: "item",
+//     id: 2,
+//     title: "152. Endocardite infectieuse",
+//     date: "2023-07-27",
+//     from: "7:00",
+//     to: "8:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 12,
+//     title: "Cardiologie",
+//     date: "2023-07-27",
+//     from: "9:00",
+//     to: "10:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 14,
+//     title: "Pneumologie",
+//     date: "2023-07-27",
+//     from: "14:00",
+//     to: "16:00",
+//     desc: "",
+//   },
+//   {
+//     type: "item",
+//     id: 1,
+//     title: "188. Endocardite infectieuse",
+//     date: "2023-07-27",
+//     from: "16:00",
+//     to: "17:00",
+//     desc: "here some description you added",
+//   },
+//   {
+//     type: "item",
+//     id: 2,
+//     title: "152. Endocardite infectieuse",
+//     date: "2023-07-28",
+//     from: "10:00",
+//     to: "11:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 12,
+//     title: "Cardiologie",
+//     date: "2023-07-28",
+//     from: "19:00",
+//     to: "21:00",
+//     desc: "",
+//   },
+//   {
+//     type: "matiere",
+//     id: 14,
+//     title: "Pneumologie",
+//     date: "2023-07-28",
+//     from: "6:00",
+//     to: "8:00",
+//     desc: "",
+//   },
+//   {
+//     type: "item",
+//     id: 1,
+//     title: "188. Endocardite infectieuse",
+//     date: "2023-07-28",
+//     from: "13:00",
+//     to: "14:00",
+//     desc: "here some description you added",
+//   },
+//   {
+//     type: "item",
+//     id: 2,
+//     title: "152. Endocardite infectieuse",
+//     date: "2023-07-28",
+//     from: "17:00",
+//     to: "18:00",
+//     desc: "",
+//   },
+// ];
 function PlannerPage() {
+  const { user } = useAuth();
+  const authHttpClient = useAuthHttpClient();
+  const { showNotification } = useNotification();
+  const [events, setEvents] = useState([]);
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const response = await authHttpClient.post("/schedule/filter/", {
+        user_id: user._id,
+      });
+      console.log(response);
+      setEvents(
+        response.data.data.map((event) => ({
+          type: event.MatiereOrItem,
+          title: event.matiere_or_item_id.name,
+          date: format(new Date(event.from), "yyyy-MM-dd"),
+          from: format(new Date(event.from), "HH:mm"),
+          to: format(new Date(event.to), "HH:mm"),
+          desc: event.desc,
+        }))
+      );
+    };
+    fetchEvents();
+  }, []);
+
   const [view, setView] = useState("Day view");
   const [today, setToday] = useState(startOfToday());
   const [selectedDay, setSelectedDay] = useState(today);
@@ -313,26 +340,29 @@ function PlannerPage() {
       events.filter((event) =>
         isSameDay(parse(event.date, "yyyy-MM-dd", new Date()), selectedDay)
       ),
-    [selectedDay]
+    [selectedDay, events]
   );
   const weeklyEvents = useMemo(
     () =>
       events.filter((event) =>
         isSameWeek(parse(event.date, "yyyy-MM-dd", new Date()), selectedDay)
       ),
-    [selectedDay]
+    [selectedDay, events]
   );
   const monthlyEvents = useMemo(
     () =>
       events.filter((event) =>
-        isSameMonth(parse(event.date, "yyyy-MM-dd", new Date()), firstDayCurrentMonth)
+        isSameMonth(
+          parse(event.date, "yyyy-MM-dd", new Date()),
+          firstDayCurrentMonth
+        )
       ),
-    [firstDayCurrentMonth]
+    [firstDayCurrentMonth, events]
   );
 
-  const [open, setOpen]= useState(false)
+  const [open, setOpen] = useState(false);
   const addEvent = () => {
-    setOpen(true)
+    setOpen(true);
   };
 
   const goToToday = () => {
@@ -475,7 +505,7 @@ function PlannerPage() {
           />
         )}
       </div>
-      <AddEventModal open={open} setOpen={setOpen}/>
+      <AddEventModal open={open} setOpen={setOpen} />
     </div>
   );
 }
