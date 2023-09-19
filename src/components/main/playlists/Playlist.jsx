@@ -229,7 +229,7 @@ function Playlist({ playlist }) {
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
                   {questions.map((question) => (
-                    <QuestionItem question={question} key={question.question_id} refresh={fetchQuestions()}/>
+                    <QuestionItem question={question} key={question.question_id} refresh={fetchQuestions}/>
                   ))}
                 </tbody>
               </table>

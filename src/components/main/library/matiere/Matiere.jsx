@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Tabs from "../../Tabs";
 import Breadcrumb from "../../Breadcrumb";
 import {
@@ -14,19 +14,24 @@ import Toolbox from "./Toolbox";
 import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
 import { Spinner } from "../../../icons/Spinner";
 import { useQuiz } from "../../../../hooks/useQuiz";
+import ConfirmModal from "../../../common/ConfirmModal";
 
 const Matiere = () => {
+  const { id } = useParams();
+  const navigator = useNavigate();
   const authHttpClient = useAuthHttpClient();
-  const { setOpenTakeTestModal, setSelectedMatiere, setSelectedItem } =
-    useQuiz();
+  const {
+    setOpenTakeTestModal,
+    setSelectedMatiere,
+    setSelectedItem,
+    selectedQuestions,
+    loadQuestions,
+  } = useQuiz();
   const [matiere, setMatiere] = useState();
   const [isLoading, setIsLoading] = useState(true);
-  const { id } = useParams();
-  const createTest = () => {
-    setSelectedMatiere(id);
-    setSelectedItem(null);
-    setOpenTakeTestModal(true);
-  };
+  const [preparingTest, setPreparingTest] = useState(false);
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -65,6 +70,54 @@ const Matiere = () => {
     { name: "Library", href: "/library/", current: false },
     { name: matiere?.name, href: "#", current: true },
   ];
+
+  const createTest = () => {
+    if (!selectedQuestions.length) {
+      setSelectedMatiere(id);
+      setSelectedItem(null);
+      setOpenTakeTestModal(true);
+    } else {
+      setOpenConfirmModal(true);
+    }
+  };
+
+  const testFromPlaylist = () => {
+    fetchQuestions();
+  };
+
+  const fetchQuestions = async () => {
+    setPreparingTest(true);
+    const questions = [];
+    for (let i = 0; i < selectedQuestions.length; i++) {
+      const response = await authHttpClient.get(
+        `question/${selectedQuestions[i]}`
+      );
+      questions.push(response.data.data);
+    }
+    setPreparingTest(false);
+    console.log(questions);
+    loadQuestions(questions);
+    navigator("/quiz");
+  };
+
+  const CreateTestButton = () => {
+    return (
+      <div className="flex gap-4">
+        <div
+          onClick={() => !preparingTest && createTest()}
+          className="border-2 border-primary-600 rounded-full text-primary-600 flex gap-2 font-extrabold items-center px-4 click-action hover:cursor-pointer click-action py-1.5"
+        >
+          {preparingTest ? (
+            <Spinner small center />
+          ) : (
+            <AcademicCapIcon className="w-6 h-6" />
+          )}
+          <p>Create a test</p>
+        </div>
+      </div>
+    );
+  };
+  
   return (
     <div>
       <div className="-mt-4 mb-6">
@@ -79,18 +132,9 @@ const Matiere = () => {
           />
           <p className="flex-1 truncate">{matiere?.name}</p>
         </div>
-        <div className="flex gap-4">
-          <div
-            onClick={() => createTest()}
-            className="border-2 border-primary-600 rounded-full text-primary-600 flex gap-2 font-extrabold items-center px-4 click-action hover:cursor-pointer click-action py-1.5"
-          >
-            <AcademicCapIcon className="w-6 h-6" />
-            <p>Create a test</p>
-          </div>
-        </div>
+        <CreateTestButton />
       </div>
       <Tabs tabs={tabs} setCurrentTab={setCurrentTab} />
-
       {isLoading ? (
         <div
           role="status"
@@ -114,6 +158,14 @@ const Matiere = () => {
           )}
         </div>
       )}
+      <ConfirmModal
+        open={openConfirmModal}
+        setOpen={setOpenConfirmModal}
+        content={`Do you want to take the test with ${selectedQuestions.length} questions from this playlist?`}
+        onConfirm={() => {
+          testFromPlaylist();
+        }}
+      />
     </div>
   );
 };
