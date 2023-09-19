@@ -58,23 +58,24 @@ function SavedQuestions({ item_id }) {
     setSort(tempSort);
   };
 
+  const fetchQuestions = async () => {
+    try {
+      const response = await authHttpClient.post(`/playlist/getPage`, {
+        user_id: user._id,
+        item_id: item_id,
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+        sort,
+      });
+      setTotalNumber(response.data.total_number);
+      setQuestions(response.data.data);
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        const response = await authHttpClient.post(`/playlist/getPage`, {
-          user_id: user._id,
-          item_id: item_id,
-          pageNumber: pageNumber,
-          pageSize: pageSize,
-          sort,
-        });
-        setTotalNumber(response.data.total_number);
-        setQuestions(response.data.data);
-        setIsLoading(false);
-      } catch (error) {
-        console.log(error);
-      }
-    };
     fetchQuestions();
   }, [pageSize, pageNumber, sort]);
 
@@ -193,7 +194,7 @@ function SavedQuestions({ item_id }) {
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {questions.map((question) => (
-                <QuestionItem question={question} key={question.question_id} />
+                <QuestionItem question={question} key={question.question_id} refresh={fetchQuestions()}/>
               ))}
             </tbody>
           </table>
