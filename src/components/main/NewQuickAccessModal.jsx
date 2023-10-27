@@ -5,6 +5,7 @@ import Modal from "../common/Modal";
 import { Spinner } from "../icons/Spinner";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox } from "@headlessui/react";
+import { useData } from "../../providers/learningDataProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -17,10 +18,10 @@ export default function NewQuickAccessModal({
 }) {
   const { user } = useAuth();
   const authHttpClient = useAuthHttpClient();
+  const { matieres } = useData();
 
   const [itemType, setType] = useState("Matiere"); // Matiere, Item
 
-  const [matieres, setMatieres] = useState([]);
   const [selectedMatiere, setSelectedMatiere] = useState(null);
   const [matiereQuery, setMatiereQuery] = useState("");
   const filteredMatieres =
@@ -31,47 +32,23 @@ export default function NewQuickAccessModal({
             .toLowerCase()
             .includes(matiereQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchMatieres = async () => {
-      try {
-        const response = await authHttpClient.get(`/matiere/`);
-        setMatieres(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    open && fetchMatieres();
-  }, [open]);
 
   const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [itemQuery, setItemQuery] = useState("");
   const filteredItems =
-    itemQuery === ""
-      ? items
-      : items.filter((item) => {
-          console.log(item);
-          return (
-            item.name.toLowerCase().includes(itemQuery.toLowerCase()) ||
-            String(item.item_number).includes(itemQuery.toLowerCase())
-          );
-        });
-  useEffect(() => {
-    const fetchItems = async () => {
-      const filter = selectedMatiere
-        ? {
-            matiere_id: selectedMatiere._id,
-          }
-        : {};
-      try {
-        const response = await authHttpClient.post(`/item/filter/`, filter);
-        setItems(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    open && fetchItems();
-  }, [selectedMatiere, open]);
+  itemQuery === ""
+    ? items.filter(
+        (item) => !selectedMatiere || item.matiere_id === selectedMatiere
+      )
+    : items.filter((item) => {
+        return (
+          (item.name.toLowerCase().includes(itemQuery.toLowerCase()) ||
+            String(item.item_number).includes(itemQuery.toLowerCase())) &&
+          (!selectedMatiere || item.matiere_id === selectedMatiere)
+        );
+      });
+
 
   useEffect(() => {
     if (!open) {

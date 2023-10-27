@@ -21,6 +21,7 @@ import Modal from "../../../common/Modal";
 import { Spinner } from "../../../icons/Spinner";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox, Switch } from "@headlessui/react";
+import { useData } from "../../../../providers/learningDataProvider";
 
 const colors = [
   "primary",
@@ -37,26 +38,19 @@ const colors = [
   "purple",
 ];
 export default function Sessions() {
-  const { user } = useAuth();
   const authHttpClient = useAuthHttpClient();
-  const [sessions, setSessions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { sessions: allSessions, setSessions } = useData();
   const [openNewSessionModal, setOpenNewSessionModal] = useState(false);
   const [openEditSessionModal, setOpenEditSessionModal] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
 
-  useEffect(() => {
-    const fetchSessions = async () => {
-      try {
-        const response = await authHttpClient.get(`/session/`);
-        setSessions(response.data.data);
-        setIsLoading(false);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchSessions();
-  }, []);
+  const [searchText, setSearchText] = useState("");
+  const sessions =
+    searchText === ""
+      ? allSessions
+      : allSessions.filter(({ name }) =>
+          name.toLowerCase().includes(searchText.toLowerCase())
+        );
 
   return (
     <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
@@ -73,7 +67,7 @@ export default function Sessions() {
             Add New Session
           </button>
           <div className="flex items-center space-x-2">
-            <Search />
+            <Search searchText={searchText} setSearchText={setSearchText} />
           </div>
         </div>
         {sessions.map((session, index) => (

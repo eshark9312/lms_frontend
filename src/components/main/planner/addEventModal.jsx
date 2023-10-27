@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { format, parse } from "date-fns";
 import Modal from "../../common/Modal";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
@@ -7,12 +7,13 @@ import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
 import { useAuth } from "../../../providers/authProvider";
 import { Spinner } from "../../icons/Spinner";
 import { useNotification } from "../../../providers/notificationProvider";
+import { useData } from "../../../providers/learningDataProvider";
+import DatePicker from "tailwind-datepicker-react";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-
-export default function AddEventModal({ open, setOpen }) {
+export default function AddEventModal({ open, setOpen, events, setEvents }) {
   const { user } = useAuth();
   const authHttpClient = useAuthHttpClient();
   const { showNotification } = useNotification();
@@ -23,24 +24,46 @@ export default function AddEventModal({ open, setOpen }) {
   const [itemType, setType] = useState("Matiere"); // Matiere, Item
   const [uploading, setUploading] = useState(false);
 
+  console.log(date);
   const handleClick = () => {
     if (validate()) {
       submit();
     }
   };
 
+  const addEvent = (event) => {
+    const tempEvents = [...events];
+    tempEvents.push(parseEvent(event));
+    setEvents(tempEvents);
+  };
+
+  const parseEvent = (event) => ({
+    id: event.matiere_or_item_id,
+    type: event.MatiereOrItem,
+    title:
+      event.MatiereOrItem === "Matiere"
+        ? matieres.find(({ _id }) => _id === event.matiere_or_item_id)?.name
+        : items.find(({ _id }) => _id === event.matiere_or_item_id)?.name,
+    date: format(new Date(event.from), "yyyy-MM-dd"),
+    from: format(new Date(event.from), "HH:mm"),
+    to: format(new Date(event.to), "HH:mm"),
+    desc: event.desc,
+  });
+
   const submit = async () => {
     setUploading(true);
     try {
-      authHttpClient.post("/schedule/", {
-        from: parse(`${date}:${from}`,"yyyy-MM-dd:HH:mm", new Date()),
-        to: parse(`${date}:${to}`,"yyyy-MM-dd:HH:mm", new Date()),
+      const response = await authHttpClient.post("/schedule/", {
+        from: parse(`${date}:${from}`, "yyyy-MM-dd:HH:mm", new Date()),
+        to: parse(`${date}:${to}`, "yyyy-MM-dd:HH:mm", new Date()),
         user_id: user._id,
         MatiereOrItem: itemType,
         matiere_or_item_id:
           itemType === "Matiere" ? selectedMatiere._id : selectedItem._id,
       });
+      addEvent(response.data.data);
       setOpen(false);
+      setUploading(false);
     } catch (err) {
       console.log(err);
       setUploading(false);
@@ -79,7 +102,7 @@ export default function AddEventModal({ open, setOpen }) {
     return true;
   };
 
-  const [matieres, setMatieres] = useState([]);
+  const { matieres, items } = useData();
   const [selectedMatiere, setSelectedMatiere] = useState(null);
   const [matiereQuery, setMatiereQuery] = useState("");
   const filteredMatieres =
@@ -90,71 +113,80 @@ export default function AddEventModal({ open, setOpen }) {
             .toLowerCase()
             .includes(matiereQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchMatieres = async () => {
-      try {
-        const response = await authHttpClient.get(`/matiere/`);
-        setMatieres(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    open && fetchMatieres();
-  }, [open]);
 
-  const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [itemQuery, setItemQuery] = useState("");
   const filteredItems =
     itemQuery === ""
-      ? items
+      ? items.filter(
+          (item) => !selectedMatiere || item.matiere_id === selectedMatiere._id
+        )
       : items.filter((item) => {
-          console.log(item);
           return (
-            item.name.toLowerCase().includes(itemQuery.toLowerCase()) ||
-            String(item.item_number).includes(itemQuery.toLowerCase())
+            (item.name.toLowerCase().includes(itemQuery.toLowerCase()) ||
+              String(item.item_number).includes(itemQuery.toLowerCase())) &&
+            (!selectedMatiere || item.matiere_id === selectedMatiere._id)
           );
         });
-  useEffect(() => {
-    const fetchItems = async () => {
-      const filter = selectedMatiere
-        ? {
-            matiere_id: selectedMatiere._id,
-          }
-        : {};
-      try {
-        const response = await authHttpClient.post(`/item/filter/`, filter);
-        setItems(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    open && fetchItems();
-  }, [selectedMatiere, open]);
+
+  const [show, setShow] = useState(false);
+  const options = {
+    autoHide: true,
+    todayBtn: true,
+    clearBtn: true,
+    inputDateFormatProp: {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    },
+    theme: {
+      background: "",
+      todayBtn: "bg-primary-600",
+      clearBtn: "",
+      icons: "",
+      text: "",
+      disabledText: "",
+      input: "",
+      inputIcon: "",
+      selected: "bg-primary-600",
+    },
+  };
 
   return (
     <Modal open={open} setOpen={setOpen}>
       <div className="bg-white rounded-xl p-8 border-2 border-gray-400">
+        <input type="text" autofocus="true" className="sr-only" />
         <fieldset>
           <legend className="block text-sm font-medium leading-6 text-gray-900">
             Date and Time
           </legend>
+
           <div className="mt-2 -space-y-px rounded-md bg-white shadow-sm">
             <div>
               <label htmlFor="card-number" className="sr-only">
                 date
               </label>
-              <input
-                type="text"
-                name="date"
-                id="date"
-                value={date}
-                onChange={(e) => {
-                  setDate(e.target.value);
+              <DatePicker
+                show={show}
+                setShow={(state) => setShow(state)}
+                options={options}
+                onChange={(value) => {
+                  setDate(format(value, "yyyy-MM-dd"));
                 }}
-                className="relative block w-full rounded-none rounded-t-md border-0 bg-transparent py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-                placeholder={format(Date.now(), "yyyy-MM-dd")}
-              />
+              >
+                <input
+                  type="text"
+                  name="date"
+                  id="date"
+                  value={date}
+                  onFocus={() => {
+                    setShow(true);
+                  }}
+                  className="relative block w-full rounded-none rounded-t-md border-0 bg-transparent py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                  placeholder={format(Date.now(), "yyyy-MM-dd")}
+                  readOnly
+                />
+              </DatePicker>
             </div>
             <div className="flex -space-x-px">
               <div className="w-1/2 min-w-0 flex-1">
@@ -169,7 +201,7 @@ export default function AddEventModal({ open, setOpen }) {
                   onChange={(e) => {
                     setFrom(e.target.value);
                   }}
-                  className="relative block w-full rounded-none rounded-bl-md border-0 bg-transparent py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                  className="relative block w-full rounded-none rounded-l-md border-0 bg-transparent py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
                   placeholder={format(Date.now(), "HH:00")}
                 />
               </div>
@@ -185,7 +217,7 @@ export default function AddEventModal({ open, setOpen }) {
                   onChange={(e) => {
                     setTo(e.target.value);
                   }}
-                  className="relative block w-full rounded-none rounded-br-md border-0 bg-transparent py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                  className="relative block w-full rounded-none rounded-r-md border-0 bg-transparent py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
                   placeholder={format(Date.now() + 60 * 60 * 1000, "HH:00")}
                 />
               </div>
@@ -196,8 +228,8 @@ export default function AddEventModal({ open, setOpen }) {
           <legend className="block text-sm font-medium leading-6 text-gray-900">
             What are you planning to do?
           </legend>
-          <div className="mt-2 -space-y-px rounded-md shadow-sm">
-            <div className=" flex grid grid-cols-2 border-2 border-primary-600 divide-x-2 divide-primary-600 rounded-lg">
+          <div className="mt-2 mb-4 -space-y-px rounded-md shadow-sm">
+            <div className="grid grid-cols-2 border-2 border-primary-600 divide-x-2 divide-primary-600 rounded-lg">
               <div
                 onClick={() => setType("Matiere")}
                 className={classNames(
@@ -379,6 +411,8 @@ export default function AddEventModal({ open, setOpen }) {
               )}
             </div>
           </div>
+        </fieldset>
+        <fieldset className="mt-6 bg-white">
           <div>
             <button
               onClick={() => {

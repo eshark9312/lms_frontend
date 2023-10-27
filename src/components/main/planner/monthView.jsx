@@ -16,6 +16,7 @@ export default function MonthView({
   events,
   selectedDay,
   setSelectedDay,
+  clickEventHandle,
 }) {
   return (
     <>
@@ -71,7 +72,7 @@ export default function MonthView({
                     {getEvents(events, day.date)
                       .slice(0, 2)
                       .map((event, idx) => (
-                        <li key={idx}>
+                        <li key={idx} onClick={()=>{clickEventHandle()}}>
                           <a href={event.href} className="group flex">
                             <p className="flex-auto truncate font-medium text-gray-900 group-hover:text-primary-600">
                               {event.title}
@@ -155,6 +156,7 @@ export default function MonthView({
             {getEvents(events, selectedDay).map((event, id) => (
               <li
                 key={id}
+                onClick={()=>{clickEventHandle()}}
                 className="group flex p-4 pr-6 focus-within:bg-gray-50 hover:bg-gray-50"
               >
                 <div className="flex-auto">

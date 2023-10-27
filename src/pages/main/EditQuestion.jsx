@@ -3,8 +3,9 @@ import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 import useAuthHttpClient from "../../hooks/useAuthHttpClient";
 import { Spinner } from "../../components/icons/Spinner";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { Combobox } from "@headlessui/react";
+import { Combobox, Switch } from "@headlessui/react";
 import { useParams } from "react-router-dom";
+import { useData } from "../../providers/learningDataProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -12,9 +13,22 @@ function classNames(...classes) {
 function EditQuestionPage() {
   const authHttpClient = useAuthHttpClient();
   const { id } = useParams();
+  const [addToAnnales, setAddToAnnales] = useState(false);
+  const { sessions, matieres, items, tags, cards } = useData();
 
-  const [matieres, setMatieres] = useState([]);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [sessionQuery, setSessionQuery] = useState("");
+  const filteredSessions =
+    sessionQuery === ""
+      ? sessions
+      : sessions.filter((session) => {
+          return session.name
+            .toLowerCase()
+            .includes(sessionQuery.toLowerCase());
+        });
+
   const [selectedMatiere, setSelectedMatiere] = useState(null);
+  const [selectedMatieres, setSelectedMatieres] = useState([]);
   const [matiereQuery, setMatiereQuery] = useState("");
   const filteredMatieres =
     matiereQuery === ""
@@ -24,47 +38,26 @@ function EditQuestionPage() {
             .toLowerCase()
             .includes(matiereQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchMatieres = async () => {
-      try {
-        const response = await authHttpClient.get(`/matiere/`);
-        setMatieres(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchMatieres();
-  }, []);
 
-  const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItems, setSelectedItems] = useState([]);
   const [itemQuery, setItemQuery] = useState("");
   const filteredItems =
     itemQuery === ""
       ? items.filter(
-          (item) => !selectedMatiere || item.matiere_id === selectedMatiere
+          (item) =>
+            addToAnnales ||
+            !selectedMatiere ||
+            item.matiere_id === selectedMatiere._id
         )
       : items.filter((item) => {
           return (
             (item.name.toLowerCase().includes(itemQuery.toLowerCase()) ||
               String(item.item_number).includes(itemQuery.toLowerCase())) &&
-            (!selectedMatiere || item.matiere_id === selectedMatiere)
+            (!selectedMatiere || item.matiere_id === selectedMatiere._id)
           );
         });
-  useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const response = await authHttpClient.post(`/item/filter`, {});
-        console.log(response);
-        setItems(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchItems();
-  }, []);
 
-  const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [tagQuery, setTagQuery] = useState("");
   const filteredTags =
@@ -73,19 +66,7 @@ function EditQuestionPage() {
       : tags.filter((tag) => {
           return tag.name.toLowerCase().includes(tagQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        const response = await authHttpClient.get(`/tag/`);
-        setTags(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchTags();
-  }, []);
 
-  const [cards, setCards] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
   const [cardQuery, setCardQuery] = useState("");
   const filteredCards =
@@ -94,17 +75,6 @@ function EditQuestionPage() {
       : cards.filter((card) => {
           return card.name.toLowerCase().includes(cardQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchCards = async () => {
-      try {
-        const response = await authHttpClient.get(`/card/`);
-        setCards(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchCards();
-  }, []);
 
   const [isUploading, setIsUploading] = useState(false);
   const [newQuestion, setNewQuestion] = useState({});
@@ -132,6 +102,12 @@ function EditQuestionPage() {
         setSelectedItem(response.data.data.item_id);
         setSelectedTags(response.data.data.tags);
         setSelectedCards(response.data.data.cards);
+        if (response.data.data.session_id) {
+          setAddToAnnales(true);
+          setSelectedSession(response.data.data.session_id);
+          setSelectedMatieres(response.data.data.matieres);
+          setSelectedItems(response.data.data.items);
+        }
       } catch (err) {
         console.log(err);
       }
@@ -242,10 +218,15 @@ function EditQuestionPage() {
   };
 
   const validate = () => {
-    if (!newQuestion.matiere_id)
-      setErr((err) => ({ ...err, matiere_id: "required" }));
-    if (!newQuestion.item_id)
-      setErr((err) => ({ ...err, item_id: "required" }));
+    if (addToAnnales) {
+      if (!newQuestion.session_id)
+        setErr((err) => ({ ...err, session_id: "required" }));
+    } else {
+      if (!newQuestion.matiere_id)
+        setErr((err) => ({ ...err, matiere_id: "required" }));
+      if (!newQuestion.item_id)
+        setErr((err) => ({ ...err, item_id: "required" }));
+    }
     if (newQuestion.question_number === "")
       setErr((err) => ({ ...err, question_number: "required" }));
     if (newQuestion.question === "")
@@ -265,13 +246,14 @@ function EditQuestionPage() {
       setErr((err) => ({ ...err, answers: answers }));
     if (
       newQuestion.question &&
-      newQuestion.matiere_id &&
-      newQuestion.item_id &&
-      newQuestion.comment &&
+      (addToAnnales
+        ? newQuestion.session_id
+        : newQuestion.matiere_id && newQuestion.item_id) &&
       answers.filter((_) => _).length === 0
     )
       return true;
-    else return false;
+    console.log("validation failed");
+    return false;
   };
   function onKeyDown(event) {
     if (event.keyCode === 13 && (event.metaKey || event.ctrlKey)) {
@@ -290,176 +272,463 @@ function EditQuestionPage() {
     <div className="flex w-full justify-center">
       <div className="p-10 rounded-lg bg-white sm:w-[900px]">
         <div className="text-xl flex justify-center font-bold">Edit QI</div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 my-2 gap-2">
-          {/*   select matiere   */}
-          <Combobox
-            as="div"
-            value={selectedMatiere}
-            onChange={(matiere_id) => {
-              setSelectedItem(null);
-              setSelectedMatiere(matiere_id);
+        <div className="flex gap-4">
+          <Switch
+            checked={addToAnnales}
+            onChange={() => {
+              setAddToAnnales(!addToAnnales);
             }}
+            className={classNames(
+              addToAnnales ? "bg-primary-600" : "bg-gray-200",
+              "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2"
+            )}
           >
-            <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
-              Select Matiere
-            </Combobox.Label>
-            <div className="relative mt-2">
-              <Combobox.Input
-                className={classNames(
-                  `w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6`,
-                  err.matiere_id && `ring-red-600`
-                )}
-                onChange={(event) => {
-                  setMatiereQuery(event.target.value);
-                }}
-                displayValue={(matiere_id) =>
-                  matieres.find((matiere) => matiere._id === matiere_id)?.name
-                }
-              />
-              <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
-                <ChevronUpDownIcon
-                  className="h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-              </Combobox.Button>
-
-              {filteredMatieres.length > 0 && (
-                <Combobox.Options className="absolute z-50 mt-1 max-h-52 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                  {filteredMatieres.map((matiere) => (
-                    <Combobox.Option
-                      key={matiere._id}
-                      value={matiere._id}
-                      className={({ active }) =>
-                        classNames(
-                          "relative cursor-default select-none py-2 pl-3 pr-9",
-                          active ? "bg-primary-600 text-white" : "text-gray-900"
-                        )
-                      }
-                    >
-                      {({ active, selected }) => (
-                        <>
-                          <div className="flex items-center">
-                            <img
-                              src={matiere.image}
-                              alt={matiere.name}
-                              className="h-6 w-6 flex-shrink-0 rounded-full"
-                            />
-                            <span
-                              className={classNames(
-                                "ml-3 truncate",
-                                selected && "font-semibold"
-                              )}
-                            >
-                              {matiere.name}
-                            </span>
-                          </div>
-
-                          {selected && (
-                            <span
-                              className={classNames(
-                                "absolute inset-y-0 right-0 flex items-center pr-4",
-                                active ? "text-white" : "text-primary-600"
-                              )}
-                            >
-                              <CheckIcon
-                                className="h-5 w-5"
-                                aria-hidden="true"
-                              />
-                            </span>
-                          )}
-                        </>
-                      )}
-                    </Combobox.Option>
-                  ))}
-                </Combobox.Options>
+            <span
+              aria-hidden="true"
+              className={classNames(
+                addToAnnales ? "translate-x-5" : "translate-x-0",
+                "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
               )}
-            </div>
-          </Combobox>
-          {/*   select item    */}
-          <Combobox
-            as="div"
-            value={selectedItem}
-            onChange={(item_id) => {
-              setSelectedMatiere(
-                items.find(({ _id }) => _id === item_id).matiere_id
-              );
-              setSelectedItem(item_id);
-            }}
-          >
-            <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
-              Select Item
-            </Combobox.Label>
-            <div className="relative mt-2">
-              <Combobox.Input
-                className={classNames(
-                  `w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6`,
-                  err.item_id && `ring-red-600`
-                )}
-                onChange={(event) => {
-                  setItemQuery(event.target.value);
-                }}
-                displayValue={(item_id) =>
-                  items.find(({ _id }) => _id === item_id) &&
-                  `${items.find(({ _id }) => _id === item_id).item_number}. ${
-                    items.find(({ _id }) => _id === item_id).name
-                  }`
-                }
-              />
-              <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
-                <ChevronUpDownIcon
-                  className="h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
-              </Combobox.Button>
-
-              {filteredItems.length > 0 && (
-                <Combobox.Options className="absolute z-50 mt-1 max-h-52 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                  {filteredItems.map((item) => (
-                    <Combobox.Option
-                      key={item._id}
-                      value={item._id}
-                      className={({ active }) =>
-                        classNames(
-                          "relative cursor-default select-none py-2 pl-3 pr-9",
-                          active ? "bg-primary-600 text-white" : "text-gray-900"
-                        )
-                      }
-                    >
-                      {({ active, selected }) => (
-                        <>
-                          <div className="flex items-center">
-                            <span
-                              className={classNames(
-                                "ml-3 truncate",
-                                selected && "font-semibold"
-                              )}
-                            >
-                              {`${item.item_number}. ${item.name}`}
-                            </span>
-                          </div>
-
-                          {selected && (
-                            <span
-                              className={classNames(
-                                "absolute inset-y-0 right-0 flex items-center pr-4",
-                                active ? "text-white" : "text-primary-600"
-                              )}
-                            >
-                              <CheckIcon
-                                className="h-5 w-5"
-                                aria-hidden="true"
-                              />
-                            </span>
-                          )}
-                        </>
-                      )}
-                    </Combobox.Option>
-                  ))}
-                </Combobox.Options>
-              )}
-            </div>
-          </Combobox>
+            />
+          </Switch>
+          <span>Add to Annales</span>
         </div>
+        {addToAnnales ? (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 my-2 gap-2">
+              {/*   select session   */}
+              <Combobox
+                as="div"
+                value={selectedSession}
+                onChange={setSelectedSession}
+              >
+                <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
+                  Select Session
+                </Combobox.Label>
+                <div className="relative mt-2">
+                  <Combobox.Input
+                    className={classNames(
+                      "w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6",
+                      err.session_id && "ring-red-600"
+                    )}
+                    onChange={(event) => setSessionQuery(event.target.value)}
+                    displayValue={(session) =>
+                      sessions.find(({ _id }) => _id === session)?.name
+                    }
+                  />
+                  <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+                    <ChevronUpDownIcon className="h-5 w-5 text-gray-400" />
+                  </Combobox.Button>
+
+                  {filteredSessions.length > 0 && (
+                    <Combobox.Options className="absolute z-50 mt-1 max-h-52 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                      {filteredSessions.map((session) => (
+                        <Combobox.Option
+                          key={session._id}
+                          value={session._id}
+                          className={({ active }) =>
+                            classNames(
+                              "relative cursor-default select-none py-2 pl-3 pr-9",
+                              active
+                                ? "bg-primary-600 text-white"
+                                : "text-gray-900"
+                            )
+                          }
+                        >
+                          {({ active, selected }) => (
+                            <>
+                              <div className="flex items-center">
+                                <span
+                                  className={classNames(
+                                    "ml-3 truncate",
+                                    selected && "font-semibold"
+                                  )}
+                                >
+                                  {session.name}
+                                </span>
+                              </div>
+
+                              {selected && (
+                                <span
+                                  className={classNames(
+                                    "absolute inset-y-0 right-0 flex items-center pr-4",
+                                    active ? "text-white" : "text-primary-600"
+                                  )}
+                                >
+                                  <CheckIcon
+                                    className="h-5 w-5"
+                                    aria-hidden="true"
+                                  />
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </Combobox.Option>
+                      ))}
+                    </Combobox.Options>
+                  )}
+                </div>
+              </Combobox>
+            </div>
+            {/*   select matieres   */}
+            <Combobox
+              as="div"
+              value={selectedMatieres}
+              onChange={setSelectedMatieres}
+              multiple
+            >
+              <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
+                Select Matieres
+              </Combobox.Label>
+              <div className="flex gap-2">
+                <div className="relative mt-2 max-w-fit">
+                  <Combobox.Input
+                    className="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                    onChange={(event) => setMatiereQuery(event.target.value)}
+                    // displayValue={(items) => { return items.map((item) => item.name).join(", "); }}
+                  />
+                  <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+                    <ChevronUpDownIcon
+                      className="h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
+                  </Combobox.Button>
+
+                  {filteredMatieres.length > 0 && (
+                    <Combobox.Options className="absolute z-50 mt-1 max-h-52 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                      {filteredMatieres.map((matiere) => (
+                        <Combobox.Option
+                          key={matiere._id}
+                          value={matiere._id}
+                          className={({ active }) =>
+                            classNames(
+                              "relative cursor-default select-none py-2 pl-3 pr-9",
+                              active
+                                ? "bg-primary-600 text-white"
+                                : "text-gray-900"
+                            )
+                          }
+                        >
+                          {({ active, selected }) => (
+                            <>
+                              <div className="flex items-center">
+                                <span
+                                  className={classNames(
+                                    "ml-3 truncate",
+                                    selected && "font-semibold"
+                                  )}
+                                >
+                                  {matiere.name}
+                                </span>
+                              </div>
+
+                              {selected && (
+                                <span
+                                  className={classNames(
+                                    "absolute inset-y-0 right-0 flex items-center pr-4",
+                                    active ? "text-white" : "text-primary-600"
+                                  )}
+                                >
+                                  <CheckIcon
+                                    className="h-5 w-5"
+                                    aria-hidden="true"
+                                  />
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </Combobox.Option>
+                      ))}
+                    </Combobox.Options>
+                  )}
+                </div>
+                <div className="mt-1.5 flex-1 rounded-lg border-dashed border-2 border-gray-200 p-2">
+                  <div className="flex gap-2 flex-wrap ">
+                    {selectedMatieres.map((matiere_id) => (
+                      <div
+                        className="px-2  hover:text-red-900 hover:border-red-900 hover:cursor-pointer min-w-fit border border-gray-400 rounded-md text-[12px]"
+                        onClick={() =>
+                          setSelectedMatieres(
+                            selectedMatieres.filter(
+                              (matiere) => matiere !== matiere_id
+                            )
+                          )
+                        }
+                      >
+                        {
+                          matieres.find((matiere) => matiere._id === matiere_id)
+                            ?.name
+                        }
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Combobox>
+            {/*   select items   */}
+            <Combobox
+              as="div"
+              value={selectedItems}
+              onChange={setSelectedItems}
+              multiple
+            >
+              <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
+                Select Items
+              </Combobox.Label>
+              <div className="flex gap-2">
+                <div className="relative mt-2 max-w-fit">
+                  <Combobox.Input
+                    className="w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                    onChange={(event) => setItemQuery(event.target.value)}
+                    // displayValue={(items) => { return items.map((item) => item.name).join(", "); }}
+                  />
+                  <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+                    <ChevronUpDownIcon
+                      className="h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
+                  </Combobox.Button>
+
+                  {filteredItems.length > 0 && (
+                    <Combobox.Options className="absolute z-50 mt-1 max-h-52 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                      {filteredItems.map((item) => (
+                        <Combobox.Option
+                          key={item._id}
+                          value={item._id}
+                          className={({ active }) =>
+                            classNames(
+                              "relative cursor-default select-none py-2 pl-3 pr-9",
+                              active
+                                ? "bg-primary-600 text-white"
+                                : "text-gray-900"
+                            )
+                          }
+                        >
+                          {({ active, selected }) => (
+                            <>
+                              <div className="flex items-center">
+                                <span
+                                  className={classNames(
+                                    "ml-3 truncate",
+                                    selected && "font-semibold"
+                                  )}
+                                >
+                                  {`${item.item_number}. ${item.name}`}
+                                </span>
+                              </div>
+
+                              {selected && (
+                                <span
+                                  className={classNames(
+                                    "absolute inset-y-0 right-0 flex items-center pr-4",
+                                    active ? "text-white" : "text-primary-600"
+                                  )}
+                                >
+                                  <CheckIcon
+                                    className="h-5 w-5"
+                                    aria-hidden="true"
+                                  />
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </Combobox.Option>
+                      ))}
+                    </Combobox.Options>
+                  )}
+                </div>
+                <div className="mt-1.5 flex-1 rounded-lg border-dashed border-2 border-gray-200 p-2">
+                  <div className="flex gap-2 flex-wrap ">
+                    {selectedItems.map((item) => (
+                      <div
+                        className="px-2  hover:text-red-900 hover:border-red-900 hover:cursor-pointer min-w-fit border border-gray-400 rounded-md text-[12px]"
+                        onClick={() =>
+                          setSelectedItems(
+                            selectedItems.filter(
+                              (selectedItem) => selectedItem._id !== item._id
+                            )
+                          )
+                        }
+                      >
+                        {items.find(({ _id }) => _id === item)?.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Combobox>
+          </>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 my-2 gap-2">
+            {/*   select matiere   */}
+            <Combobox
+              as="div"
+              value={selectedMatiere}
+              onChange={(matiere) => {
+                setSelectedItem(null);
+                setSelectedMatiere(matiere);
+              }}
+            >
+              <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
+                Select Matiere
+              </Combobox.Label>
+              <div className="relative mt-2">
+                <Combobox.Input
+                  className={classNames(
+                    `w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6`,
+                    err.matiere_id && `ring-red-600`
+                  )}
+                  onChange={(event) => {
+                    setMatiereQuery(event.target.value);
+                  }}
+                  displayValue={(matiere) => matiere?.name}
+                />
+                <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+                  <ChevronUpDownIcon
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                </Combobox.Button>
+
+                {filteredMatieres.length > 0 && (
+                  <Combobox.Options className="absolute z-50 mt-1 max-h-52 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                    {filteredMatieres.map((matiere) => (
+                      <Combobox.Option
+                        key={matiere._id}
+                        value={matiere}
+                        className={({ active }) =>
+                          classNames(
+                            "relative cursor-default select-none py-2 pl-3 pr-9",
+                            active
+                              ? "bg-primary-600 text-white"
+                              : "text-gray-900"
+                          )
+                        }
+                      >
+                        {({ active, selected }) => (
+                          <>
+                            <div className="flex items-center">
+                              <img
+                                src={matiere.image}
+                                alt={matiere.name}
+                                className="h-6 w-6 flex-shrink-0 rounded-full"
+                              />
+                              <span
+                                className={classNames(
+                                  "ml-3 truncate",
+                                  selected && "font-semibold"
+                                )}
+                              >
+                                {matiere.name}
+                              </span>
+                            </div>
+
+                            {selected && (
+                              <span
+                                className={classNames(
+                                  "absolute inset-y-0 right-0 flex items-center pr-4",
+                                  active ? "text-white" : "text-primary-600"
+                                )}
+                              >
+                                <CheckIcon
+                                  className="h-5 w-5"
+                                  aria-hidden="true"
+                                />
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </Combobox.Option>
+                    ))}
+                  </Combobox.Options>
+                )}
+              </div>
+            </Combobox>
+            {/*   select item    */}
+            <Combobox
+              as="div"
+              value={selectedItem}
+              onChange={(item) => {
+                setSelectedMatiere(
+                  matieres.find(({ _id }) => _id === item.matiere_id)
+                );
+                setSelectedItem(item);
+              }}
+            >
+              <Combobox.Label className="text-left block text-sm font-medium leading-6 text-gray-900">
+                Select Item
+              </Combobox.Label>
+              <div className="relative mt-2">
+                <Combobox.Input
+                  className={classNames(
+                    `w-full rounded-md border-0 bg-white py-1.5 pl-3 pr-12 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6`,
+                    err.item_id && `ring-red-600`
+                  )}
+                  onChange={(event) => {
+                    setItemQuery(event.target.value);
+                  }}
+                  displayValue={(item) =>
+                    item && `${item.item_number}. ${item.name}`
+                  }
+                />
+                <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+                  <ChevronUpDownIcon
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                </Combobox.Button>
+
+                {filteredItems.length > 0 && (
+                  <Combobox.Options className="absolute z-50 mt-1 max-h-52 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                    {filteredItems.map((item) => (
+                      <Combobox.Option
+                        key={item._id}
+                        value={item}
+                        className={({ active }) =>
+                          classNames(
+                            "relative cursor-default select-none py-2 pl-3 pr-9",
+                            active
+                              ? "bg-primary-600 text-white"
+                              : "text-gray-900"
+                          )
+                        }
+                      >
+                        {({ active, selected }) => (
+                          <>
+                            <div className="flex items-center">
+                              <span
+                                className={classNames(
+                                  "ml-3 truncate",
+                                  selected && "font-semibold"
+                                )}
+                              >
+                                {`${item.item_number}. ${item.name}`}
+                              </span>
+                            </div>
+
+                            {selected && (
+                              <span
+                                className={classNames(
+                                  "absolute inset-y-0 right-0 flex items-center pr-4",
+                                  active ? "text-white" : "text-primary-600"
+                                )}
+                              >
+                                <CheckIcon
+                                  className="h-5 w-5"
+                                  aria-hidden="true"
+                                />
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </Combobox.Option>
+                    ))}
+                  </Combobox.Options>
+                )}
+              </div>
+            </Combobox>
+          </div>
+        )}
         {/*   select tags   */}
         <Combobox
           as="div"

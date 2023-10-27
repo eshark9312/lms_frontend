@@ -6,6 +6,7 @@ import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox } from "@headlessui/react";
 import QuestionForm from "../../components/main/library/dps/QuestionForm";
 import { useParams } from "react-router-dom";
+import { useData } from "../../providers/learningDataProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -19,8 +20,8 @@ const questionTypes = [
 
 function EditDPPage() {
   const authHttpClient = useAuthHttpClient();
+  const { sessions, matieres, items, tags, cards} = useData();
   const { id } = useParams();
-  const [sessions, setSessions] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
   const [sessionQuery, setSessionQuery] = useState("");
   const filteredSessions =
@@ -31,19 +32,7 @@ function EditDPPage() {
             .toLowerCase()
             .includes(sessionQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchSessions = async () => {
-      try {
-        const response = await authHttpClient.get(`/session/`);
-        setSessions(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchSessions();
-  }, []);
-
-  const [matieres, setMatieres] = useState([]);
+        
   const [selectedMatieres, setSelectedMatieres] = useState([]);
   const [matiereQuery, setMatiereQuery] = useState("");
   const filteredMatieres =
@@ -54,19 +43,7 @@ function EditDPPage() {
             .toLowerCase()
             .includes(matiereQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchMatieres = async () => {
-      try {
-        const response = await authHttpClient.get(`/matiere/`);
-        setMatieres(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchMatieres();
-  }, []);
 
-  const [items, setItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [itemQuery, setItemQuery] = useState("");
   const filteredItems =
@@ -78,19 +55,7 @@ function EditDPPage() {
             String(item.item_number).includes(itemQuery.toLowerCase())
           );
         });
-  useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const response = await authHttpClient.get(`/item/`);
-        setItems(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchItems();
-  }, []);
 
-  const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [tagQuery, setTagQuery] = useState("");
   const filteredTags =
@@ -99,30 +64,6 @@ function EditDPPage() {
       : tags.filter((tag) => {
           return tag.name.toLowerCase().includes(tagQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        const response = await authHttpClient.get(`/tag/`);
-        setTags(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchTags();
-  }, []);
-
-  const [cards, setCards] = useState([]);
-  useEffect(() => {
-    const fetchCards = async () => {
-      try {
-        const response = await authHttpClient.get(`/card/`);
-        setCards(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchCards();
-  }, []);
 
   const [isUploading, setIsUploading] = useState(false);
   const [newDP, setNewDP] = useState({});

@@ -1,34 +1,24 @@
-import Search from "../../Search";
-import Filter from "../../Filter";
+import {  useState } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
-import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
-import { useAuth } from "../../../../providers/authProvider";
-import { Spinner } from "../../../icons/Spinner";
 import AddNewCardSlide from "./AddNewCardSlide";
 import EditCardSlide from "./EditCardSlide";
+import Search from "../../Search";
+import { useData } from "../../../../providers/learningDataProvider";
 
 export default function Cards() {
-  const authHttpClient = useAuthHttpClient();
-  const [cards, setCards] = useState([]);
+  const { cards: allCards, setCards } = useData();
   const [selectedCard, setSelectedCard] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [searchText, setSearchText] = useState("");
+  const cards =
+    searchText === ""
+      ? allCards
+      : allCards.filter(({ name }) =>
+          name.toLowerCase().includes(searchText.toLowerCase())
+        );
   const [openNewCardSlide, setOpenNewCardSlide] = useState(false);
   const [openEditCardSlide, setOpenEditCardSlide] = useState(false);
 
-  useEffect(() => {
-    const fetchCards = async () => {
-      try {
-        const response = await authHttpClient.get(`/card/`);
-        setCards(response.data.data);
-        setIsLoading(false);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchCards();
-  }, []);
   return (
     <>
       <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
@@ -44,8 +34,7 @@ export default function Cards() {
               Add New Card
             </button>
             <div className="flex items-center space-x-2">
-              <Search />
-              <Filter />
+              <Search searchText={searchText} setSearchText={setSearchText} />
             </div>
           </div>
 

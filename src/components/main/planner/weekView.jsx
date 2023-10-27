@@ -4,21 +4,22 @@ import { useEffect, useRef } from "react";
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-const cols=[
-    "",
-    "sm:col-start-2",
-    "sm:col-start-3",
-    "sm:col-start-4",
-    "sm:col-start-5",
-    "sm:col-start-6",
-    "sm:col-start-7",
-]
+const cols = [
+  "",
+  "sm:col-start-2",
+  "sm:col-start-3",
+  "sm:col-start-4",
+  "sm:col-start-5",
+  "sm:col-start-6",
+  "sm:col-start-7",
+];
 export default function WeekView({
   selectedWeek,
   selectedDay,
   setSelectedDay,
   today,
   events,
+  clickEventHandle,
 }) {
   const container = useRef(null);
   const containerNav = useRef(null);
@@ -271,48 +272,46 @@ export default function WeekView({
                 gridTemplateRows: "1.75rem repeat(288, minmax(0, 1fr)) auto",
               }}
             >
-              {events.map(
-                (event, idx) =>(
-                    <li
-                      key={idx}
-                      className= {`relative mt-px flex ${cols[getDay(parse(event.date, "yyyy-MM-dd", new Date()))]}`}
-                      style={{
-                        gridRow: `${
-                          Number(
-                            format(parse(event.from, "HH:mm", new Date()), "HH")
-                          ) *
-                            12 +
-                          2
-                        } / span ${
-                          (Number(
-                            format(parse(event.to, "HH:mm", new Date()), "HH")
-                          ) -
-                            Number(
-                              format(
-                                parse(event.from, "HH:mm", new Date()),
-                                "HH"
-                              )
-                            )) *
-                          12
-                        }`,
-                      }}
-                    >
-                      <div className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 p-2 text-xs leading-5 hover:bg-blue-100">
-                        <p className="order-1 font-semibold text-blue-700">
-                          {event.title}
-                        </p>
-                        <p className="text-blue-500 group-hover:text-blue-700">
-                          <time dateTime="2022-01-22T06:00">
-                            {format(
-                              parse(event.from, "HH:mm", new Date()),
-                              "hh:mm a"
-                            )}
-                          </time>
-                        </p>
-                      </div>
-                    </li>
-                  )
-              )}
+              {events.map((event, idx) => (
+                <li
+                  key={idx}
+                  onClick={()=>{clickEventHandle()}}
+                  className={`relative mt-px flex ${
+                    cols[getDay(parse(event.date, "yyyy-MM-dd", new Date()))]
+                  }`}
+                  style={{
+                    gridRow: `${
+                      Number(
+                        format(parse(event.from, "HH:mm", new Date()), "HH")
+                      ) *
+                        12 +
+                      2
+                    } / span ${
+                      (Number(
+                        format(parse(event.to, "HH:mm", new Date()), "HH")
+                      ) -
+                        Number(
+                          format(parse(event.from, "HH:mm", new Date()), "HH")
+                        )) *
+                      12
+                    }`,
+                  }}
+                >
+                  <div className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg bg-blue-50 p-2 text-xs leading-5 hover:bg-blue-100">
+                    <p className="order-1 font-semibold text-blue-700">
+                      {event.title}
+                    </p>
+                    <p className="text-blue-500 group-hover:text-blue-700">
+                      <time dateTime="2022-01-22T06:00">
+                        {format(
+                          parse(event.from, "HH:mm", new Date()),
+                          "hh:mm a"
+                        )}
+                      </time>
+                    </p>
+                  </div>
+                </li>
+              ))}
             </ol>
           </div>
         </div>

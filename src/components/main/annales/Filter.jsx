@@ -5,6 +5,7 @@ import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import useAuthHttpClient from "../../../hooks/useAuthHttpClient";
 
 import FilterIcon from "../../icons/FilterIcon";
+import { useData } from "../../../providers/learningDataProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -12,8 +13,8 @@ function classNames(...classes) {
 
 export default function Filter({ filter, setFilter }) {
   const authHttpClient = useAuthHttpClient();
+  const { matieres, items } = useData();
 
-  const [matieres, setMatieres] = useState([]);
   const [selectedMatieres, setSelectedMatieres] = useState([]);
   const [matiereQuery, setMatiereQuery] = useState("");
   const filteredMatieres =
@@ -24,19 +25,7 @@ export default function Filter({ filter, setFilter }) {
             .toLowerCase()
             .includes(matiereQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchMatieres = async () => {
-      try {
-        const response = await authHttpClient.get(`/matiere/`);
-        setMatieres(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchMatieres();
-  }, []);
 
-  const [items, setItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [itemQuery, setItemQuery] = useState("");
   const filteredItems =
@@ -48,17 +37,6 @@ export default function Filter({ filter, setFilter }) {
             String(item.item_number).includes(itemQuery.toLowerCase())
           );
         });
-  useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const response = await authHttpClient.get(`/item/`);
-        setItems(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchItems();
-  }, []);
 
   const clickHandle = () => {
     setFilter({

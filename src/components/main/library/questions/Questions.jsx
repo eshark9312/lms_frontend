@@ -16,26 +16,27 @@ import { Spinner } from "../../../icons/Spinner";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox, Switch } from "@headlessui/react";
 import { useQuiz } from "../../../../hooks/useQuiz";
+import { useData } from "../../../../providers/learningDataProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 export default function Questions() {
-  const {setOpenTakeTestModal} = useQuiz();
+  const { setOpenTakeTestModal } = useQuiz();
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
+  const { matieres, items, tags, sessions, cards } = useData();
   const authHttpClient = useAuthHttpClient();
-  const [openNewItemModal, setOpenNewQuestionModal] = useState(false);
-  const [openEditItemModal, setOpenEditItemModal] = useState(false);
   const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         const response = await authHttpClient.get("/question");
-        setQuestions(response.data.data.filter(question=> !!question.matiere_id));
+        setQuestions(response.data.data);
       } catch (error) {
         console.log(error);
       }
@@ -43,15 +44,15 @@ export default function Questions() {
     fetchQuestions();
   }, []);
 
-  const createQuestion = ()=>{
-    var win = window.open("/addQuestion/", '_blank');
+  const createQuestion = () => {
+    var win = window.open("/addQuestion/", "_blank");
     win.focus();
-  }
+  };
 
-  const editQuestion = (id)=>{
-    var win = window.open(`/editQuestion/${id}`, '_blank');
+  const editQuestion = (id) => {
+    var win = window.open(`/editQuestion/${id}`, "_blank");
     win.focus();
-  }
+  };
 
   return (
     <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
@@ -71,8 +72,7 @@ export default function Questions() {
                 Add New Question
               </button>
               <div className="flex items-center space-x-2">
-                <Search />
-                <Filter />
+                <Search searchText={searchText} setSearchText={setSearchText} />
               </div>
             </div>
             <table className="my-4 min-w-full divide-y divide-gray-300 rounded-lg border-2 border-gray-400">
@@ -106,7 +106,7 @@ export default function Questions() {
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Cards
+                    Session
                   </th>
                   {/* <th
                     scope="col"
@@ -132,21 +132,31 @@ export default function Questions() {
                       {question.question}
                     </td>
                     <td className=" px-3 py-4 text-sm text-gray-500">
-                      {question.matiere_id?.name}
+                      {
+                        matieres.find(({ _id }) => _id === question.matiere_id)
+                          ?.name
+                      }
                     </td>
                     <td className=" px-3 py-4 text-sm text-gray-500">
-                      { question.item_id && `${question.item_id?.item_number}. ${question.item_id?.name}`}
+                      {question.item_id &&
+                        `${
+                          items.find(({ _id }) => _id === question.item_id)
+                            ?.item_number
+                        }. ${
+                          items.find(({ _id }) => _id === question.item_id)
+                            ?.name
+                        }`}
                     </td>
                     <td className=" px-3 py-1 text-sm text-gray-500">
                       <div className="flex flex-wrap">
-                        {question.cards.map((card) => (
+                        {question.session_id &&
                           <div
-                            key={card._id}
+                            key={question.session_id}
                             className="px-2 m-1 max-w-fit border border-gray-400 rounded-md text-[12px]"
                           >
-                            {card.name}
+                            {sessions.find(({ _id }) => _id === question.session_id)?.name}
                           </div>
-                        ))}
+                        }
                       </div>
                     </td>
                     {/* <td className=" px-3 py-1 text-sm text-gray-500 ">
@@ -175,7 +185,7 @@ export default function Questions() {
                     </td>
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <Link
-                        onClick={()=>editQuestion(question._id)}
+                        onClick={() => editQuestion(question._id)}
                         // to={`/editQuestion/${question._id}`}
                         className="text-primary-600 hover:text-primary-900"
                       >
@@ -193,20 +203,16 @@ export default function Questions() {
     </div>
   );
 
-  function DeleteConformModal(){
+  function DeleteConformModal() {
     const [deleting, setDeleting] = useState(false);
     const handleSubmit = async (e) => {
       setDeleting(true);
       try {
-        await authHttpClient.delete(
-          `/question/${selectedQuestion._id}`
-        );
+        await authHttpClient.delete(`/question/${selectedQuestion._id}`);
         setDeleting(false);
         setOpenDeleteConfirmModal(false);
-        setQuestions((questions) =>{
-          return questions.filter((item) => 
-            item._id !== selectedQuestion._id
-          );
+        setQuestions((questions) => {
+          return questions.filter((item) => item._id !== selectedQuestion._id);
         });
       } catch (error) {
         console.log(error);
@@ -236,5 +242,4 @@ export default function Questions() {
       </Modal>
     );
   }
-
 }

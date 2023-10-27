@@ -4,12 +4,12 @@ import { useState } from "react";
 import { Spinner } from "../icons/Spinner";
 
 export default function Signup() {
-  const navigate = useNavigate();
   const { signup } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [err, seterr] = useState({});
+  const [checkEmail, setCheckEmail] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -28,9 +28,11 @@ export default function Signup() {
             //   // sendVerficationmail(email);
             // }
           } else {
-            setIsLoading(false);
-            navigate("/auth/signin");
+            // navigate("/auth/signin");
+            seterr({});
+            setCheckEmail(true);
           }
+          setIsLoading(false);
         } catch (error) {
           setIsLoading(false);
           console.error(error);
@@ -79,6 +81,11 @@ export default function Signup() {
                 {err?.email && (
                   <p className="mt-2 text-sm text-red-600" id="email-error">
                     {err?.email}
+                  </p>
+                )}
+                {checkEmail && (
+                  <p className="mt-2 text-sm text-green-600" id="email-error">
+                    Verification link was sent. Please check your email!
                   </p>
                 )}
               </div>

@@ -7,34 +7,24 @@ import { useAuth } from "../../../../providers/authProvider";
 import EditableMatiereCard from "./EditableMatiereCard";
 import { PlusIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import Modal from "../../../common/Modal";
+import { useData } from "../../../../providers/learningDataProvider";
 
 function Matieres() {
   const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [matieres, setMatieres] = useState([]);
+  const { loading, matieres: allMatieres, setMatieres } = useData();
   const authHttpClient = useAuthHttpClient();
   const [openNewMatiereModal, setOpenNewMatiereModal] = useState(false);
   const [openEditMatiereModal, setOpenEditMatiereModal] = useState(false);
   const [openDeleteConfirmModal, setOpenDeleteConfirmModal] = useState(false);
   const [selectedMatiere, setSelectedMatiere] = useState(null);
-
   const [searchText, setSearchText] = useState("");
 
-  useEffect(() => {
-    const fetchMatieres = async () => {
-      try {
-        const response = await authHttpClient.post(`/matiere/getPage`, {
-          searchText,
-        });
-        setMatieres(response.data.data);
-        setIsLoading(false);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchMatieres();
-  }, [searchText]);
-
+  const matieres =
+    searchText === ""
+      ? allMatieres
+      : allMatieres.filter(({ name }) =>
+          name.toLowerCase().includes(searchText.toLowerCase())
+        );
   const AddNewMatiereModal = () => {
     const [isUploading, setIsUploading] = useState(false);
     const [imageBuffer, setImageBuffer] = useState();
@@ -160,7 +150,7 @@ function Matieres() {
         setIsUploading(false);
         setOpenEditMatiereModal(false);
         console.log(response.data.data);
-        setMatieres((matieres) =>{
+        setMatieres((matieres) => {
           return matieres.map((matiere) => {
             if (matiere._id === selectedMatiere._id) {
               return selectedMatiere;
@@ -275,19 +265,17 @@ function Matieres() {
     );
   };
 
-  const DeleteConformModal =()=>{
+  const DeleteConformModal = () => {
     const [deleting, setDeleting] = useState(false);
     const handleSubmit = async (e) => {
       setDeleting(true);
       try {
-        await authHttpClient.delete(
-          `/matiere/${selectedMatiere._id}`
-        );
+        await authHttpClient.delete(`/matiere/${selectedMatiere._id}`);
         setDeleting(false);
         setOpenDeleteConfirmModal(false);
-        setMatieres((matieres) =>{
-          return matieres.filter((matiere) => 
-            matiere._id !== selectedMatiere._id
+        setMatieres((matieres) => {
+          return matieres.filter(
+            (matiere) => matiere._id !== selectedMatiere._id
           );
         });
       } catch (error) {
@@ -317,11 +305,11 @@ function Matieres() {
         </div>
       </Modal>
     );
-  }
+  };
 
   return (
     <div>
-      {isLoading ? (
+      {loading ? (
         <div
           role="status"
           className="h-[70vh] pb-20 flex justify-center items-center"
@@ -333,7 +321,7 @@ function Matieres() {
           {user.role === "user" && (
             <>
               <div className="mb-4 flex flex-row-reverse">
-              <Search searchText={searchText} setSearchText={setSearchText}/>
+                <Search searchText={searchText} setSearchText={setSearchText} />
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                 {matieres.map((matiere, index) => (
@@ -355,7 +343,7 @@ function Matieres() {
                   <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
                   Add New Matiere
                 </button>
-              <Search searchText={searchText} setSearchText={setSearchText}/>
+                <Search searchText={searchText} setSearchText={setSearchText} />
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                 {matieres.map((matiere, index) => (

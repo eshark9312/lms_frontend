@@ -28,6 +28,7 @@ export default function TakeExamModal() {
   const [history, setHistory] = useState("Tried"); // Never tried, Both
   const [n_questions, setN_questions] = useState(5);
   const [modeExam, setEnabled] = useState(false);
+  const { matieres, tags} = useData();
 
   const handleSubmit = async (e) => {
     setIsUploading(true);
@@ -48,7 +49,7 @@ export default function TakeExamModal() {
     }
   };
 
-  const [matieres, setMatieres] = useState([]);
+  // const [matieres, setMatieres] = useState([]);
   const [matiereQuery, setMatiereQuery] = useState("");
   const filteredMatieres =
     matiereQuery === ""
@@ -58,44 +59,22 @@ export default function TakeExamModal() {
             .toLowerCase()
             .includes(matiereQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchMatieres = async () => {
-      try {
-        const response = await authHttpClient.get(`/matiere/`);
-        setMatieres(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchMatieres();
-  }, []);
 
   const [items, setItems] = useState([]);
   const [itemQuery, setItemQuery] = useState("");
   const filteredItems =
     itemQuery === ""
-      ? items
+      ? items.filter(
+          (item) => !selectedMatiere || item.matiere_id === selectedMatiere
+        )
       : items.filter((item) => {
-        return item.name.toLowerCase().includes(itemQuery.toLowerCase()) || String(item.item_number).includes(itemQuery.toLowerCase());
+          return (
+            (item.name.toLowerCase().includes(itemQuery.toLowerCase()) ||
+              String(item.item_number).includes(itemQuery.toLowerCase())) &&
+            (!selectedMatiere || item.matiere_id === selectedMatiere)
+          );
         });
-  useEffect(() => {
-    const fetchItems = async () => {
-      const filter = selectedMatiere
-        ? {
-            matiere_id: selectedMatiere._id,
-          }
-        : {};
-      try {
-        const response = await authHttpClient.post(`/item/filter/`, filter);
-        setItems(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchItems();
-  }, [selectedMatiere]);
 
-  const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [tagQuery, setTagQuery] = useState("");
   const filteredTags =
@@ -104,17 +83,6 @@ export default function TakeExamModal() {
       : tags.filter((tag) => {
           return tag.name.toLowerCase().includes(tagQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        const response = await authHttpClient.get(`/tag/`);
-        setTags(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchTags();
-  }, []);
 
   return (
     <Transition.Root show={openTakeTestModal} as={Fragment}>

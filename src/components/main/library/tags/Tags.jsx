@@ -20,6 +20,7 @@ import Modal from "../../../common/Modal";
 import { Spinner } from "../../../icons/Spinner";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox, Switch } from "@headlessui/react";
+import { useData } from "../../../../providers/learningDataProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -40,27 +41,19 @@ const colors = [
   "purple",
 ];
 export default function Tags() {
-  const { user } = useAuth();
   const authHttpClient = useAuthHttpClient();
-  const [tags, setTags] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { tags: allTags, setTags, loading } = useData();
   const [openNewTagModal, setOpenNewTagModal] = useState(false);
   const [openEditTagModal, setOpenEditTagModal] = useState(false);
   const [selectedTag, setSelectedTag] = useState(null);
 
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        const response = await authHttpClient.get(`/tag/`);
-        setTags(response.data.data);
-        setIsLoading(false);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchTags();
-  }, []);
-
+  const [searchText, setSearchText] = useState("");
+  const tags =
+    searchText === ""
+      ? allTags
+      : allTags.filter(({ name }) =>
+          name.toLowerCase().includes(searchText.toLowerCase())
+        );
   return (
     <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
       <div className="inline-block min-w-full align-middle">
@@ -76,7 +69,7 @@ export default function Tags() {
             Add New Tag
           </button>
           <div className="flex items-center space-x-2">
-            <Search />
+            <Search searchText={searchText} setSearchText={setSearchText} />
           </div>
         </div>
         {tags.map((tag, index) => (
@@ -190,11 +183,12 @@ export default function Tags() {
         setOpenEditTagModal(false);
         setTags(
           tags.map((tag) => {
-            if (tag._id === selectedTag._id) return {
-              ...tag,
-              name: name,
-              desc: desc,
-            };
+            if (tag._id === selectedTag._id)
+              return {
+                ...tag,
+                name: name,
+                desc: desc,
+              };
             return tag;
           })
         );

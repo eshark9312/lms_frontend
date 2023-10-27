@@ -115,6 +115,22 @@ export const AuthProvider = ({ children }) => {
     return err;
   };
 
+  const verifyEmail = async (token) => {
+    let err;
+    try {
+      console.log(token)
+      await httpClient.post("/auth/verifyEmail", { token });
+      // navigate("/");
+    } catch (error) {
+      if (isAxiosError(error)) {
+        err = error.response.data.error;
+      } else {
+        err = "Opps! Something Unexpected happens";
+      }
+    }
+    return err;
+  };
+
   const value = {
     user,
     login,
@@ -122,6 +138,7 @@ export const AuthProvider = ({ children }) => {
     signout,
     forgotpassword,
     resetpassword,
+    verifyEmail,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

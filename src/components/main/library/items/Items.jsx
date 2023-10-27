@@ -23,6 +23,7 @@ import { Combobox, Switch } from "@headlessui/react";
 import { useQuiz } from "../../../../hooks/useQuiz";
 import { ItemStatus } from "../../ItemStatus";
 import { ItemStatusFilter } from "../matiere/Overview";
+import { useData } from "../../../../providers/learningDataProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -33,7 +34,7 @@ export default function Items() {
   const { setOpenTakeTestModal, setSelectedMatiere, setSelectedItem } =
     useQuiz();
 
-  const [matieres, setMatieres] = useState([]);
+  const { matieres } = useData();
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [openNewItemModal, setOpenNewItemModal] = useState(false);
@@ -69,19 +70,6 @@ export default function Items() {
     };
     fetchItems();
   }, [pageSize, pageNumber, searchText, filter, sort]);
-
-  useEffect(() => {
-    const fetchMatieres = async () => {
-      try {
-        const response = await authHttpClient.get("/matiere");
-        setMatieres(response.data.data);
-        setIsLoading(false);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    if (user.role === "admin") fetchMatieres();
-  }, [user]);
 
   const filterByStatus = (status) => {
     setFilter({ status: status });
@@ -247,32 +235,31 @@ export default function Items() {
       )}
       {user.role === "admin" && (
         <>
-          {isLoading ? (
-            <div
-              role="status"
-              className="h-[70vh] pb-20 flex justify-center items-center"
-            >
-              <Spinner />
-            </div>
-          ) : (
-            <div className="inline-block min-w-full align-middle">
-              <div className="flex justify-between">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpenNewItemModal(true);
-                  }}
-                  className="click-action inline-flex justify-between border-2 border-gray-300 items-center gap-x-1.5 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold hover:text-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
-                >
-                  <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
-                  Add New Item
-                </button>
-                <div className="flex items-center space-x-2">
-                  <Search />
-                  <Filter />
-                </div>
+          <div className="inline-block min-w-full align-middle">
+            <div className="flex justify-between">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpenNewItemModal(true);
+                }}
+                className="click-action inline-flex justify-between border-2 border-gray-300 items-center gap-x-1.5 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold hover:text-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
+              >
+                <PlusIcon className="-ml-0.5 h-5 w-5" aria-hidden="true" />
+                Add New Item
+              </button>
+              <div className="flex items-center space-x-2">
+                <Search searchText={searchText} setSearchText={setSearchText} />
               </div>
-              {items.map((item) => (
+            </div>
+            {isLoading ? (
+              <div
+                role="status"
+                className="h-[70vh] pb-20 flex justify-center items-center"
+              >
+                <Spinner />
+              </div>
+            ) : (
+              items.map((item) => (
                 <EditableItem
                   item={item}
                   editAction={() => {
@@ -284,10 +271,9 @@ export default function Items() {
                     setOpenDeleteConfirmModal(true);
                   }}
                 />
-              ))}
-            </div>
-          )}
-
+              ))
+            )}
+          </div>
           <Pagination
             totalNumber={totalNumber}
             pageNumber={pageNumber}

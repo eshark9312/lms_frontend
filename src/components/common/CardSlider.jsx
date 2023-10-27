@@ -4,26 +4,31 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useCard } from "../../providers/cardProvider";
 import useAuthHttpClient from "../../hooks/useAuthHttpClient";
 import { Spinner } from "../icons/Spinner";
+import HTMLReactParser from "html-react-parser";
 
 function CardSlider() {
-  // const authHttpClient = useAuthHttpClient();
-  const { openCard, setOpenCard, card } = useCard();
-  // console.log(openCard)
-  // const [card, setCard] = useState();
-  // const [isLoading, setLoading] = useState(true);
-  // useEffect(() => {
-  //   setLoading(true);
-  //   const fetchCard = async () => {
-  //     try {
-  //       const response = await authHttpClient.get(`/card/${cardId}`);
-  //       setCard(response.data.data);
-  //       setLoading(false);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   fetchCard();
-  // }, [cardId, authHttpClient]);
+  const authHttpClient = useAuthHttpClient();
+  const { openCard, setOpenCard, card: cardWithOutContent } = useCard();
+
+  const [card, setCard] = useState();
+  const [isLoading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchCard = async () => {
+      try {
+        const response = await authHttpClient.get(
+          `/card/${cardWithOutContent._id}`
+        );
+        setCard(response.data.data);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    cardWithOutContent && fetchCard();
+  }, [cardWithOutContent]);
+
   return (
     <Transition.Root show={openCard} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setOpenCard}>
@@ -51,8 +56,9 @@ function CardSlider() {
                 leaveFrom="translate-x-0"
                 leaveTo="translate-x-full"
               >
-                <Dialog.Panel className="pointer-events-auto w-screen max-w-md">                  
-                    {card && (<div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
+                <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
+                  {card && (
+                    <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
                       <div className="px-4 sm:px-6">
                         <div className="flex items-start justify-between">
                           <Dialog.Title className="leading-6 text-gray-900 font-extrabold text-lg">
@@ -73,31 +79,15 @@ function CardSlider() {
                           </div>
                         </div>
                       </div>
-                      <div className="relative mt-6 flex-1 px-4 sm:px-6">
-                        <div className="text-sm">
-                          {card.def}
-                        </div>
-                        {/* Separator */}
-                        <div
-                          className="my-6 block h-px w-full bg-gray-900/10"
-                          aria-hidden="true"
-                        />
-                        <div className="font-bold text-gray-500">{card.title}</div>
-                        <div className="text-sm text-gray-500">
-                          {card.content}
-                        </div>
-                        <div className="my-4 p-4 rounded bg-gray-100 text-sm text-gray-500 font-extrabold">
-                          {card.instruction}
-                        </div>
-                        <img
-                          src="/assets/image/image1.png"
-                          alt="Aspect d’une angine à diphtérie"
-                        />
-                        <i className="text-gray-500">
-                          {card.image_desc}
-                        </i>
+                      <div className="relative mt-6 flex-1 px-6">
+                        {isLoading ? (
+                          <Spinner />
+                        ) : (
+                          HTMLReactParser(card.content)
+                        )}
                       </div>
-                    </div>)}
+                    </div>
+                  )}
                 </Dialog.Panel>
               </Transition.Child>
             </div>

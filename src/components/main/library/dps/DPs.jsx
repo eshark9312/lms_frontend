@@ -39,7 +39,7 @@ export default function DPs() {
   const [questions, setQuestions] = useState([]);
   const [dps, setDps] = useState([]);
   const [selectedDp, setSelectedDp] = useState(null);
-
+  const [searchText, setSearchText] = useState("");
   useEffect(() => {
     const fetchDPs = async () => {
       try {
@@ -58,10 +58,10 @@ export default function DPs() {
     win.focus();
   };
 
-  const editDP = (id)=>{
-    var win = window.open(`/editDP/${id}`, '_blank');
+  const editDP = (id) => {
+    var win = window.open(`/editDP/${id}`, "_blank");
     win.focus();
-  }
+  };
 
   return (
     <div className="-mx-4 sm:-mx-6 lg:-mx-8 -mb-8 px-4 sm:px-6 lg:px-8 py-8 bg-gray-50">
@@ -80,8 +80,7 @@ export default function DPs() {
                 Add New DP
               </button>
               <div className="flex items-center space-x-2">
-                <Search />
-                <Filter />
+                <Search searchText={searchText} setSearchText={setSearchText} />
               </div>
             </div>
             <table className="my-4 min-w-full divide-y divide-gray-300 rounded-lg border-2 border-gray-400">
@@ -175,7 +174,9 @@ export default function DPs() {
                     </td>
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <Link
-                        onClick={()=>{editDP(dp._id)}}
+                        onClick={() => {
+                          editDP(dp._id);
+                        }}
                         // to={`/editDP/${dp._id}`}
                         className="text-primary-600 hover:text-primary-900"
                       >

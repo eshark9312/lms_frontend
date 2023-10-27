@@ -4,14 +4,15 @@ import useAuthHttpClient from "../../hooks/useAuthHttpClient";
 import { Spinner } from "../../components/icons/Spinner";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox, Switch } from "@headlessui/react";
+import { useData } from "../../providers/learningDataProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 function AddNewQuestionPage() {
   const authHttpClient = useAuthHttpClient();
+  const { matieres, items, tags, sessions, cards } = useData();
   const [addToAnnales, setAddToAnnales] = useState(false);
-  const [sessions, setSessions] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
   const [sessionQuery, setSessionQuery] = useState("");
   const filteredSessions =
@@ -22,19 +23,7 @@ function AddNewQuestionPage() {
             .toLowerCase()
             .includes(sessionQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchSessions = async () => {
-      try {
-        const response = await authHttpClient.get(`/session/`);
-        setSessions(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchSessions();
-  }, []);
 
-  const [matieres, setMatieres] = useState([]);
   const [selectedMatiere, setSelectedMatiere] = useState(null);
   const [selectedMatieres, setSelectedMatieres] = useState([]);
   const [matiereQuery, setMatiereQuery] = useState("");
@@ -46,49 +35,27 @@ function AddNewQuestionPage() {
             .toLowerCase()
             .includes(matiereQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchMatieres = async () => {
-      try {
-        const response = await authHttpClient.get(`/Matiere/`);
-        setMatieres(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchMatieres();
-  }, []);
 
-  const [items, setItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
   const [itemQuery, setItemQuery] = useState("");
   const filteredItems =
     itemQuery === ""
-      ? items
+      ? items.filter(
+          (item) =>
+            addToAnnales ||
+            !selectedMatiere ||
+            item.matiere_id === selectedMatiere._id
+        )
       : items.filter((item) => {
           return (
-            item.name.toLowerCase().includes(itemQuery.toLowerCase()) ||
-            String(item.item_number).includes(itemQuery.toLowerCase())
+            (item.name.toLowerCase().includes(itemQuery.toLowerCase()) ||
+              String(item.item_number).includes(itemQuery.toLowerCase())) &&
+            (!selectedMatiere || item.matiere_id === selectedMatiere._id)
           );
         });
-  useEffect(() => {
-    const fetchItems = async () => {
-      const filter = selectedMatiere
-        ? {
-            matiere_id: selectedMatiere._id,
-          }
-        : {};
-      try {
-        const response = await authHttpClient.post(`/item/filter/`, filter);
-        setItems(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchItems();
-  }, [selectedMatiere]);
+  console.log(selectedMatiere);
 
-  const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [tagQuery, setTagQuery] = useState("");
   const filteredTags =
@@ -97,19 +64,7 @@ function AddNewQuestionPage() {
       : tags.filter((tag) => {
           return tag.name.toLowerCase().includes(tagQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        const response = await authHttpClient.get(`/tag/`);
-        setTags(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchTags();
-  }, []);
 
-  const [cards, setCards] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
   const [cardQuery, setCardQuery] = useState("");
   const filteredCards =
@@ -118,17 +73,6 @@ function AddNewQuestionPage() {
       : cards.filter((card) => {
           return card.name.toLowerCase().includes(cardQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchCards = async () => {
-      try {
-        const response = await authHttpClient.get(`/card/`);
-        setCards(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchCards();
-  }, []);
 
   const [isUploading, setIsUploading] = useState(false);
   const [newQuestion, setNewQuestion] = useState({});

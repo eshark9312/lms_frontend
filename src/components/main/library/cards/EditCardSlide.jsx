@@ -5,6 +5,8 @@ import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { Combobox } from "@headlessui/react";
 import useAuthHttpClient from "../../../../hooks/useAuthHttpClient";
 import { Spinner } from "../../../icons/Spinner";
+import CardEditor from "../../../common/Editor";
+import { useData } from "../../../../providers/learningDataProvider";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -12,10 +14,12 @@ function classNames(...classes) {
 function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
   const authHttpClient = useAuthHttpClient();
   const [card, setCard] = useState({});
+  const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [items, setItems] = useState([]);
+  const { items } = useData();
+  const [content, setContent] = useState();
   useEffect(() => {
     if (selectedCard) {
       setSelectedItems(
@@ -23,25 +27,29 @@ function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
           selectedCard.items.map((item) => item._id).includes(item._id)
         )
       );
-      setCard(selectedCard);
     }
   }, [selectedCard, items]);
+
   useEffect(() => {
-    const fetchItems = async () => {
+    setLoading(true);
+    const fetchCard = async () => {
       try {
-        const response = await authHttpClient.get(`/item/`);
-        setItems(response.data.data);
+        const response = await authHttpClient.get(`/card/${selectedCard._id}`);
+        setCard(response.data.data);
+        setLoading(false);
       } catch (error) {
         console.log(error);
       }
     };
-    fetchItems();
-  }, []);
+    fetchCard();
+  }, [selectedCard]);
+
   const updateCard = async (e) => {
     setIsUpdating(true);
     try {
       const response = await authHttpClient.put(`/card/${card._id}`, {
         ...card,
+        content,
         items: selectedItems.map((item) => item._id),
       });
       console.log(response.data.data);
@@ -67,24 +75,6 @@ function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
       setIsDeleting(false);
       console.log(error);
     }
-  };
-
-  const convert = (e) => {
-    if (e.target.files[0].size > 2000000) {
-      console.log("File too large");
-      return;
-    }
-    var reader = new FileReader();
-    reader.readAsDataURL(e.target.files[0]);
-    reader.onload = () => {
-      setCard({
-        ...card,
-        image: reader.result,
-      });
-    };
-    reader.onerror = (error) => {
-      console.log("Error: ", error);
-    };
   };
 
   const [query, setQuery] = useState("");
@@ -152,7 +142,7 @@ function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
                       </div>
                     </div>
                     <div className="relative mt-2 flex-1 px-4 sm:px-6">
-                      <div className="text-sm">
+                      <div className="text-sm mb-4">
                         <Combobox
                           as="div"
                           value={selectedItems}
@@ -198,10 +188,10 @@ function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
 
                             {filteredItems.length > 0 && (
                               <Combobox.Options className="absolute z-50 mt-1 max-h-52 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                {filteredItems.map((item) => (
+                                {filteredItems.map((matiere) => (
                                   <Combobox.Option
-                                    key={item._id}
-                                    value={item}
+                                    key={matiere._id}
+                                    value={matiere}
                                     className={({ active }) =>
                                       classNames(
                                         "relative cursor-default select-none py-2 pl-3 pr-9",
@@ -220,9 +210,10 @@ function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
                                               selected && "font-semibold"
                                             )}
                                           >
-                                            {item.name}
+                                            {matiere.name}
                                           </span>
                                         </div>
+
                                         {selected && (
                                           <span
                                             className={classNames(
@@ -246,134 +237,31 @@ function EditCardSlide({ open, setOpen, selectedCard, setCards }) {
                             )}
                           </div>
                         </Combobox>
-                        <div className="mt-2 first:focus:border-primary-600">
-                          <textarea
-                            placeholder="Definition"
-                            className="w-full min-h-[64px] border rounded-md border-gray-300 focus:border-primary-600"
-                            value={card.def}
-                            onChange={(e) => {
-                              setCard((card) => ({
-                                ...card,
-                                def: e.target.value,
-                              }));
-                            }}
-                          ></textarea>
-                        </div>
                       </div>
-                      {/* Separator */}
-                      <div
-                        className="my-6 block h-px w-full bg-gray-900/10"
-                        aria-hidden="true"
+                      <CardEditor
+                        content={card.content}
+                        setContent={setContent}
                       />
-                      <div className="font-bold text-gray-500">
-                        <input
-                          type="text"
-                          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-                          value={card.title}
-                          placeholder="Title"
-                          onChange={(e) => {
-                            setCard((card) => ({
-                              ...card,
-                              title: e.target.value,
-                            }));
-                          }}
-                        />
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        <div className="mt-2 first:focus:border-primary-600">
-                          <textarea
-                            placeholder="Content"
-                            className="w-full min-h-[64px] border rounded-md border-gray-300 focus:border-primary-600"
-                            value={card.content}
-                            onChange={(e) => {
-                              setCard((card) => ({
-                                ...card,
-                                content: e.target.value,
-                              }));
-                            }}
-                          ></textarea>
-                        </div>
-                      </div>
-                      <div className="my-4 p-4 rounded bg-gray-100 text-sm text-gray-500 font-extrabold">
-                        <div className="first:focus:border-primary-600">
-                          <textarea
-                            className="w-full min-h-[64px] border rounded-md bg-transparent border-gray-300 focus:border-primary-600"
-                            value={card.instruction}
-                            onChange={(e) => {
-                              setCard((card) => ({
-                                ...card,
-                                instruction: e.target.value,
-                              }));
-                            }}
-                          ></textarea>
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-2 justify-center items-center">
-                        {card.image ? (
-                          <img
-                            className="mt-2 flex justify-center items-center rounded-lg border border-dashed border-gray-900/25 w-full"
-                            alt="CardImage"
-                            src={card.image}
-                          />
-                        ) : (
-                          <div className="mt-2 flex justify-center items-center rounded-lg border border-dashed border-gray-900/25 h-32 w-full">
-                            <PhotoIcon
-                              className="mx-auto h-12 w-12 text-gray-300"
-                              aria-hidden="true"
-                            />
-                          </div>
-                        )}
-                        <div className="flex text-sm leading-6 text-gray-600">
-                          <label
-                            htmlFor="file-upload"
-                            className="relative h-fit cursor-pointer rounded-md bg-white font-semibold text-primary-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-primary-600 focus-within:ring-offset-2 hover:text-primary-500 px-2"
-                          >
-                            <span>Upload an image file</span>
-                            <input
-                              accept="image/*"
-                              onChange={convert}
-                              id="file-upload"
-                              name="file-upload"
-                              type="file"
-                              className="sr-only"
-                            />
-                          </label>
-                        </div>
-                      </div>
-                      <i className="text-gray-500">
-                        <input
-                          type="text"
-                          className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-                          value={card.image_desc}
-                          placeholder="image description"
-                          onChange={(e) => {
-                            setCard((card) => ({
-                              ...card,
-                              image_desc: e.target.value,
-                            }));
-                          }}
-                        />
-                      </i>
-                      <div className="mt-4 flex flex-row-reverse justify-between gap-2">
-                        <button
-                          onClick={() => {
-                            updateCard();
-                          }}
-                          type="button"
-                          className="click-action inline-flex justify-between border border-gray-300 items-center gap-x-1.5 rounded-md bg-primary-600 text-white px-2.5 py-1.5 text-sm font-semibol focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
-                        >
-                          {isUpdating && <Spinner small />}Update Card
-                        </button>
-                        <button
-                          onClick={() => {
-                            deleteCard();
-                          }}
-                          type="button"
-                          className="click-action inline-flex justify-between border border-gray-300 items-center gap-x-1.5 rounded-md bg-red-600 text-white px-2.5 py-1.5 text-sm font-semibol focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
-                        >
-                          {isDeleting && <Spinner small />}Delete Card
-                        </button>
-                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-row-reverse justify-between gap-2 mx-6 mb-4">
+                      <button
+                        onClick={() => {
+                          updateCard();
+                        }}
+                        type="button"
+                        className="click-action inline-flex justify-between border border-gray-300 items-center gap-x-1.5 rounded-md bg-primary-600 text-white px-2.5 py-1.5 text-sm font-semibol focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
+                      >
+                        {isUpdating && <Spinner small />}Update Card
+                      </button>
+                      <button
+                        onClick={() => {
+                          deleteCard();
+                        }}
+                        type="button"
+                        className="click-action inline-flex justify-between border border-gray-300 items-center gap-x-1.5 rounded-md bg-red-600 text-white px-2.5 py-1.5 text-sm font-semibol focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 hover:outline-primary-600"
+                      >
+                        {isDeleting && <Spinner small />}Delete Card
+                      </button>
                     </div>
                   </div>
                 </Dialog.Panel>

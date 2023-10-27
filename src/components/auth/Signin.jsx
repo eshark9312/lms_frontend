@@ -31,9 +31,9 @@ export default function Signin() {
         //   // sendVerficationmail(email);
         // }
       } else {
-        setIsLoading(false);
         navigate("/");
       }
+      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       console.error(error);

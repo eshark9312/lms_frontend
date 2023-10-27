@@ -72,46 +72,21 @@ export default function TakeTestModal() {
             .toLowerCase()
             .includes(matiereQuery.toLowerCase());
         });
-  useEffect(() => {
-    const fetchMatieres = async () => {
-      try {
-        const response = await authHttpClient.get(`/matiere/`);
-        console.log(response);
-        setMatieres(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    openTakeTestModal && fetchMatieres();
-  }, [openTakeTestModal]);
 
   const [items, setItems] = useState([]);
   const [itemQuery, setItemQuery] = useState("");
   const filteredItems =
-    itemQuery === ""
-      ? items
-      : items.filter((item) => {
-          return (
-            item.name.toLowerCase().includes(itemQuery.toLowerCase()) ||
-            String(item.item_number).includes(itemQuery.toLowerCase())
-          );
-        });
-  useEffect(() => {
-    const fetchItems = async () => {
-      const filter = selectedMatiere
-        ? {
-            matiere_id: selectedMatiere,
-          }
-        : {};
-      try {
-        const response = await authHttpClient.post(`/item/filter/`, filter);
-        setItems(response.data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    openTakeTestModal && fetchItems();
-  }, [selectedMatiere, openTakeTestModal]);
+  itemQuery === ""
+    ? items.filter(
+        (item) => !selectedMatiere || item.matiere_id === selectedMatiere
+      )
+    : items.filter((item) => {
+        return (
+          (item.name.toLowerCase().includes(itemQuery.toLowerCase()) ||
+            String(item.item_number).includes(itemQuery.toLowerCase())) &&
+          (!selectedMatiere || item.matiere_id === selectedMatiere)
+        );
+      });
 
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
